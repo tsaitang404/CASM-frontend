@@ -29,6 +29,7 @@
               <button class="action-btn" type="submit">确认</button>
               <button class="action-btn" type="button" @click="onPwdCancel">取消</button>
             </div>
+            <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
           </form>
         </div>
       </div>
@@ -51,13 +52,34 @@ const oldPwd = ref('')
 const newPwd1 = ref('')
 const newPwd2 = ref('')
 const router = useRouter()
+const errorMsg = ref('')
+const isSubmitting = ref(false)
 
 async function onPwdSubmit() {
+  // 重置错误信息
+  errorMsg.value = ''
+  
+  // 验证新密码
   if (newPwd1.value !== newPwd2.value) {
-    alert('两次新密码输入不一致')
+    errorMsg.value = '两次新密码输入不一致'
     return
   }
+  
+  // 验证密码不为空
+  if (!oldPwd.value || !newPwd1.value) {
+    errorMsg.value = '密码不能为空'
+    return
+  }
+  
+  // 验证新密码长度
+  if (newPwd1.value.length < 8) {
+    errorMsg.value = '新密码长度不能少于8个字符'
+    return
+  }
+  
+  isSubmitting.value = true
   const token = localStorage.getItem('Token')
+  
   try {
     const res = await fetch('/api/user/change_pass', {
       method: 'POST',
@@ -66,27 +88,48 @@ async function onPwdSubmit() {
         'Token': token || ''
       },
       body: JSON.stringify({
-        old_password: oldPwd.value,
+        old_password: oldPwd.value.trim(),
         new_password: newPwd1.value,
         check_password: newPwd2.value
       })
     })
+    
     const data = await res.json()
     if (data.code === 200) {
-      alert('修改成功，请重新登录')
+      // 清除表单
+      oldPwd.value = ''
+      newPwd1.value = ''
+      newPwd2.value = ''
+      showPwdForm.value = false
+      
+      // 清除认证信息
       localStorage.removeItem('Token')
-      router.push({ name: 'Login' })
+      localStorage.removeItem('username')
+      
+      // 弹出提示并跳转
+      alert('密码修改成功，请使用新密码重新登录')
+      
+      // 重定向到登录页面，并传递密码已修改的标志
+      router.push({ 
+        path: '/login', 
+        query: { passwordChanged: 'true' } 
+      })
     } else {
-      alert(data.message || '修改失败')
+      // 显示具体的错误信息
+      if (data.code === 303) {
+        errorMsg.value = '旧密码错误'
+      } else {
+        errorMsg.value = data.message || '密码修改失败'
+      }
     }
   } catch (e) {
-    alert('请求失败')
+    errorMsg.value = '网络错误，请稍后再试'
+    console.error('密码修改请求出错:', e)
+  } finally {
+    isSubmitting.value = false
   }
-  showPwdForm.value = false
-  oldPwd.value = ''
-  newPwd1.value = ''
-  newPwd2.value = ''
 }
+
 function onPwdCancel() {
   showPwdForm.value = false
   oldPwd.value = ''
@@ -268,5 +311,10 @@ function onLogout() {
 }
 .form-btns .action-btn {
   flex: 1;
+}
+.error-msg {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
 }
 </style>

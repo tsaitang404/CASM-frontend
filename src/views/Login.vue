@@ -21,8 +21,11 @@
             </div>
             <input v-model="password" type="password" placeholder="请输入密码" required />
           </div>
-          <button type="submit">登 录</button>
+          <button type="submit" :disabled="isLoading">
+            {{ isLoading ? '登录中...' : '登 录' }}
+          </button>
           <p v-if="error" class="error-message">{{ error }}</p>
+          <p v-if="passwordChanged" class="info-message">密码已被修改，请使用新密码登录</p>
         </form>
       </div>
     </div>
@@ -33,35 +36,66 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const username = ref('')
 const password = ref('')
 const error = ref('')
+const isLoading = ref(false)
+const passwordChanged = ref(false)
 const router = useRouter()
+const route = useRoute()
+
+// 检查是否从密码修改页面跳转过来
+onMounted(() => {
+  if (route.query.passwordChanged === 'true') {
+    passwordChanged.value = true
+  }
+})
 
 const handleLogin = async () => {
   error.value = ''
+  passwordChanged.value = false
+  
+  if (!username.value || !password.value) {
+    error.value = '用户名和密码不能为空'
+    return
+  }
+  
+  isLoading.value = true
+  
   try {
-    // 假设后端接口为 /api/user/login
     const res = await fetch('/api/user/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.value, password: password.value })
+      body: JSON.stringify({ 
+        username: username.value.trim(),
+        password: password.value
+      })
     })
+    
     const data = await res.json()
+    
     if (data.code === 200) {
       localStorage.setItem('Token', data.data.token)
       localStorage.setItem('username', data.data.username)
-      // 使用Vue Router进行跳转，而不是直接修改location
       router.push('/home')
     } else {
-      // 只有 message 存在且不是 'success' 时才显示 message，否则显示默认错误
-      error.value = (data.message && data.message !== 'success') ? data.message : '用户名或密码错误'
+      // 提供更详细的错误信息
+      if (data.code === 401) {
+        error.value = '用户名或密码错误'
+      } else if (data.message && data.message !== 'success') {
+        error.value = data.message
+      } else {
+        error.value = '登录失败，请重试 (错误代码: ' + data.code + ')'
+      }
     }
   } catch (e) {
-    error.value = '网络错误'
+    error.value = '网络错误，请检查网络连接'
+    console.error('登录请求出错:', e)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -176,13 +210,26 @@ const handleLogin = async () => {
   letter-spacing: 6px;
 }
 
-.login-form button:hover {
+.login-form button:hover:not(:disabled) {
   background: #66b1ff;
+}
+
+.login-form button:disabled {
+  background: #a0cfff;
+  cursor: not-allowed;
 }
 
 /* 错误信息样式 */
 .error-message {
   color: #f56c6c;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 15px;
+}
+
+/* 信息提示样式 */
+.info-message {
+  color: #67c23a;
   font-size: 14px;
   text-align: center;
   margin-top: 15px;
