@@ -2,19 +2,79 @@
   <div class="topbar">
     <div class="topbar-left">{{ title }}</div>
     <div class="topbar-right">
-      <img class="avatar" src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" alt="avatar" />
-      <span class="username">Admin</span>
+      <img class="avatar" src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" alt="avatar" @click="showUserInfo = true" />
+      <!-- 用户信息弹窗 -->
+      <div v-if="showUserInfo" class="user-info-modal" @click.self="showUserInfo = false">
+        <div class="user-info-content">
+          <div class="user-info-header">
+            <img class="modal-avatar" src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" alt="avatar" />
+            <div class="user-info-title">Admin</div>
+            <div class="user-info-desc">系统管理员</div>
+          </div>
+          <div v-if="!showPwdForm" class="user-info-actions">
+            <button class="action-btn" @click="showPwdForm = true">修改密码</button>
+            <button class="action-btn logout" @click="onLogout">注销</button>
+          </div>
+          <form v-else class="pwd-form" @submit.prevent="onPwdSubmit">
+            <div class="form-group">
+              <input v-model="oldPwd" type="password" placeholder="当前密码" required autocomplete="current-password" />
+            </div>
+            <div class="form-group">
+              <input v-model="newPwd1" type="password" placeholder="新密码" required autocomplete="new-password" />
+            </div>
+            <div class="form-group">
+              <input v-model="newPwd2" type="password" placeholder="确认新密码" required autocomplete="new-password" />
+            </div>
+            <div class="form-btns">
+              <button class="action-btn" type="submit">确认</button>
+              <button class="action-btn" type="button" @click="onPwdCancel">取消</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 const props = defineProps({
   title: {
     type: String,
     default: 'CASM 系统'
   }
 })
+const showUserInfo = ref(false)
+const showPwdForm = ref(false)
+const oldPwd = ref('')
+const newPwd1 = ref('')
+const newPwd2 = ref('')
+
+function onChangePassword() {
+  showPwdForm.value = true
+}
+function onPwdSubmit() {
+  if (newPwd1.value !== newPwd2.value) {
+    alert('两次新密码输入不一致')
+    return
+  }
+  // TODO: 实际提交修改密码逻辑
+  alert('密码修改功能待实现')
+  showPwdForm.value = false
+  oldPwd.value = ''
+  newPwd1.value = ''
+  newPwd2.value = ''
+}
+function onPwdCancel() {
+  showPwdForm.value = false
+  oldPwd.value = ''
+  newPwd1.value = ''
+  newPwd2.value = ''
+}
+function onLogout() {
+  // TODO: 实现注销逻辑
+  alert('注销功能待实现')
+}
 </script>
 
 <style scoped>
@@ -42,9 +102,132 @@ const props = defineProps({
   height: 32px;
   border-radius: 50%;
   margin-right: 8px;
+  border: 2px solid #409eff;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.avatar:hover {
+  box-shadow: 0 0 0 3px #e6f0fa;
 }
 .username {
+  display: none;
+}
+.user-info-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.user-info-content {
+  background: #fff;
+  padding: 32px 36px 20px 36px;
+  border-radius: 12px;
+  min-width: 260px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.user-info-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.modal-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 2px solid #409eff;
+  margin-bottom: 8px;
+}
+.user-info-title {
+  font-size: 19px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.user-info-desc {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 2px;
+}
+.user-info-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.action-btn,
+.close-btn {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 0;
   font-size: 15px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.action-btn {
+  background: #f5f5f5;
   color: #333;
+}
+.action-btn.logout {
+  background: #ff4d4f;
+  color: #fff;
+}
+.action-btn:hover {
+  background: #e6e6e6;
+}
+.action-btn.logout:hover {
+  background: #ff7875;
+}
+.close-btn {
+  background: #409eff;
+  color: #fff;
+  margin-top: 2px;
+  align-self: center;
+}
+.close-btn:hover {
+  background: #66b1ff;
+}
+.pwd-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.form-group {
+  width: 100%;
+}
+.pwd-form input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 15px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border 0.2s;
+}
+.pwd-form input:focus {
+  border: 1.5px solid #409eff;
+}
+.form-btns {
+  display: flex;
+  gap: 10px;
+}
+.form-btns .action-btn {
+  flex: 1;
 }
 </style>
