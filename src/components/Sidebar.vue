@@ -3,7 +3,7 @@
     <div class="logo-word">
       <img src="/wlogo.svg" alt="logo" style="height: 24px; vertical-align: middle;" />
     </div>
-    <a-menu theme="dark" mode="inline" :selected-keys="['task']" style="font-size: 13px;">
+    <a-menu theme="dark" mode="inline" :selected-keys="[modelValue]" style="font-size: 13px;" @click="onMenuClick">
       <a-menu-item key="task" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="profile" style="font-size: 16px;" /></template>
         任务管理
@@ -49,7 +49,17 @@
 </template>
 
 <script setup>
-// 侧边栏暂不需要逻辑
+import { defineProps, defineEmits } from 'vue'
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: 'task',
+  },
+})
+const emit = defineEmits(['update:modelValue'])
+function onMenuClick({ key }) {
+  emit('update:modelValue', key)
+}
 </script>
 
 <style scoped>
