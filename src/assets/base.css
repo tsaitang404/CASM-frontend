@@ -58,8 +58,16 @@
   font-weight: normal;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* 防止页面级别的滚动条 */
+}
+
 body {
   min-height: 100vh;
+  height: 100vh; /* 确保body占据整个视口高度 */
   color: var(--color-text);
   background: var(--color-background);
   transition:
