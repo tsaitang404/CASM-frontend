@@ -102,17 +102,11 @@ async function onPwdSubmit() {
       newPwd2.value = ''
       showPwdForm.value = false
       
-      // 获取当前用户名以在提示中显示
-      const username = localStorage.getItem('username') || 'Admin'
-      
       // 清除认证信息
       localStorage.removeItem('Token')
       localStorage.removeItem('username')
       
-      // 弹出提示并跳转
-      alert(`密码修改成功，${username}请使用新密码重新登录`)
-      
-      // 重定向到登录页面，并传递密码已修改的标志
+      // 直接重定向到登录页面，并传递密码已修改的标志
       router.push({ 
         path: '/login', 
         query: { passwordChanged: 'true' } 
