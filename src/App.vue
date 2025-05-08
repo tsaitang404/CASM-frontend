@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import Sidebar from './components/Sidebar.vue'
+import Layout from './Layout.vue'
 import TaskManageView from './views/TaskManageView.vue'
 import AssetSearchView from './views/AssetSearchView.vue'
 import AssetMonitorView from './views/AssetMonitorView.vue'
@@ -52,12 +52,9 @@ watch(activeKey, (newKey) => {
 </script>
 
 <template>
-  <div style="display: flex; min-height: 100vh;">
-    <Sidebar v-model="activeKey" />
-    <div style="flex: 1; margin-left: 180px; padding: 24px;">
-      <component :is="CurrentView" />
-    </div>
-  </div>
+  <Layout>
+    <component :is="CurrentView" />
+  </Layout>
 </template>
 
 <style scoped>
