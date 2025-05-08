@@ -1,8 +1,8 @@
 <template>
   <div class="layout-root">
-    <Sidebar :modelValue="currentView" @update:modelValue="val => currentView = val" />
-    <div class="layout-main">
-      <Topbar :title="viewNameMap[currentView]" />
+    <Sidebar :modelValue="currentView" @update:modelValue="val => currentView = val" :collapsed="sidebarCollapsed" />
+    <div class="layout-main" :class="{ 'collapsed': sidebarCollapsed }">
+      <Topbar :title="viewNameMap[currentView]" @toggle-sidebar="toggleSidebar" :sidebarCollapsed="sidebarCollapsed" />
       <div class="layout-content" ref="contentRef">
         <slot />
       </div>
@@ -19,6 +19,12 @@ import Footbar from './components/Footbar.vue'
 
 const currentView = ref('task')
 const contentRef = ref(null)
+const sidebarCollapsed = ref(false) // 控制侧边栏折叠状态
+
+// 切换侧边栏折叠状态
+const toggleSidebar = () => {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+}
 
 // 调整内容区域大小的函数
 const adjustContentSize = () => {
@@ -87,9 +93,14 @@ const viewNameMap = {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 180px; /* 侧栏宽度 */
+  margin-left: 180px; /* 正常侧栏宽度 */
   height: 100vh;
   overflow: hidden;
+  transition: margin-left 0.3s ease; /* 添加过渡效果 */
+}
+
+.layout-main.collapsed {
+  margin-left: 64px; /* 折叠后侧栏宽度 */
 }
 
 .layout-content {

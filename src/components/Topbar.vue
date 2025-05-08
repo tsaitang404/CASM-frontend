@@ -1,8 +1,8 @@
 <template>
   <div class="topbar">
     <div class="topbar-left">
-      <button class="menu-btn">
-        <ion-icon name="menu-outline"></ion-icon>
+      <button class="menu-btn" @click="$emit('toggle-sidebar')">
+        <ion-icon :name="sidebarCollapsed ? 'menu-outline' : 'close-outline'"></ion-icon>
       </button>
       <span class="title-text">{{ title }}</span>
     </div>
@@ -49,8 +49,16 @@ const props = defineProps({
   title: {
     type: String,
     default: 'CASM 系统'
+  },
+  sidebarCollapsed: {
+    type: Boolean,
+    default: false
   }
 })
+
+// 定义要发出的事件
+defineEmits(['toggle-sidebar'])
+
 const showUserInfo = ref(false)
 const showPwdForm = ref(false)
 const oldPwd = ref('')
