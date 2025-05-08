@@ -1,6 +1,11 @@
 <template>
   <div class="topbar">
-    <div class="topbar-left">{{ title }}</div>
+    <div class="topbar-left">
+      <button class="menu-btn">
+        <ion-icon name="menu-outline"></ion-icon>
+      </button>
+      <span class="title-text">{{ title }}</span>
+    </div>
     <div class="topbar-right">
       <img class="avatar" src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" alt="avatar" @click="showUserInfo = true" />
       <!-- 用户信息弹窗 -->
@@ -164,11 +169,38 @@ function onLogout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
   box-shadow: 0 2px 8px #f0f1f2;
   z-index: 101;
 }
 .topbar-left {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 500;
+}
+.menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #dddddd; /* 添加灰色边框 */
+  background: transparent;
+  cursor: pointer;
+  margin-right: 12px;
+  margin-left: 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.menu-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #cccccc; /* 悬停时边框颜色稍微深一点 */
+}
+.menu-btn ion-icon {
+  font-size: 22px;
+  color: #555;
+}
+.title-text {
   font-size: 18px;
   font-weight: 500;
 }
