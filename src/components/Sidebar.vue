@@ -3,42 +3,46 @@
     <div class="logo-word">
       <img src="/wlogo.svg" alt="logo" style="height: 24px; vertical-align: middle;" />
     </div>
-    <a-menu theme="dark" mode="inline" :selected-keys="[modelValue]" style="font-size: 13px;" @click="onMenuClick">
+    <a-menu theme="dark" mode="inline" :selected-keys="['task']" style="font-size: 13px;">
       <a-menu-item key="task" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="profile" style="font-size: 16px;" /></template>
+        <ion-icon name="albums"></ion-icon>
         任务管理
       </a-menu-item>
       <a-menu-item key="search" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="search" style="font-size: 16px;" /></template>
+        <ion-icon name="search"></ion-icon>
         资产搜索
       </a-menu-item>
       <a-menu-item key="monitor" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="eye" style="font-size: 16px;" /></template>
+        <ion-icon name="pulse"></ion-icon>
         资产监控
       </a-menu-item>
       <a-menu-item key="group" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="appstore" style="font-size: 16px;" /></template>
+        <ion-icon name="file-tray-stacked"></ion-icon>
         资产分组
       </a-menu-item>
       <a-menu-item key="policy" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="setting" style="font-size: 16px;" /></template>
+        <ion-icon name="locate"></ion-icon>
         策略配置
       </a-menu-item>
       <a-menu-item key="tags" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="tags" style="font-size: 16px;" /></template>
+        <ion-icon name="finger-print"></ion-icon>
         指纹管理
       </a-menu-item>
       <a-menu-item key="pocinfo" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="info-circle" style="font-size: 16px;" /></template>
+        <ion-icon name="shield-checkmark"></ion-icon>
         PoC信息
       </a-menu-item>
       <a-menu-item key="poc" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="schedule" style="font-size: 16px;" /></template>
+        <ion-icon name="pulse"></ion-icon>
         计划任务
-      </a-menu-item>
-      <a-menu-item key="github" style="height: 36px; line-height: 36px;">
-        <template #icon><a-icon type="github" style="font-size: 16px;" /></template>
-        GitHub管理
       </a-menu-item>
       <a-menu-item key="github-monitor" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="alert" style="font-size: 16px;" /></template>
@@ -49,17 +53,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: 'task',
-  },
-})
-const emit = defineEmits(['update:modelValue'])
-function onMenuClick({ key }) {
-  emit('update:modelValue', key)
-}
+// 侧边栏暂不需要逻辑
 </script>
 
 <style scoped>
