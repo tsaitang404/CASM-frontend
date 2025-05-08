@@ -3,7 +3,7 @@
     <div class="logo-word">
       <img src="/wlogo.svg" alt="logo" style="height: 24px; vertical-align: middle;" />
     </div>
-    <a-menu theme="dark" mode="inline" :selected-keys="['task']" style="font-size: 13px;">
+    <a-menu theme="dark" mode="inline" :selected-keys="[modelValue]" style="font-size: 13px;" @select="handleSelect">
       <a-menu-item key="task" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="profile" style="font-size: 16px;" /></template>
         <ion-icon name="albums"></ion-icon>
@@ -46,6 +46,7 @@
       </a-menu-item>
       <a-menu-item key="github-monitor" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="alert" style="font-size: 16px;" /></template>
+        <ion-icon name="logo-github"></ion-icon>
         GitHub监控
       </a-menu-item>
     </a-menu>
@@ -53,7 +54,19 @@
 </template>
 
 <script setup>
-// 侧边栏暂不需要逻辑
+import { defineProps, defineEmits } from 'vue'
+
+const props = defineProps({
+  modelValue: {
+    type: String,
+    required: true
+  }
+})
+const emit = defineEmits(['update:modelValue'])
+
+function handleSelect({ key }) {
+  emit('update:modelValue', key)
+}
 </script>
 
 <style scoped>

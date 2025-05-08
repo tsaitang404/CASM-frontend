@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
 import TaskManageView from './views/TaskManageView.vue'
 import AssetSearchView from './views/AssetSearchView.vue'
@@ -27,7 +27,28 @@ const viewMap = {
   'github-monitor': GithubMonitorView,
 }
 
+const titleMap = {
+  task: '任务管理',
+  search: '资产搜索',
+  monitor: '资产监控',
+  group: '资产分组',
+  policy: '策略配置',
+  tags: '指纹管理',
+  pocinfo: 'PoC信息',
+  poc: '计划任务',
+  github: 'GitHub管理',
+  'github-monitor': 'GitHub监控',
+}
+
 const CurrentView = computed(() => viewMap[activeKey.value] || TaskManageView)
+
+onMounted(() => {
+  document.title = titleMap[activeKey.value] || '管理平台'
+})
+
+watch(activeKey, (newKey) => {
+  document.title = titleMap[newKey] || '管理平台'
+})
 </script>
 
 <template>
