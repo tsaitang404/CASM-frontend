@@ -35,8 +35,8 @@ const viewNameMap = {
 <style scoped>
 .layout-root {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  width: 100%;
   overflow: hidden;
 }
 .layout-main {
@@ -44,7 +44,7 @@ const viewNameMap = {
   display: flex;
   flex-direction: column;
   margin-left: 180px; /* 侧栏宽度 */
-  height: 100vh;
+  min-height: 100vh;
 }
 .layout-content {
   flex: 1;
