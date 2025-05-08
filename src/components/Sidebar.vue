@@ -41,7 +41,7 @@
       </a-menu-item>
       <a-menu-item key="poc" style="height: 36px; line-height: 36px;">
         <template #icon><a-icon type="schedule" style="font-size: 16px;" /></template>
-        <ion-icon name="pulse"></ion-icon>
+        <ion-icon name="calendar-number"></ion-icon>
         计划任务
       </a-menu-item>
       <a-menu-item key="github-monitor" style="height: 36px; line-height: 36px;">
