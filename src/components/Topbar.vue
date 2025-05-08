@@ -38,6 +38,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 const props = defineProps({
   title: {
     type: String,
@@ -49,17 +50,38 @@ const showPwdForm = ref(false)
 const oldPwd = ref('')
 const newPwd1 = ref('')
 const newPwd2 = ref('')
+const router = useRouter()
 
-function onChangePassword() {
-  showPwdForm.value = true
-}
-function onPwdSubmit() {
+async function onPwdSubmit() {
   if (newPwd1.value !== newPwd2.value) {
     alert('两次新密码输入不一致')
     return
   }
-  // TODO: 实际提交修改密码逻辑
-  alert('密码修改功能待实现')
+  const token = localStorage.getItem('Token')
+  try {
+    const res = await fetch('/api/user/change_pass', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Token': token || ''
+      },
+      body: JSON.stringify({
+        old_password: oldPwd.value,
+        new_password: newPwd1.value,
+        check_password: newPwd2.value
+      })
+    })
+    const data = await res.json()
+    if (data.code === 200) {
+      alert('修改成功，请重新登录')
+      localStorage.removeItem('Token')
+      router.push({ name: 'Login' })
+    } else {
+      alert(data.message || '修改失败')
+    }
+  } catch (e) {
+    alert('请求失败')
+  }
   showPwdForm.value = false
   oldPwd.value = ''
   newPwd1.value = ''
@@ -72,8 +94,25 @@ function onPwdCancel() {
   newPwd2.value = ''
 }
 function onLogout() {
-  // TODO: 实现注销逻辑
-  alert('注销功能待实现')
+  console.log('logout')
+  const token = localStorage.getItem('Token')
+  // 先调用后端的注销接口
+  if (token) {
+    fetch('/api/user/logout', {
+      method: 'GET',
+      headers: {
+        'Token': token
+      }
+    }).finally(() => {
+      // 无论成功失败都清除本地Token并重定向到登录页
+      localStorage.removeItem('Token')
+      localStorage.removeItem('username')
+      window.location.href = '/login'
+    })
+  } else {
+    // 如果没有token，直接跳转登录页
+    window.location.href = '/login'
+  }
 }
 </script>
 
