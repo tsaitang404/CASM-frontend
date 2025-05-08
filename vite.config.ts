@@ -18,5 +18,9 @@ export default defineConfig({
   server: {
     port: 5018,
     host: '127.0.0.1',
+    hmr: {
+      host: '127.0.0.1',
+      port: 5018,
+    },
   },
 })
