@@ -70,6 +70,9 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const props = defineProps({
   modelValue: {
     type: String,
@@ -84,6 +87,24 @@ const emit = defineEmits(['update:modelValue'])
 
 function handleSelect({ key }) {
   emit('update:modelValue', key)
+  
+  // 根据菜单项的key路由到对应的页面
+  const routeMap = {
+    'task': '/task',
+    'search': '/search',
+    'monitor': '/monitor',
+    'group': '/group',
+    'policy': '/policy',
+    'tags': '/tags',
+    'pocinfo': '/pocinfo',
+    'poc': '/poc',
+    'github-monitor': '/github-monitor',
+  }
+  
+  // 如果路由映射表中有对应的路由，则进行跳转
+  if (routeMap[key]) {
+    router.push(routeMap[key])
+  }
 }
 </script>
 

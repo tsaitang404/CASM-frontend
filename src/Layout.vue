@@ -4,7 +4,12 @@
     <div class="layout-main" :class="{ 'collapsed': sidebarCollapsed }">
       <Topbar :title="viewNameMap[currentView]" @toggle-sidebar="toggleSidebar" :sidebarCollapsed="sidebarCollapsed" />
       <div class="layout-content" ref="contentRef">
-        <slot />
+        <!-- 使用router-view显示对应路由的组件内容 -->
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
       </div>
       <Footbar />
     </div>
@@ -12,14 +17,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar.vue'
 import Topbar from './components/Topbar.vue'
 import Footbar from './components/Footbar.vue'
 
+const router = useRouter()
+const route = useRoute()
 const currentView = ref('task')
 const contentRef = ref(null)
 const sidebarCollapsed = ref(false) // 控制侧边栏折叠状态
+
+// 根据当前路由路径更新currentView
+watch(() => route.path, (newPath) => {
+  // 移除前导斜杠，将路径转换为对应的菜单key
+  const path = newPath.substring(1)
+  if (path && viewNameMap[path]) {
+    currentView.value = path
+  }
+}, { immediate: true })
 
 // 切换侧边栏折叠状态
 const toggleSidebar = () => {
@@ -66,6 +83,7 @@ const viewNameMap = {
   pocinfo: 'PoC信息',
   poc: '计划任务',
   'github-monitor': 'GitHub监控',
+  home: '首页'
 }
 </script>
 
@@ -109,5 +127,16 @@ const viewNameMap = {
   padding: 24px;
   box-sizing: border-box;
   overflow: auto; /* 仅当内容超出时显示滚动条 */
+}
+
+/* 添加页面过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

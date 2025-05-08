@@ -1,6 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Login from '@/views/Login.vue'
+import TaskManageView from '@/views/TaskManageView.vue'
+import AssetSearchView from '@/views/AssetSearchView.vue'
+import AssetMonitorView from '@/views/AssetMonitorView.vue'
+import AssetGroupView from '@/views/AssetGroupView.vue'
+import PolicyConfigView from '@/views/PolicyConfigView.vue'
+import FingerManageView from '@/views/FingerManageView.vue'
+import PocInfoView from '@/views/PocInfoView.vue'
+import TaskScheduleView from '@/views/TaskScheduleView.vue'
+import GithubMonitorView from '@/views/GithubMonitorView.vue'
 
 const routes = [
   {
@@ -24,6 +33,60 @@ const routes = [
     name: 'Login', 
     component: Login,
     meta: { guest: true }
+  },
+  {
+    path: '/task',
+    name: 'task',
+    component: TaskManageView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: AssetSearchView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/monitor',
+    name: 'monitor',
+    component: AssetMonitorView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/group',
+    name: 'group',
+    component: AssetGroupView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/policy',
+    name: 'policy',
+    component: PolicyConfigView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/tags',
+    name: 'tags',
+    component: FingerManageView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/pocinfo',
+    name: 'pocinfo',
+    component: PocInfoView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/poc',
+    name: 'poc',
+    component: TaskScheduleView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/github-monitor',
+    name: 'github-monitor',
+    component: GithubMonitorView,
+    meta: { requiresAuth: true }
   }
 ]
 
