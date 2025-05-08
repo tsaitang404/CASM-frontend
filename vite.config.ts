@@ -16,11 +16,19 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5018,
+    port: 5020,
     host: '127.0.0.1',
     hmr: {
       host: '127.0.0.1',
-      port: 5018,
+      port: 5020,
+    },
+    proxy: {
+      // 假设你的 API 路径以 /api 开头
+      '/api': {
+        target: 'http://127.0.0.1:5018',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '/api'),
+      },
     },
   },
 })

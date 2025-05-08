@@ -34,7 +34,8 @@ const handleLogin = async () => {
       localStorage.setItem('username', data.data.username)
       router.push('/')
     } else {
-      error.value = data.message || '用户名或密码错误'
+      // 只有 message 存在且不是 'success' 时才显示 message，否则显示默认错误
+      error.value = (data.message && data.message !== 'success') ? data.message : '用户名或密码错误'
     }
   } catch (e) {
     error.value = '网络错误'
