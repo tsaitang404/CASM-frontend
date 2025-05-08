@@ -111,22 +111,22 @@ const viewNameMap = {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 180px; /* 正常侧栏宽度 */
+  margin-left: 240px; /* 从220px增大到240px，与侧边栏宽度匹配 */
   height: 100vh;
   overflow: hidden;
-  transition: margin-left 0.3s ease; /* 添加过渡效果 */
+  transition: margin-left 0.2s ease;
 }
 
 .layout-main.collapsed {
-  margin-left: 64px; /* 折叠后侧栏宽度 */
+  margin-left: 70px; /* 从60px增大到70px，与侧边栏折叠宽度匹配 */
 }
 
 .layout-content {
   flex: 1;
   background: #f7f8fa;
-  padding: 24px;
+  padding: 26px; /* 从22px增大到26px */
   box-sizing: border-box;
-  overflow: auto; /* 仅当内容超出时显示滚动条 */
+  overflow: auto;
 }
 
 /* 添加页面过渡动画 */

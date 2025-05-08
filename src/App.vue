@@ -71,12 +71,23 @@ watch(activeKey, (newKey) => {
 
 <template>
   <!-- 根据路由路径动态决定显示登录页还是主应用布局 -->
-  <Login v-if="isLoginPage" />
-  <Layout v-else>
-    <component :is="CurrentView" />
-  </Layout>
+  <div class="compact-layout">
+    <Login v-if="isLoginPage" />
+    <Layout v-else>
+      <component :is="CurrentView" />
+    </Layout>
+  </div>
 </template>
 
-<style scoped>
-/* 可根据需要调整全局样式 */
+<style>
+/* 应用全局紧凑样式 */
+html, body {
+  font-size: 12px;
+}
+
+/* 减小全局间距 */
+:root {
+  --content-padding: 12px;
+  --element-spacing: 8px;
+}
 </style>

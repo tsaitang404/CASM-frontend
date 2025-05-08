@@ -1,0 +1,119 @@
+/* 全局紧凑样式 - 调整为更舒适的尺寸 */
+.compact-layout {
+  --compact-font-size-base: 16px; /* 从15px增大到16px */
+  --compact-font-size-sm: 15px; /* 从14px增大到15px */
+  --compact-padding-base: 20px; /* 从16px增大到20px */
+  --compact-margin-base: 20px; /* 从16px增大到20px */
+  --compact-border-radius: 5px; /* 从4px增大到5px */
+  --compact-height-base: 40px; /* 从36px增大到40px */
+  --compact-height-sm: 32px; /* 从28px增大到32px */
+}
+
+/* Ant Design 组件紧凑样式覆盖 */
+.compact-layout .ant-btn {
+  height: var(--compact-height-base);
+  padding: 0 20px; /* 从16px增大到20px */
+  font-size: var(--compact-font-size-base);
+}
+
+.compact-layout .ant-btn-sm {
+  height: var(--compact-height-sm);
+  padding: 0 16px; /* 从12px增大到16px */
+  font-size: var(--compact-font-size-sm);
+}
+
+.compact-layout .ant-input {
+  padding: 6px 20px; /* 从5px 16px增大到6px 20px */
+  height: var(--compact-height-base);
+  font-size: var(--compact-font-size-base);
+}
+
+.compact-layout .ant-form-item {
+  margin-bottom: 20px; /* 从16px增大到20px */
+}
+
+.compact-layout .ant-form-item-label > label {
+  font-size: var(--compact-font-size-base);
+  height: 32px; /* 从28px增大到32px */
+}
+
+.compact-layout .ant-table {
+  font-size: var(--compact-font-size-base);
+}
+
+.compact-layout .ant-table-thead > tr > th {
+  padding: 16px 20px; /* 从12px 16px增大到16px 20px */
+}
+
+.compact-layout .ant-table-tbody > tr > td {
+  padding: 14px 20px; /* 从10px 16px增大到14px 20px */
+}
+
+.compact-layout .ant-pagination-item {
+  min-width: 40px; /* 从36px增大到40px */
+  height: 40px; /* 从36px增大到40px */
+  line-height: 38px; /* 从34px增大到38px */
+}
+
+.compact-layout .ant-menu {
+  line-height: 56px; /* 从48px增大到56px */
+}
+
+.compact-layout .ant-menu-item {
+  height: 56px; /* 从48px增大到56px */
+  line-height: 56px; /* 从48px增大到56px */
+}
+
+.compact-layout .ant-card-head {
+  min-height: 56px; /* 从48px增大到56px */
+  padding: 0 24px; /* 从20px增大到24px */
+}
+
+.compact-layout .ant-card-head-title {
+  padding: 16px 0; /* 从14px增大到16px */
+  font-size: 18px; /* 从16px增大到18px */
+}
+
+.compact-layout .ant-card-body {
+  padding: 24px; /* 从20px增大到24px */
+}
+
+.compact-layout .ant-tabs-tab {
+  padding: 16px 24px; /* 从12px 20px增大到16px 24px */
+}
+
+.compact-layout .ant-modal-header {
+  padding: 20px 28px; /* 从16px 24px增大到20px 28px */
+}
+
+.compact-layout .ant-modal-body {
+  padding: 24px; /* 从20px增大到24px */
+}
+
+.compact-layout .ant-modal-footer {
+  padding: 20px 28px; /* 从16px 24px增大到20px 28px */
+}
+
+.compact-layout .ant-drawer-header {
+  padding: 20px 24px; /* 从16px 20px增大到20px 24px */
+}
+
+.compact-layout .ant-drawer-body {
+  padding: 24px; /* 从20px增大到24px */
+}
+
+/* 紧凑表格样式 */
+.compact-table .ant-table-thead > tr > th,
+.compact-table .ant-table-tbody > tr > td {
+  padding: 16px 20px; /* 从12px 16px增大到16px 20px */
+}
+
+/* 紧凑表单样式 */
+.compact-form .ant-form-item {
+  margin-bottom: 18px; /* 从14px增大到18px */
+}
+
+/* 紧凑卡片样式 */
+.compact-card .ant-card-body {
+  padding: 20px; /* 从16px增大到20px */
+}

@@ -172,65 +172,76 @@ function onLogout() {
 <style scoped>
 .topbar {
   width: 100%;
-  height: 48px;
+  height: 64px; /* 从56px增大到64px */
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 8px #f0f1f2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   z-index: 101;
 }
+
 .topbar-left {
   display: flex;
   align-items: center;
-  font-size: 18px;
+  font-size: 20px; /* 从18px增大到20px */
   font-weight: 500;
 }
+
 .menu-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid #dddddd; /* 添加灰色边框 */
+  width: 40px; /* 从36px增大到40px */
+  height: 40px; /* 从36px增大到40px */
+  border: 1px solid #dddddd;
   background: transparent;
   cursor: pointer;
-  margin-right: 12px;
-  margin-left: 12px;
-  border-radius: 4px;
+  margin-right: 16px; /* 从12px增大到16px */
+  margin-left: 16px; /* 从12px增大到16px */
+  border-radius: 5px; /* 从4px增大到5px */
   transition: background-color 0.2s, border-color 0.2s;
 }
+
 .menu-btn:hover {
   background-color: #f5f5f5;
-  border-color: #cccccc; /* 悬停时边框颜色稍微深一点 */
+  border-color: #cccccc;
 }
+
 .menu-btn ion-icon {
-  font-size: 22px;
+  font-size: 28px; /* 从24px增大到28px */
   color: #555;
 }
+
 .title-text {
-  font-size: 18px;
+  font-size: 20px; /* 从18px增大到20px */
   font-weight: 500;
 }
+
 .topbar-right {
   display: flex;
   align-items: center;
+  margin-right: 16px; /* 从12px增大到16px */
 }
+
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px; /* 从36px增大到40px */
+  height: 40px; /* 从36px增大到40px */
   border-radius: 50%;
-  margin-right: 8px;
-  border: 2px solid #409eff;
+  margin-right: 16px;
+  border: 2px solid #409eff; /* 从1px增大到2px */
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
+
 .avatar:hover {
-  box-shadow: 0 0 0 3px #e6f0fa;
+  box-shadow: 0 0 0 2px #e6f0fa; /* 从3px减小到2px */
 }
+
 .username {
   display: none;
 }
+
 .user-info-modal {
   position: fixed;
   top: 0;
@@ -243,115 +254,135 @@ function onLogout() {
   justify-content: center;
   z-index: 9999;
 }
+
 .user-info-content {
   background: #fff;
-  padding: 32px 36px 20px 36px;
-  border-radius: 12px;
-  min-width: 260px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+  padding: 24px 28px 16px 28px; /* 从32px 36px 20px 36px减小 */
+  border-radius: 8px; /* 从12px减小到8px */
+  min-width: 240px; /* 从260px减小到240px */
+  box-shadow: 0 3px 16px rgba(0,0,0,0.12);
   text-align: center;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .user-info-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 14px; /* 从18px减小到14px */
 }
+
 .modal-avatar {
-  width: 54px;
-  height: 54px;
+  width: 46px; /* 从54px减小到46px */
+  height: 46px; /* 从54px减小到46px */
   border-radius: 50%;
-  border: 2px solid #409eff;
-  margin-bottom: 8px;
+  border: 1px solid #409eff; /* 从2px减小到1px */
+  margin-bottom: 6px; /* 从8px减小到6px */
 }
+
 .user-info-title {
-  font-size: 19px;
+  font-size: 16px; /* 从19px减小到16px */
   font-weight: 600;
   margin-bottom: 2px;
 }
+
 .user-info-desc {
-  font-size: 14px;
+  font-size: 12px; /* 从14px减小到12px */
   color: #888;
   margin-bottom: 2px;
 }
+
 .user-info-actions {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 8px; /* 从10px减小到8px */
+  margin-bottom: 12px; /* 从18px减小到12px */
 }
+
 .action-btn,
 .close-btn {
   width: 100%;
   box-sizing: border-box;
-  padding: 7px 0;
-  font-size: 15px;
-  border-radius: 4px;
+  padding: 6px 0; /* 从7px减小到6px */
+  font-size: 13px; /* 从15px减小到13px */
+  border-radius: 3px; /* 从4px减小到3px */
   border: none;
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .action-btn {
   background: #f5f5f5;
   color: #333;
 }
+
 .action-btn.logout {
   background: #ff4d4f;
   color: #fff;
 }
+
 .action-btn:hover {
   background: #e6e6e6;
 }
+
 .action-btn.logout:hover {
   background: #ff7875;
 }
+
 .close-btn {
   background: #409eff;
   color: #fff;
   margin-top: 2px;
   align-self: center;
 }
+
 .close-btn:hover {
   background: #66b1ff;
 }
+
 .pwd-form {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 8px; /* 从12px减小到8px */
+  margin-bottom: 8px; /* 从10px减小到8px */
 }
+
 .form-group {
   width: 100%;
 }
+
 .pwd-form input {
   width: 100%;
-  padding: 8px 10px;
-  font-size: 15px;
+  padding: 6px 8px; /* 从8px 10px减小到6px 8px */
+  font-size: 13px; /* 从15px减小到13px */
   border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  border-radius: 3px; /* 从4px减小到3px */
   outline: none;
   box-sizing: border-box;
   transition: border 0.2s;
 }
+
 .pwd-form input:focus {
-  border: 1.5px solid #409eff;
+  border: 1px solid #409eff; /* 从1.5px减小到1px */
 }
+
 .form-btns {
   display: flex;
-  gap: 10px;
+  gap: 8px; /* 从10px减小到8px */
 }
+
 .form-btns .action-btn {
   flex: 1;
 }
+
 .error-msg {
   color: red;
-  font-size: 14px;
-  margin-top: 10px;
+  font-size: 12px; /* 从14px减小到12px */
+  margin-top: 8px; /* 从10px减小到8px */
 }
 </style>
