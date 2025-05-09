@@ -1,3 +1,6 @@
+/* 导入样式系统 */
+@import './styles/index.css';
+
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --vt-c-white: #ffffff;
@@ -50,6 +53,7 @@
   }
 }
 
+/* 基础样式重置 */
 *,
 *::before,
 *::after {
@@ -58,6 +62,7 @@
   font-weight: normal;
 }
 
+/* 全局布局样式 */
 html, body {
   height: 100%;
   margin: 0;
@@ -68,11 +73,9 @@ html, body {
 body {
   min-height: 100vh;
   height: 100vh; /* 确保body占据整个视口高度 */
-  color: var(--color-text);
-  background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
+  color: var(--text-primary);
+  background: var(--bg-gray);
+  transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;
   font-family:
     Inter,
@@ -87,7 +90,7 @@ body {
     'Droid Sans',
     'Helvetica Neue',
     sans-serif;
-  font-size: 15px;
+  font-size: var(--font-base);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -1,0 +1,45 @@
+/* 任务详情页面样式 */
+.task-detail-container {
+  padding: var(--spacing-large);
+}
+
+.header-actions {
+  margin-bottom: var(--spacing-large);
+}
+
+.detail-card {
+  margin-bottom: var(--spacing-large);
+}
+
+/* 卡片头部样式 */
+.ant-card-head {
+  min-height: 48px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ant-card-head-title {
+  padding: 12px 0;
+  font-size: var(--font-medium);
+  font-weight: 500;
+}
+
+/* 描述列表样式 */
+.ant-descriptions-item-label {
+  font-weight: 500;
+}
+
+/* 统计数据样式 */
+.ant-statistic {
+  text-align: center;
+}
+
+.ant-statistic-title {
+  font-size: var(--font-medium);
+  margin-bottom: var(--spacing-small);
+}
+
+.ant-statistic-content {
+  font-size: 24px;
+  font-weight: 600;
+}

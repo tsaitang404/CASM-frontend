@@ -80,14 +80,15 @@ watch(activeKey, (newKey) => {
 </template>
 
 <style>
-/* 应用全局紧凑样式 */
+@import '@/assets/base.css';
+
+/* 全局紧凑布局样式 */
 html, body {
-  font-size: 12px;
+  font-size: var(--font-base);
 }
 
-/* 减小全局间距 */
 :root {
-  --content-padding: 12px;
-  --element-spacing: 8px;
+  --content-padding: var(--spacing-medium);
+  --element-spacing: var(--spacing-small);
 }
 </style>

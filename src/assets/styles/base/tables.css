@@ -1,0 +1,83 @@
+/* 通用表格样式 */
+
+/* 表格容器 */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-light);
+}
+
+/* 基础表格 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* 表头 */
+.table th {
+  background: var(--bg-gray);
+  padding: var(--spacing-medium);
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* 表格单元格 */
+.table td {
+  padding: var(--spacing-medium);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+/* 表格行悬浮效果 */
+.table tbody tr:hover {
+  background: var(--bg-gray);
+}
+
+/* 紧凑型表格 */
+.table-compact th,
+.table-compact td {
+  padding: var(--spacing-small);
+}
+
+/* 条纹表格 */
+.table-striped tbody tr:nth-child(odd) {
+  background: var(--bg-gray);
+}
+
+/* 带边框表格 */
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid var(--border-color);
+}
+
+/* 表格操作列 */
+.table-actions {
+  display: flex;
+  gap: var(--spacing-small);
+  justify-content: flex-end;
+}
+
+/* 可调整列宽表格 */
+.table-resizable th {
+  position: relative;
+  user-select: none;
+}
+
+.table-resizable .resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: transparent;
+  cursor: col-resize;
+}
+
+.table-resizable .resize-handle:hover,
+.table-resizable .resize-handle.active {
+  background: var(--primary-color);
+}

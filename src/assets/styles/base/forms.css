@@ -1,0 +1,61 @@
+/* 通用表单样式 */
+
+/* 表单容器 */
+.form-container {
+  padding: var(--spacing-large);
+  background: #fff;
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-light);
+}
+
+/* 表单项样式 */
+.form-item {
+  margin-bottom: var(--spacing-medium);
+}
+
+/* 表单标签 */
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-small);
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* 表单输入框 */
+.form-input {
+  width: 100%;
+  padding: 8px var(--spacing-medium);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-small);
+  font-size: var(--font-base);
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+  outline: none;
+}
+
+/* 表单错误状态 */
+.form-error {
+  margin-top: var(--spacing-mini);
+  color: var(--danger-color);
+  font-size: var(--font-small);
+}
+
+/* 表单按钮组 */
+.form-actions {
+  margin-top: var(--spacing-large);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-small);
+}
+
+/* 必填标记 */
+.required::after {
+  content: "*";
+  color: var(--danger-color);
+  margin-left: 4px;
+}

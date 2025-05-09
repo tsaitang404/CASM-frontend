@@ -1,6 +1,5 @@
 import './assets/main.css'
 import 'ant-design-vue/dist/reset.css'
-import './assets/styles/compact.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'

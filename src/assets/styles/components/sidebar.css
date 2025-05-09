@@ -1,0 +1,101 @@
+/* 侧边栏基础样式 */
+.ant-layout-sider {
+  height: 100vh;
+  background: #001529;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  transition: all 0.2s ease;
+}
+
+/* Logo区域样式 */
+.logo-word {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.centered-logo {
+  display: block;
+  margin: 0 auto;
+}
+
+/* 菜单项样式 */
+.menu-item-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* 图标样式 */
+ion-icon {
+  font-size: 26px;
+  margin-right: 16px;
+  width: 26px;
+  text-align: center;
+}
+
+/* Ant Design Menu 样式覆盖 */
+.ant-menu {
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.ant-menu-item {
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 32px !important;
+  padding-right: 24px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 展开状态样式 */
+.ant-menu:not(.ant-menu-inline-collapsed) .menu-item-content {
+  justify-content: flex-start;
+  padding-left: 0;
+}
+
+/* 折叠状态样式 */
+.ant-menu.ant-menu-inline-collapsed > .ant-menu-item {
+  padding: 0 !important;
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+.ant-menu.ant-menu-inline-collapsed .menu-item-content {
+  justify-content: center !important;
+  padding-left: 0 !important;
+}
+
+.ant-menu.ant-menu-inline-collapsed .menu-item-content ion-icon {
+  margin-right: 0 !important;
+}
+
+/* 选中状态样式 */
+.ant-menu-item.ant-menu-item-selected {
+  background-color: #1890ff !important;
+}
+
+.ant-menu-item.ant-menu-item-selected .menu-item-content {
+  position: relative;
+  z-index: 1;
+}
+
+.ant-menu-inline-collapsed .ant-menu-item.ant-menu-item-selected {
+  padding: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ant-menu-inline-collapsed .ant-menu-item.ant-menu-item-selected .menu-item-content {
+  width: 100%;
+  justify-content: center;
+}

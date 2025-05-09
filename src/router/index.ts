@@ -10,6 +10,7 @@ import FingerManageView from '@/views/FingerManageView.vue'
 import PocInfoView from '@/views/PocInfoView.vue'
 import TaskScheduleView from '@/views/TaskScheduleView.vue'
 import GithubMonitorView from '@/views/GithubMonitorView.vue'
+import TaskDetailView from '@/views/TaskdetailView.vue'
 
 const routes = [
   {
@@ -86,6 +87,12 @@ const routes = [
     path: '/github-monitor',
     name: 'github-monitor',
     component: GithubMonitorView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/task/detail/:id',
+    name: 'TaskDetail',
+    component: TaskDetailView,
     meta: { requiresAuth: true }
   }
 ]

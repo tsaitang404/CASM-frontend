@@ -14,17 +14,17 @@
           <!-- 基本查询条件 -->
           <a-col :span="6">
             <a-form-item label="任务名称">
-              <a-input v-model:value="queryParams.name" placeholder="请输入任务名称" allow-clear />
+              <a-input v-model="queryParams.name" placeholder="请输入任务名称" allow-clear />
             </a-form-item>
           </a-col>
           <a-col :span="6">
             <a-form-item label="任务目标">
-              <a-input v-model:value="queryParams.target" placeholder="请输入任务目标" allow-clear />
+              <a-input v-model="queryParams.target" placeholder="请输入任务目标" allow-clear />
             </a-form-item>
           </a-col>
           <a-col :span="6">
             <a-form-item label="任务状态">
-              <a-select v-model:value="queryParams.status" placeholder="请选择任务状态" allow-clear>
+              <a-select v-model="queryParams.status" placeholder="请选择任务状态" allow-clear>
                 <a-select-option value="waiting">等待中</a-select-option>
                 <a-select-option value="running">运行中</a-select-option>
                 <a-select-option value="done">已完成</a-select-option>
@@ -35,7 +35,7 @@
           </a-col>
           <a-col :span="6">
             <a-form-item label="任务标签">
-              <a-select v-model:value="queryParams.task_tag" placeholder="请选择任务标签" allow-clear>
+              <a-select v-model="queryParams.task_tag" placeholder="请选择任务标签" allow-clear>
                 <a-select-option value="task">常规任务</a-select-option>
                 <a-select-option value="risk_cruising">侦查任务</a-select-option>
               </a-select>
@@ -47,7 +47,7 @@
             <!-- 选项配置查询 -->
             <a-col :span="6">
               <a-form-item label="域名爆破类型">
-                <a-select v-model:value="queryParams['options.domain_brute_type']" placeholder="请选择" allow-clear>
+                <a-select v-model="queryParams['options.domain_brute_type']" placeholder="请选择" allow-clear>
                   <a-select-option value="small">小字典</a-select-option>
                   <a-select-option value="medium">中字典</a-select-option>
                   <a-select-option value="big">大字典</a-select-option>
@@ -56,7 +56,7 @@
             </a-col>
             <a-col :span="6">
               <a-form-item label="端口扫描类型">
-                <a-select v-model:value="queryParams['options.port_scan_type']" placeholder="请选择" allow-clear>
+                <a-select v-model="queryParams['options.port_scan_type']" placeholder="请选择" allow-clear>
                   <a-select-option value="top100">Top100</a-select-option>
                   <a-select-option value="top1000">Top1000</a-select-option>
                   <a-select-option value="all">全部</a-select-option>
@@ -67,7 +67,7 @@
             <!-- 选项开关筛选 -->
             <a-col :span="6">
               <a-form-item label="域名爆破">
-                <a-select v-model:value="queryParams['options.domain_brute']" placeholder="请选择" allow-clear>
+                <a-select v-model="queryParams['options.domain_brute']" placeholder="请选择" allow-clear>
                   <a-select-option :value="true">开启</a-select-option>
                   <a-select-option :value="false">关闭</a-select-option>
                 </a-select>
@@ -75,7 +75,7 @@
             </a-col>
             <a-col :span="6">
               <a-form-item label="端口扫描">
-                <a-select v-model:value="queryParams['options.port_scan']" placeholder="请选择" allow-clear>
+                <a-select v-model="queryParams['options.port_scan']" placeholder="请选择" allow-clear>
                   <a-select-option :value="true">开启</a-select-option>
                   <a-select-option :value="false">关闭</a-select-option>
                 </a-select>
@@ -87,14 +87,14 @@
               <a-form-item label="站点数量">
                 <a-row :gutter="8">
                   <a-col :span="8">
-                    <a-select v-model:value="queryParams.siteCountCompare" placeholder="比较" allow-clear>
+                    <a-select v-model="queryParams.siteCountCompare" placeholder="比较" allow-clear>
                       <a-select-option value="eq">等于</a-select-option>
                       <a-select-option value="gt">大于</a-select-option>
                       <a-select-option value="lt">小于</a-select-option>
                     </a-select>
                   </a-col>
                   <a-col :span="16">
-                    <a-input-number v-model:value="queryParams.siteCountValue" placeholder="数量" style="width: 100%" />
+                    <a-input-number v-model="queryParams.siteCountValue" placeholder="数量" style="width: 100%" />
                   </a-col>
                 </a-row>
               </a-form-item>
@@ -103,14 +103,14 @@
               <a-form-item label="域名数量">
                 <a-row :gutter="8">
                   <a-col :span="8">
-                    <a-select v-model:value="queryParams.domainCountCompare" placeholder="比较" allow-clear>
+                    <a-select v-model="queryParams.domainCountCompare" placeholder="比较" allow-clear>
                       <a-select-option value="eq">等于</a-select-option>
                       <a-select-option value="gt">大于</a-select-option>
                       <a-select-option value="lt">小于</a-select-option>
                     </a-select>
                   </a-col>
                   <a-col :span="16">
-                    <a-input-number v-model:value="queryParams.domainCountValue" placeholder="数量" style="width: 100%" />
+                    <a-input-number v-model="queryParams.domainCountValue" placeholder="数量" style="width: 100%" />
                   </a-col>
                 </a-row>
               </a-form-item>
@@ -119,14 +119,14 @@
               <a-form-item label="WIH数量">
                 <a-row :gutter="8">
                   <a-col :span="8">
-                    <a-select v-model:value="queryParams.wihCountCompare" placeholder="比较" allow-clear>
+                    <a-select v-model="queryParams.wihCountCompare" placeholder="比较" allow-clear>
                       <a-select-option value="eq">等于</a-select-option>
                       <a-select-option value="gt">大于</a-select-option>
                       <a-select-option value="lt">小于</a-select-option>
                     </a-select>
                   </a-col>
                   <a-col :span="16">
-                    <a-input-number v-model:value="queryParams.wihCountValue" placeholder="数量" style="width: 100%" />
+                    <a-input-number v-model="queryParams.wihCountValue" placeholder="数量" style="width: 100%" />
                   </a-col>
                 </a-row>
               </a-form-item>
@@ -177,6 +177,7 @@
       @change="handleTableChange"
       row-key="_id"
       size="middle"
+      :components="resizableComponents"
     >
       <!-- 任务名称列 -->
       <template #bodyCell="{ column, record }">
@@ -226,6 +227,9 @@
             <a-tooltip title="查看详情">
               <a @click="showTaskDetail(record)"><EyeOutlined /></a>
             </a-tooltip>
+            <a-tooltip title="导出任务">
+              <a @click="exportTask(record)"><DownloadOutlined /></a>
+            </a-tooltip>
             <a-tooltip v-if="record.status === 'running' || record.status === 'waiting'" title="停止任务">
               <a @click="stopTask(record)"><PauseCircleOutlined /></a>
             </a-tooltip>
@@ -245,7 +249,7 @@
 
     <!-- 新建任务弹窗 -->
     <a-modal
-      v-model:open="createTaskModalVisible"
+      v-model="createTaskModalVisible"
       title="新建任务"
       @ok="handleCreateTask"
       @cancel="handleCancel"
@@ -258,12 +262,12 @@
         <a-row :gutter="20">
           <a-col :span="12">
             <a-form-item name="name" label="任务名称">
-              <a-input v-model:value="taskForm.name" placeholder="请输入任务名称" />
+              <a-input v-model="taskForm.name" placeholder="请输入任务名称" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item name="target" label="目标">
-              <a-input v-model:value="taskForm.target" placeholder="请输入目标IP/域名" />
+              <a-input v-model="taskForm.target" placeholder="请输入目标IP/域名" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -271,7 +275,7 @@
         <a-row :gutter="20">
           <a-col :span="12">
             <a-form-item name="domain_brute_type" label="域名爆破类型">
-              <a-select v-model:value="taskForm.domain_brute_type">
+              <a-select v-model="taskForm.domain_brute_type">
                 <a-select-option value="small">小字典</a-select-option>
                 <a-select-option value="medium">中字典</a-select-option>
                 <a-select-option value="big">大字典</a-select-option>
@@ -280,7 +284,7 @@
           </a-col>
           <a-col :span="12">
             <a-form-item name="port_scan_type" label="端口扫描类型">
-              <a-select v-model:value="taskForm.port_scan_type">
+              <a-select v-model="taskForm.port_scan_type">
                 <a-select-option value="top100">Top100</a-select-option>
                 <a-select-option value="top1000">Top1000</a-select-option>
                 <a-select-option value="all">全部</a-select-option>
@@ -296,41 +300,41 @@
           <div class="option-group">
             <div class="group-title">信息收集</div>
             <div class="options">
-              <a-checkbox v-model:checked="taskForm.domain_brute">域名爆破</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.alt_dns">DNS生成</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.dns_query_plugin">DNS解析</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.casm_search">搜索</a-checkbox>
+              <a-checkbox v-model="taskForm.domain_brute">域名爆破</a-checkbox>
+              <a-checkbox v-model="taskForm.alt_dns">DNS生成</a-checkbox>
+              <a-checkbox v-model="taskForm.dns_query_plugin">DNS解析</a-checkbox>
+              <a-checkbox v-model="taskForm.casm_search">搜索</a-checkbox>
             </div>
           </div>
           
           <div class="option-group">
             <div class="group-title">端口扫描</div>
             <div class="options">
-              <a-checkbox v-model:checked="taskForm.port_scan">端口扫描</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.service_detection">服务识别</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.os_detection">系统识别</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.ssl_cert">SSL证书</a-checkbox>
+              <a-checkbox v-model="taskForm.port_scan">端口扫描</a-checkbox>
+              <a-checkbox v-model="taskForm.service_detection">服务识别</a-checkbox>
+              <a-checkbox v-model="taskForm.os_detection">系统识别</a-checkbox>
+              <a-checkbox v-model="taskForm.ssl_cert">SSL证书</a-checkbox>
             </div>
           </div>
           
           <div class="option-group">
             <div class="group-title">站点扫描</div>
             <div class="options">
-              <a-checkbox v-model:checked="taskForm.site_identify">站点识别</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.search_engines">搜索引擎</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.site_spider">站点爬虫</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.site_capture">站点截图</a-checkbox>
+              <a-checkbox v-model="taskForm.site_identify">站点识别</a-checkbox>
+              <a-checkbox v-model="taskForm.search_engines">搜索引擎</a-checkbox>
+              <a-checkbox v-model="taskForm.site_spider">站点爬虫</a-checkbox>
+              <a-checkbox v-model="taskForm.site_capture">站点截图</a-checkbox>
             </div>
           </div>
           
           <div class="option-group">
             <div class="group-title">安全扫描</div>
             <div class="options">
-              <a-checkbox v-model:checked="taskForm.skip_scan_cdn_ip">跳过CDN</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.file_leak">文件泄露</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.findvhost">虚拟主机</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.nuclei_scan">Nuclei</a-checkbox>
-              <a-checkbox v-model:checked="taskForm.web_info_hunter">Web信息</a-checkbox>
+              <a-checkbox v-model="taskForm.skip_scan_cdn_ip">跳过CDN</a-checkbox>
+              <a-checkbox v-model="taskForm.file_leak">文件泄露</a-checkbox>
+              <a-checkbox v-model="taskForm.findvhost">虚拟主机</a-checkbox>
+              <a-checkbox v-model="taskForm.nuclei_scan">Nuclei</a-checkbox>
+              <a-checkbox v-model="taskForm.web_info_hunter">Web信息</a-checkbox>
             </div>
           </div>
         </div>
@@ -339,7 +343,7 @@
 
     <!-- 同步任务到资产组弹窗 -->
     <a-modal
-      v-model:open="syncTaskModalVisible"
+      v-model="syncTaskModalVisible"
       title="同步任务到资产组"
       @ok="handleSyncTask"
       @cancel="syncTaskModalVisible = false"
@@ -348,7 +352,7 @@
       <a-form layout="vertical">
         <a-form-item label="资产组">
           <a-select
-            v-model:value="selectedScopeId"
+            v-model="selectedScopeId"
             placeholder="请选择要同步到的资产组"
             :loading="scopeLoading"
             show-search
@@ -364,7 +368,7 @@
     
     <!-- 任务选项详情弹窗 -->
     <a-modal
-      v-model:open="taskOptionsModalVisible"
+      v-model="taskOptionsModalVisible"
       title="任务选项详情"
       :footer="null"
       width="700px"
@@ -393,13 +397,87 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, onMounted } from 'vue';
-import { PlusOutlined, SearchOutlined, ReloadOutlined, PauseCircleOutlined, DeleteOutlined, EyeOutlined, PartitionOutlined, UpOutlined, DownOutlined } from '@ant-design/icons-vue';
+<script setup lang="ts">
+import { ref, reactive, onMounted, h } from 'vue';
+import type { Ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { PlusOutlined, SearchOutlined, ReloadOutlined, PauseCircleOutlined, DeleteOutlined, EyeOutlined, PartitionOutlined, UpOutlined, DownOutlined, DownloadOutlined } from '@ant-design/icons-vue';
 import { message, Modal } from 'ant-design-vue';
+import type { TableColumnsType } from 'ant-design-vue';
+
+interface ApiResponse<T> {
+  code: number;
+  message?: string;
+  items?: T[];
+  total?: number;
+  data?: T;
+}
+
+interface TaskForm {
+  name: string;
+  target: string;
+  domain_brute_type: string;
+  port_scan_type: string;
+  domain_brute: boolean;
+  alt_dns: boolean;
+  dns_query_plugin: boolean;
+  casm_search: boolean;
+  port_scan: boolean;
+  service_detection: boolean;
+  os_detection: boolean;
+  ssl_cert: boolean;
+  skip_scan_cdn_ip: boolean;
+  site_identify: boolean;
+  search_engines: boolean;
+  site_spider: boolean;
+  site_capture: boolean;
+  file_leak: boolean;
+  findvhost: boolean;
+  nuclei_scan: boolean;
+  web_info_hunter: boolean;
+}
+
+interface TaskOptions {
+  domain_brute?: boolean;
+  domain_brute_type?: string;
+  port_scan?: boolean;
+  port_scan_type?: string;
+  service_detection?: boolean;
+  service_brute?: boolean;
+  os_detection?: boolean;
+  site_identify?: boolean;
+  file_leak?: boolean;
+  alt_dns?: boolean;
+  search_engines?: boolean;
+  site_spider?: boolean;
+  casm_search?: boolean;
+  dns_query_plugin?: boolean;
+  skip_scan_cdn_ip?: boolean;
+  nuclei_scan?: boolean;
+  findvhost?: boolean;
+  web_info_hunter?: boolean;
+}
+
+interface Task {
+  _id: string;
+  name: string;
+  target: string;
+  status: string;
+  options: TaskOptions;
+  statistic?: {
+    site_cnt?: number;
+    domain_cnt?: number;
+    wih_cnt?: number;
+  };
+}
+
+interface AssetScope {
+  _id: string;
+  name: string;
+}
 
 // 表单引用
-const taskFormRef = ref(null);
+const taskFormRef = ref<any>(null);
 
 // 控制弹窗显示
 const createTaskModalVisible = ref(false);
@@ -408,8 +486,11 @@ const syncTaskModalVisible = ref(false);
 const taskOptionsModalVisible = ref(false);
 const confirmSyncLoading = ref(false);
 
+// 初始化选中行的数组
+const selectedRowKeys = ref<string[]>([]);
+
 // 任务表单数据
-const taskForm = reactive({
+const taskForm = reactive<TaskForm>({
   name: '',
   target: '',
   domain_brute_type: 'big',
@@ -469,35 +550,171 @@ const queryParams = reactive({
 });
 
 // 任务列表数据
-const taskList = ref([]);
+const taskList = ref<Task[]>([]);
 const loading = ref(false);
 const pagination = reactive({
   current: 1,
   pageSize: 10,
   total: 0
 });
-const selectedRowKeys = ref([]);
 
 // 资产组数据
-const assetScopes = ref([]);
+const assetScopes = ref<AssetScope[]>([]);
 const scopeLoading = ref(false);
-const selectedScopeId = ref(null);
+const selectedScopeId = ref<string | null>(null);
 
 // 当前任务选项
-const currentTaskOptions = reactive({});
+const currentTaskOptions = reactive<TaskOptions>({});
 
 // 显示高级搜索
 const showAdvanced = ref(false);
 
 // 表格列配置
-const columns = [
-  { title: '任务名称', dataIndex: 'name', key: 'name' },
-  { title: '任务目标', dataIndex: 'target', key: 'target' },
-  { title: '任务状态', dataIndex: 'status', key: 'status' },
-  { title: '任务选项', dataIndex: 'options', key: 'options' },
-  { title: '统计数据', dataIndex: 'statistic', key: 'statistic' },
-  { title: '操作', dataIndex: 'action', key: 'action' }
+const columns: TableColumnsType = [
+  { 
+    title: '任务名称', 
+    dataIndex: 'name', 
+    key: 'name', 
+    ellipsis: true,
+    resizable: true,
+    width: 150
+  },
+  { 
+    title: '任务目标', 
+    dataIndex: 'target', 
+    key: 'target', 
+    ellipsis: true,
+    resizable: true,
+    width: 200 
+  },
+  { 
+    title: '任务状态', 
+    dataIndex: 'status', 
+    key: 'status', 
+    width: 120,
+    resizable: true 
+  },
+  { 
+    title: '任务选项', 
+    dataIndex: 'options', 
+    key: 'options',
+    resizable: true,
+    width: 200
+  },
+  { 
+    title: '统计数据', 
+    dataIndex: 'statistic', 
+    key: 'statistic', 
+    width: 100,
+    resizable: true
+  },
+  { 
+    title: '操作', 
+    dataIndex: 'action', 
+    key: 'action', 
+    width: 210, 
+    fixed: 'right',
+    align: 'center'
+  }
 ];
+
+// 可调整列宽表格组件
+const VueResizeableHeader = (props: any) => {
+  let dragging = false;
+  let startX = 0;
+  let startWidth = 0;
+  let column: any = null;
+  let table: HTMLElement | null = null;
+
+  const handleMousedown = (e: MouseEvent, col: any) => {
+    dragging = true;
+    startX = e.clientX;
+    column = col;
+    startWidth = parseInt(col.width || col.minWidth || 80);
+
+    // 查找表格DOM元素
+    let currentEle = e.target as HTMLElement;
+    while (currentEle && currentEle.tagName !== 'TABLE') {
+      currentEle = currentEle.parentElement as HTMLElement;
+    }
+    table = currentEle;
+    
+    // 添加全局事件监听
+    document.addEventListener('mousemove', handleMousemove);
+    document.addEventListener('mouseup', handleMouseup);
+    
+    // 阻止默认行为和事件冒泡
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const handleMousemove = (e: MouseEvent) => {
+    if (!dragging) return;
+    // 计算宽度变化
+    const offset = e.clientX - startX;
+    const newWidth = Math.max(startWidth + offset, 50);
+    
+    if (column) {
+      column.width = newWidth;
+      
+      if (table) {
+        // 更新表格宽度
+        const tableWidth = parseInt(table.style.width || '0');
+        if (tableWidth) {
+          table.style.width = `${tableWidth + offset}px`;
+        }
+      }
+    }
+  };
+
+  const handleMouseup = () => {
+    dragging = false;
+    document.removeEventListener('mousemove', handleMousemove);
+    document.removeEventListener('mouseup', handleMouseup);
+  };
+
+  // 在组件销毁时移除事件监听
+  const onBeforeUnmount = () => {
+    document.removeEventListener('mousemove', handleMousemove);
+    document.removeEventListener('mouseup', handleMouseup);
+  };
+
+  // 创建拖拽把手
+  const renderResizeHandle = (col: any) => {
+    if (!col) return null;
+    if (col.resizable !== false) {
+      return h('span', {
+        class: 'resize-handle',
+        onClick: (e: MouseEvent) => { e.stopPropagation(); },
+        onMousedown: (e: MouseEvent) => { handleMousedown(e, col); }
+      });
+    }
+    return null;
+  };
+
+  // 渲染表头
+  const renderHeader = (props: any) => {
+    const col = props.column;
+    const resizeHandle = renderResizeHandle(col);
+    
+    return h('th', {
+      ...props,
+      class: `${props.class || ''} resizable-column`,
+    }, [
+      h('div', { class: 'ant-table-header-content' }, props.children),
+      resizeHandle
+    ]);
+  };
+
+  return renderHeader(props);
+};
+
+// 注册可调整列宽组件
+const resizableComponents = {
+  header: {
+    cell: VueResizeableHeader
+  }
+};
 
 // 显示创建任务弹窗
 const showCreateTaskModal = () => {
@@ -566,54 +783,49 @@ const handleCreateTask = () => {
         return;
       }
       
-      // 发送API请求，添加Token认证头
-      fetch('/api/task/', {
+      // 发送API请求
+      return fetch('/api/task/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Token': token
         },
         body: JSON.stringify(taskData)
-      })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(err => {
-            throw new Error(err.message || '网络请求失败');
-          }).catch(() => {
-            // 如果响应不是JSON格式，则抛出通用错误
-            throw new Error(`请求失败 (${response.status})`);
-          });
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.code === 401) {
-          // 处理认证失败情况
-          message.error('登录已过期，请重新登录');
-          // 可以在这里添加重定向到登录页的逻辑
-          return;
-        }
-        
-        message.success('创建任务成功');
-        createTaskModalVisible.value = false;
-        resetForm();
-        // 刷新任务列表
-        fetchTaskList();
-      })
-      .catch(error => {
-        message.error('创建任务失败: ' + error.message);
-      })
-      .finally(() => {
-        confirmLoading.value = false;
       });
     })
-    .catch(errors => {
-      console.log('表单验证失败', errors);
+    .then((response: Response | undefined) => {
+      if (!response) return; // 如果前面的逻辑返回了，这里就跳过
+      if (!response.ok) {
+        return response.json().then((err: ApiResponse<any>) => {
+          throw new Error(err.message || '网络请求失败');
+        }).catch(() => {
+          throw new Error(`请求失败 (${response.status})`);
+        });
+      }
+      return response.json();
+    })
+    .then((data: ApiResponse<any> | undefined) => {
+      if (!data) return; // 如果前面的逻辑返回了，这里就跳过
+      if (data.code === 401) {
+        message.error('登录已过期，请重新登录');
+        return;
+      }
+      
+      message.success('创建任务成功');
+      createTaskModalVisible.value = false;
+      resetForm();
+      fetchTaskList();
+    })
+    .catch((error: Error) => {
+      message.error('创建任务失败: ' + error.message);
+    })
+    .then(() => {
+      confirmLoading.value = false;
     });
 };
 
 // 显示同步任务弹窗
-const showSyncTaskModal = (record) => {
+const showSyncTaskModal = (record: Task) => {
   selectedScopeId.value = null;
   syncTaskModalVisible.value = true;
 };
@@ -635,26 +847,26 @@ const handleSyncTask = () => {
     },
     body: JSON.stringify({ taskId: selectedRowKeys.value })
   })
-  .then(response => {
+  .then((response: Response) => {
     if (!response.ok) {
       throw new Error('网络请求失败');
     }
     return response.json();
   })
-  .then(data => {
+  .then((data: ApiResponse<any>) => {
     message.success('同步任务成功');
     syncTaskModalVisible.value = false;
   })
-  .catch(error => {
+  .catch((error: Error) => {
     message.error('同步任务失败: ' + error.message);
   })
-  .finally(() => {
+  .then(() => {
     confirmSyncLoading.value = false;
   });
 };
 
 // 显示任务选项详情弹窗
-const showTaskOptions = (record) => {
+const showTaskOptions = (record: Task) => {
   Object.assign(currentTaskOptions, record.options);
   taskOptionsModalVisible.value = true;
 };
@@ -666,8 +878,8 @@ const handleQuery = () => {
 
 // 重置查询
 const resetQuery = () => {
-  Object.keys(queryParams).forEach(key => {
-    queryParams[key] = '';
+  Object.keys(queryParams).forEach((key: string) => {
+    (queryParams as any)[key] = '';
   });
   queryParams.siteCountValue = null;
   queryParams.domainCountValue = null;
@@ -680,15 +892,14 @@ const toggleAdvanced = () => {
 };
 
 // 表格选择变化
-const onSelectChange = (keys) => {
+const onSelectChange = (keys: string[]) => {
   selectedRowKeys.value = keys;
 };
 
 // 获取任务列表
-const fetchTaskList = (page = pagination.current, pageSize = pagination.pageSize) => {
+const fetchTaskList = (page: number = pagination.current, pageSize: number = pagination.pageSize) => {
   loading.value = true;
   
-  // 获取认证Token
   const token = localStorage.getItem('Token');
   if (!token) {
     message.error('您尚未登录或登录已过期，请重新登录');
@@ -697,38 +908,98 @@ const fetchTaskList = (page = pagination.current, pageSize = pagination.pageSize
   }
   
   // 构建查询参数
-  const params = new URLSearchParams();
-  params.append('page', page);
-  params.append('page_size', pageSize);
+  const queryObject: any = {
+    page,
+    size: pageSize
+  };
   
-  // 添加筛选条件
-  if (queryParams.name) params.append('name', queryParams.name);
-  if (queryParams.target) params.append('target', queryParams.target);
-  if (queryParams.status) params.append('status', queryParams.status);
-  if (queryParams.task_tag) params.append('task_tag', queryParams.task_tag);
+  // 添加基本筛选条件（仅添加有值的参数）
+  if (queryParams.name?.trim()) queryObject.name = queryParams.name.trim(); // 使用name而不是query
+  if (queryParams.target?.trim()) queryObject.target = queryParams.target.trim();
+  if (queryParams.status) queryObject.status = queryParams.status;
+  if (queryParams.task_tag) queryObject.task_tag = queryParams.task_tag;
   
-  // 添加选项过滤条件
-  if (queryParams['options.domain_brute_type']) params.append('options.domain_brute_type', queryParams['options.domain_brute_type']);
-  if (queryParams['options.port_scan_type']) params.append('options.port_scan_type', queryParams['options.port_scan_type']);
-  if (queryParams['options.domain_brute'] !== '') params.append('options.domain_brute', queryParams['options.domain_brute']);
-  if (queryParams['options.port_scan'] !== '') params.append('options.port_scan', queryParams['options.port_scan']);
+  // 添加选项过滤条件，只添加非空值
+  const options: any = {};
+  if (queryParams['options.domain_brute_type']) {
+    options.domain_brute_type = queryParams['options.domain_brute_type'];
+  }
+  if (queryParams['options.port_scan_type']) {
+    options.port_scan_type = queryParams['options.port_scan_type'];
+  }
+  if (queryParams['options.domain_brute'] !== undefined && queryParams['options.domain_brute'] !== '') {
+    options.domain_brute = queryParams['options.domain_brute'];
+  }
+  if (queryParams['options.port_scan'] !== undefined && queryParams['options.port_scan'] !== '') {
+    options.port_scan = queryParams['options.port_scan'];
+  }
+
+  // 只有当options有值时才添加到查询对象中
+  if (Object.keys(options).length > 0) {
+    queryObject.options = options;
+  }
   
   // 添加统计数据过滤条件
   if (queryParams.siteCountCompare && queryParams.siteCountValue !== null) {
-    params.append('site_cnt_compare', queryParams.siteCountCompare);
-    params.append('site_cnt_value', queryParams.siteCountValue);
+    switch (queryParams.siteCountCompare) {
+      case 'eq':
+        queryObject['statistic.site_cnt'] = queryParams.siteCountValue;
+        break;
+      case 'gt':
+        queryObject['statistic.site_cnt__gt'] = queryParams.siteCountValue;
+        break;
+      case 'lt':
+        queryObject['statistic.site_cnt__lt'] = queryParams.siteCountValue;
+        break;
+    }
   }
+
   if (queryParams.domainCountCompare && queryParams.domainCountValue !== null) {
-    params.append('domain_cnt_compare', queryParams.domainCountCompare);
-    params.append('domain_cnt_value', queryParams.domainCountValue);
+    switch (queryParams.domainCountCompare) {
+      case 'eq':
+        queryObject['statistic.domain_cnt'] = queryParams.domainCountValue;
+        break;
+      case 'gt':
+        queryObject['statistic.domain_cnt__gt'] = queryParams.domainCountValue;
+        break;
+      case 'lt':
+        queryObject['statistic.domain_cnt__lt'] = queryParams.domainCountValue;
+        break;
+    }
   }
+
   if (queryParams.wihCountCompare && queryParams.wihCountValue !== null) {
-    params.append('wih_cnt_compare', queryParams.wihCountCompare);
-    params.append('wih_cnt_value', queryParams.wihCountValue);
+    switch (queryParams.wihCountCompare) {
+      case 'eq':
+        queryObject['statistic.wih_cnt'] = queryParams.wihCountValue;
+        break;
+      case 'gt':
+        queryObject['statistic.wih_cnt__gt'] = queryParams.wihCountValue;
+        break;
+      case 'lt':
+        queryObject['statistic.wih_cnt__lt'] = queryParams.wihCountValue;
+        break;
+    }
   }
   
-  console.log('获取任务列表，参数:', params.toString());
+  // 构建查询字符串，过滤掉空值参数
+  const params = new URLSearchParams();
+  Object.entries(queryObject).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      if (typeof value === 'boolean') {
+        params.append(key, value ? 'true' : 'false');
+      } else if (typeof value === 'object') {
+        // 处理嵌套对象（如options）
+        params.append(key, JSON.stringify(value));
+      } else {
+        params.append(key, value.toString());
+      }
+    }
+  });
   
+  console.log('Task list query params:', params.toString());
+  
+  // 发送请求
   fetch(`/api/task/?${params.toString()}`, {
     method: 'GET',
     headers: {
@@ -736,9 +1007,9 @@ const fetchTaskList = (page = pagination.current, pageSize = pagination.pageSize
       'Token': token
     }
   })
-  .then(response => {
+  .then((response: Response) => {
     if (!response.ok && response.status !== 401) {
-      return response.json().then(err => {
+      return response.json().then((err: ApiResponse<any>) => {
         throw new Error(err.message || `请求失败 (${response.status})`);
       }).catch(() => {
         throw new Error(`请求失败 (${response.status})`);
@@ -746,12 +1017,11 @@ const fetchTaskList = (page = pagination.current, pageSize = pagination.pageSize
     }
     return response.json();
   })
-  .then(data => {
+  .then((data: ApiResponse<Task>) => {
     console.log('API返回数据:', data);
     
     if (data.code === 401) {
       message.error('登录已过期，请重新登录');
-      // 可以添加重定向到登录页的逻辑
       localStorage.removeItem('Token');
       localStorage.removeItem('TokenTime');
       localStorage.removeItem('username');
@@ -762,30 +1032,28 @@ const fetchTaskList = (page = pagination.current, pageSize = pagination.pageSize
       throw new Error(data.message || '获取任务列表失败');
     }
     
-    // 根据API实际返回结构解析数据
-    // API直接返回 {code: 200, items: [...], total: number, page: number, size: number}
     taskList.value = data.items || [];
     pagination.total = data.total || 0;
-    pagination.current = data.page || page;
-    pagination.pageSize = data.size || pageSize;
+    pagination.current = page;
+    pagination.pageSize = pageSize;
   })
-  .catch(error => {
+  .catch((error: Error) => {
     console.error('获取任务列表错误:', error);
     message.error('获取任务列表失败: ' + error.message);
-    taskList.value = []; // 清空任务列表
+    taskList.value = [];
   })
-  .finally(() => {
+  .then(() => {
     loading.value = false;
   });
 };
 
 // 处理表格分页、排序、过滤
-const handleTableChange = (pag, filters, sorter) => {
+const handleTableChange = (pag: any, filters: any, sorter: any) => {
   fetchTaskList(pag.current, pag.pageSize);
 };
 
 // 获取任务状态颜色
-const getStatusColor = (status) => {
+const getStatusColor = (status: string) => {
   // 如果状态包含特定服务名称，则视为running状态
   if (status !== 'waiting' && 
       status !== 'done' && 
@@ -809,7 +1077,7 @@ const getStatusColor = (status) => {
 };
 
 // 获取任务状态文本
-const getStatusText = (status) => {
+const getStatusText = (status: string) => {
   // 如果状态不是基本状态之一，则为运行中的具体状态
   if (status !== 'waiting' && 
       status !== 'done' && 
@@ -833,20 +1101,21 @@ const getStatusText = (status) => {
 };
 
 // 截断文本
-const truncateText = (text, length) => {
+const truncateText = (text: string, length: number) => {
   if (text.length <= length) {
     return text;
   }
   return text.slice(0, length) + '...';
 };
 
-// 假设有一个函数用于显示任务详情
-const showTaskDetail = (record) => {
-  console.log('显示任务详情:', record);
+// 显示任务详情
+const router = useRouter();
+const showTaskDetail = (record: Task) => {
+  router.push(`/task/detail/${record._id}`);
 };
 
 // 停止单个任务
-const stopTask = (record) => {
+const stopTask = (record: Task) => {
   Modal.confirm({
     title: '确认停止',
     content: `确定要停止任务"${record.name}"吗？`,
@@ -871,9 +1140,9 @@ const stopTask = (record) => {
           'Token': token
         }
       })
-      .then(response => {
+      .then((response: Response) => {
         if (!response.ok) {
-          return response.json().then(err => {
+          return response.json().then((err: ApiResponse<any>) => {
             throw new Error(err.message || '网络请求失败');
           }).catch(() => {
             throw new Error(`请求失败 (${response.status})`);
@@ -881,7 +1150,7 @@ const stopTask = (record) => {
         }
         return response.json();
       })
-      .then(data => {
+      .then((data: ApiResponse<any>) => {
         if (data.code === 401) {
           message.error('登录已过期，请重新登录');
           return;
@@ -906,7 +1175,7 @@ const stopTask = (record) => {
         // 刷新任务列表
         fetchTaskList();
       })
-      .catch(error => {
+      .catch((error: Error) => {
         message.error('停止任务失败: ' + error.message);
         console.error('停止任务错误:', error);
       });
@@ -915,12 +1184,12 @@ const stopTask = (record) => {
 };
 
 // 假设有一个函数用于重启任务
-const restartTask = (record) => {
+const restartTask = (record: Task) => {
   console.log('重启任务:', record);
 };
 
 // 删除单个任务
-const deleteTask = (record) => {
+const deleteTask = (record: Task) => {
   // 如果任务状态是"等待中"，先停止任务
   if (record.status === 'waiting') {
     // 显示确认对话框
@@ -951,7 +1220,7 @@ const deleteTask = (record) => {
 };
 
 // 停止并删除任务
-const stopAndDeleteTask = (record) => {
+const stopAndDeleteTask = (record: Task) => {
   const token = localStorage.getItem('Token');
   if (!token) {
     message.error('您尚未登录或登录已过期，请重新登录');
@@ -965,9 +1234,9 @@ const stopAndDeleteTask = (record) => {
       'Token': token
     }
   })
-  .then(response => {
+  .then((response: Response) => {
     if (!response.ok) {
-      return response.json().then(err => {
+      return response.json().then((err: ApiResponse<any>) => {
         throw new Error(err.message || '网络请求失败');
       }).catch(() => {
         throw new Error(`请求失败 (${response.status})`);
@@ -975,7 +1244,7 @@ const stopAndDeleteTask = (record) => {
     }
     return response.json();
   })
-  .then(data => {
+  .then((data: ApiResponse<any>) => {
     if (data.code === 200) {
       // 停止成功后，执行删除操作
       message.success('任务已停止，正在删除...');
@@ -986,13 +1255,13 @@ const stopAndDeleteTask = (record) => {
       throw new Error(data.message || '停止任务失败');
     }
   })
-  .catch(error => {
+  .catch((error: Error) => {
     message.error('停止任务失败: ' + error.message);
   });
 };
 
 // 执行删除任务
-const performDeleteTask = (taskId) => {
+const performDeleteTask = (taskId: string) => {
   // 获取认证Token
   const token = localStorage.getItem('Token');
   if (!token) {
@@ -1012,9 +1281,9 @@ const performDeleteTask = (taskId) => {
       del_task_data: false   // 默认不删除关联数据
     })
   })
-  .then(response => {
+  .then((response: Response) => {
     if (!response.ok) {
-      return response.json().then(err => {
+      return response.json().then((err: ApiResponse<any>) => {
         throw new Error(err.message || '网络请求失败');
       }).catch(() => {
         throw new Error(`请求失败 (${response.status})`);
@@ -1022,7 +1291,7 @@ const performDeleteTask = (taskId) => {
     }
     return response.json();
   })
-  .then(data => {
+  .then((data: ApiResponse<any>) => {
     if (data.code === 401) {
       message.error('登录已过期，请重新登录');
       return;
@@ -1036,7 +1305,7 @@ const performDeleteTask = (taskId) => {
     // 刷新任务列表
     fetchTaskList();
   })
-  .catch(error => {
+  .catch((error: Error) => {
     message.error('删除任务失败: ' + error.message);
     console.error('删除任务错误:', error);
   });
@@ -1080,9 +1349,9 @@ const handleBatchStop = () => {
           task_id: selectedRowKeys.value // 后端API要求传递任务ID数组
         })
       })
-      .then(response => {
+      .then((response: Response) => {
         if (!response.ok) {
-          return response.json().then(err => {
+          return response.json().then((err: ApiResponse<any>) => {
             throw new Error(err.message || '网络请求失败');
           }).catch(() => {
             throw new Error(`请求失败 (${response.status})`);
@@ -1090,7 +1359,7 @@ const handleBatchStop = () => {
         }
         return response.json();
       })
-      .then(data => {
+      .then((data: ApiResponse<any>) => {
         if (data.code === 401) {
           message.error('登录已过期，请重新登录');
           return;
@@ -1106,13 +1375,9 @@ const handleBatchStop = () => {
         // 刷新任务列表
         fetchTaskList();
       })
-      .catch(error => {
+      .catch((error: Error) => {
         message.error('批量停止任务失败: ' + error.message);
         console.error('批量停止任务错误:', error);
-      })
-      .finally(() => {
-        // 无论成功失败都刷新列表
-        fetchTaskList();
       });
     }
   });
@@ -1163,7 +1428,7 @@ const handleBatchDelete = () => {
 };
 
 // 先停止然后批量删除任务
-const stopAndThenDeleteBatch = (taskIds) => {
+const stopAndThenDeleteBatch = (taskIds: string[]) => {
   const token = localStorage.getItem('Token');
   if (!token) {
     message.error('您尚未登录或登录已过期，请重新登录');
@@ -1184,9 +1449,9 @@ const stopAndThenDeleteBatch = (taskIds) => {
       task_id: taskIds
     })
   })
-  .then(response => {
+  .then((response: Response) => {
     if (!response.ok) {
-      return response.json().then(err => {
+      return response.json().then((err: ApiResponse<any>) => {
         throw new Error(err.message || '网络请求失败');
       }).catch(() => {
         throw new Error(`请求失败 (${response.status})`);
@@ -1194,7 +1459,7 @@ const stopAndThenDeleteBatch = (taskIds) => {
     }
     return response.json();
   })
-  .then(data => {
+  .then((data: ApiResponse<any>) => {
     if (data.code !== 200) {
       throw new Error(data.message || '批量停止任务失败');
     }
@@ -1206,14 +1471,14 @@ const stopAndThenDeleteBatch = (taskIds) => {
       performBatchDelete(taskIds);
     }, 1500);
   })
-  .catch(error => {
+  .catch((error: Error) => {
     message.error('批量停止任务失败: ' + error.message);
     console.error('批量停止任务错误:', error);
   });
 };
 
 // 执行批量删除
-const performBatchDelete = (taskIds) => {
+const performBatchDelete = (taskIds: string[]) => {
   // 获取认证Token
   const token = localStorage.getItem('Token');
   if (!token) {
@@ -1236,9 +1501,9 @@ const performBatchDelete = (taskIds) => {
       del_task_data: false // 默认不删除关联数据
     })
   })
-  .then(response => {
+  .then((response: Response) => {
     if (!response.ok) {
-      return response.json().then(err => {
+      return response.json().then((err: ApiResponse<any>) => {
         throw new Error(err.message || '网络请求失败');
       }).catch(() => {
         throw new Error(`请求失败 (${response.status})`);
@@ -1246,7 +1511,7 @@ const performBatchDelete = (taskIds) => {
     }
     return response.json();
   })
-  .then(data => {
+  .then((data: ApiResponse<any>) => {
     if (data.code === 401) {
       message.error('登录已过期，请重新登录');
       return;
@@ -1269,7 +1534,7 @@ const performBatchDelete = (taskIds) => {
     // 刷新任务列表
     fetchTaskList();
   })
-  .catch(error => {
+  .catch((error: Error) => {
     message.error('批量删除任务失败: ' + error.message);
     console.error('批量删除任务错误:', error);
   });
@@ -1281,8 +1546,46 @@ const handleBatchRestart = () => {
 };
 
 // 假设有一个函数用于过滤资产组选项
-const filterScopeOption = (input, option) => {
+const filterScopeOption = (input: string, option: any) => {
   return option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+};
+
+// 导出任务
+const exportTask = (record: Task) => {
+  // 获取认证Token
+  const token = localStorage.getItem('Token');
+  if (!token) {
+    message.error('您尚未登录或登录已过期，请重新登录');
+    return;
+  }
+  
+  // 构建下载链接
+  const url = `/api/task/export/${record._id}`;
+  
+  // 创建一个隐藏的a标签来下载文件
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = `task_${record.name}_${record._id}.json`;
+  
+  // 添加token到header
+  fetch(url, {
+    headers: {
+      'Token': token
+    }
+  })
+  .then((response: Response) => response.blob())
+  .then((blob: Blob) => {
+    const url = window.URL.createObjectURL(blob);
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  })
+  .catch((error: Error) => {
+    message.error('导出任务失败: ' + error.message);
+  });
 };
 
 // 组件挂载时调用
@@ -1291,123 +1594,6 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.task-manage-container {
-  padding: 24px;
-}
-
-.header-actions {
-  margin-bottom: 24px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.option-section {
-  border: 1px solid #f0f0f0;
-  border-radius: 5px;
-  margin-top: 16px;
-}
-
-.option-header {
-  font-size: 18px;
-  font-weight: 500;
-  padding: 12px 20px;
-  background-color: #fafafa;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.option-group {
-  padding: 16px 20px 18px;
-  border-bottom: 1px dashed #f0f0f0;
-}
-
-.option-group:last-child {
-  border-bottom: none;
-}
-
-.group-title {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 8px;
-}
-
-.options {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px 0;
-  padding-left: 16px;
-}
-
-/* 复选框样式 */
-:deep(.ant-checkbox-wrapper) {
-  font-size: 16px;
-  margin-left: 0;
-  padding: 0;
-  line-height: 1.5;
-}
-
-:deep(.ant-checkbox) {
-  font-size: 16px;
-  margin-right: 8px;
-}
-
-/* 修改表单项的间距 */
-:deep(.ant-form-item) {
-  margin-bottom: 20px;
-}
-
-:deep(.ant-form-item-label) {
-  padding-bottom: 8px;
-}
-
-:deep(.ant-form-item-label > label) {
-  font-size: 16px;
-  height: 32px;
-}
-
-:deep(.ant-input) {
-  padding: 6px 18px;
-  font-size: 16px;
-  line-height: 1.5;
-  height: 40px;
-}
-
-:deep(.ant-select-selector) {
-  padding: 0 18px !important;
-  height: 40px !important;
-  font-size: 16px;
-}
-
-:deep(.ant-select-selection-item) {
-  line-height: 38px !important;
-  font-size: 16px;
-}
-
-:deep(.ant-btn) {
-  font-size: 16px;
-  height: 40px;
-  padding: 0px 20px;
-}
-
-:deep(.ant-modal-header) {
-  padding: 20px 28px;
-}
-
-:deep(.ant-modal-footer) {
-  padding: 20px 28px;
-}
-
-:deep(.ant-modal-title) {
-  font-size: 20px;
-}
-
-:deep(.ant-modal-close-x) {
-  height: 56px;
-  width: 56px;
-  line-height: 56px;
-}
-
-:deep(.ant-row) {
-  margin-bottom: 0;
-}
+<style>
+@import '@/assets/styles/views/task-manage.css';
 </style>

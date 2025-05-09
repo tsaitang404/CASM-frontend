@@ -1,0 +1,61 @@
+/* 通用卡片样式 */
+
+/* 基础卡片 */
+.card {
+  background: #fff;
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-light);
+  margin-bottom: var(--spacing-medium);
+}
+
+/* 卡片头部 */
+.card-header {
+  padding: var(--spacing-medium);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: var(--font-medium);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* 卡片内容 */
+.card-content {
+  padding: var(--spacing-medium);
+}
+
+/* 卡片底部 */
+.card-footer {
+  padding: var(--spacing-medium);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-gray);
+}
+
+/* 无边框卡片 */
+.card-borderless {
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* 可悬浮卡片 */
+.card-hoverable {
+  transition: all var(--transition-fast);
+}
+
+.card-hoverable:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+/* 网格布局卡片 */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-medium);
+  padding: var(--spacing-medium);
+}

@@ -1,0 +1,156 @@
+/* 登录页面样式 */
+
+/* 整体页面样式 */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: var(--spacing-large);
+}
+
+/* 登录容器 */
+.login-container {
+  width: 400px;
+  background: #ffffff;
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-medium);
+  overflow: hidden;
+  padding: 0;
+}
+
+/* 登录头部 */
+.login-header {
+  padding: 30px 40px 20px;
+  text-align: center;
+  background: var(--bg-gray);
+  border-bottom: 1px solid #eaedf2;
+}
+
+/* Logo 样式 */
+.logo-container {
+  margin-bottom: var(--spacing-medium);
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+/* 系统标题 */
+.system-title {
+  font-size: var(--font-large);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* 登录表单区域 */
+.login-form {
+  padding: 30px 40px 40px;
+}
+
+/* 输入框组合样式 */
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+}
+
+/* 用户图标和锁图标 */
+.icon-user:before {
+  content: "👤";
+}
+
+.icon-lock:before {
+  content: "🔒";
+}
+
+/* 输入框样式 */
+.login-form input {
+  width: 100%;
+  padding: 12px 12px 12px 38px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-medium);
+  font-size: var(--font-medium);
+  outline: none;
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.login-form input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+/* 按钮样式 */
+.login-form button {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-medium);
+  font-size: var(--font-medium);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  margin-top: 10px;
+  letter-spacing: 6px;
+}
+
+.login-form button:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.login-form button:disabled {
+  background: #a0cfff;
+  cursor: not-allowed;
+}
+
+/* 错误信息样式 */
+.error-message {
+  color: var(--danger-color);
+  font-size: var(--font-base);
+  text-align: center;
+  margin-top: var(--spacing-medium);
+}
+
+/* 信息提示样式 */
+.info-message {
+  color: #67c23a;
+  font-size: var(--font-base);
+  text-align: center;
+  margin-top: var(--spacing-medium);
+}
+
+/* 页脚样式 */
+.login-footer {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--font-base);
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 480px) {
+  .login-container {
+    width: 100%;
+    max-width: 360px;
+  }
+  
+  .login-header, .login-form {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+}

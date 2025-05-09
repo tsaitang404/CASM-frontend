@@ -1,0 +1,42 @@
+:root {
+  /* 颜色变量 */
+  --primary-color: #409eff;
+  --primary-hover: #66b1ff;
+  --danger-color: #ff4d4f;
+  --danger-hover: #ff7875;
+  --text-primary: #333333;
+  --text-secondary: #888888;
+  --border-color: #dddddd;
+  --bg-gray: #f5f5f5;
+  
+  /* 间距变量 */
+  --spacing-mini: 4px;
+  --spacing-small: 8px;
+  --spacing-medium: 16px;
+  --spacing-large: 24px;
+  --spacing-xlarge: 32px;
+  
+  /* 字体大小 */
+  --font-small: 12px;
+  --font-base: 14px;
+  --font-medium: 16px;
+  --font-large: 20px;
+  
+  /* 布局尺寸 */
+  --header-height: 64px;
+  --footer-height: 40px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 70px;
+  
+  /* 过渡时间 */
+  --transition-fast: 0.2s;
+  
+  /* 阴影 */
+  --shadow-light: 0 1px 4px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 3px 16px rgba(0, 0, 0, 0.12);
+  
+  /* 圆角 */
+  --radius-small: 3px;
+  --radius-medium: 5px;
+  --radius-large: 8px;
+}

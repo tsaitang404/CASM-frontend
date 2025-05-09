@@ -87,56 +87,12 @@ const viewNameMap = {
 }
 </script>
 
-<style scoped>
-/* 重置可能继承的样式 */
+<style>
+@import '@/assets/styles/layouts/layout.css';
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-.layout-root {
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-.layout-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-left: 240px; /* 从220px增大到240px，与侧边栏宽度匹配 */
-  height: 100vh;
-  overflow: hidden;
-  transition: margin-left 0.2s ease;
-}
-
-.layout-main.collapsed {
-  margin-left: 70px; /* 从60px增大到70px，与侧边栏折叠宽度匹配 */
-}
-
-.layout-content {
-  flex: 1;
-  background: #f7f8fa;
-  padding: 26px; /* 从22px增大到26px */
-  box-sizing: border-box;
-  overflow: auto;
-}
-
-/* 添加页面过渡动画 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>
