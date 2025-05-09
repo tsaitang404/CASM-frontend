@@ -29,6 +29,32 @@
         </a-row>
       </a-card>
 
+      <!-- 资产统计卡片 -->
+      <a-card title="资产统计" style="margin-top: 24px;">
+        <a-row :gutter="16">
+          <a-col :span="8">
+            <a-statistic title="域名资产" :value="assetStats.domains || 0" />
+          </a-col>
+          <a-col :span="8">
+            <a-statistic title="IP资产" :value="assetStats.ips || 0" />
+          </a-col>
+          <a-col :span="8">
+            <a-statistic title="站点资产" :value="assetStats.sites || 0" />
+          </a-col>
+        </a-row>
+        <a-row :gutter="16" style="margin-top: 24px;">
+          <a-col :span="8">
+            <a-statistic title="服务资产" :value="assetStats.services || 0" />
+          </a-col>
+          <a-col :span="8">
+            <a-statistic title="漏洞数量" :value="assetStats.vulnerabilities || 0" />
+          </a-col>
+          <a-col :span="8">
+            <a-statistic title="证书数量" :value="assetStats.certificates || 0" />
+          </a-col>
+        </a-row>
+      </a-card>
+
       <!-- 任务队列状态卡片 -->
       <a-card title="任务队列状态" style="margin-top: 24px;">
         <a-table 
@@ -76,6 +102,16 @@ import { message } from 'ant-design-vue'
 const mongoStatus = ref('running')
 const rabbitStatus = ref('running')
 const workerCount = ref(0)
+
+// 资产统计数据
+const assetStats = ref({
+  domains: 0,
+  ips: 0,
+  sites: 0,
+  services: 0,
+  vulnerabilities: 0,
+  certificates: 0
+})
 
 // 队列状态数据
 const queueStats = ref([])
@@ -160,6 +196,15 @@ const getSystemStatus = async () => {
       mongoStatus.value = data.data.mongo_status
       rabbitStatus.value = data.data.rabbit_status
       workerCount.value = data.data.worker_count || 0
+      // 更新资产统计数据
+      assetStats.value = {
+        domains: data.data.assets?.domains || 0,
+        ips: data.data.assets?.ips || 0,
+        sites: data.data.assets?.sites || 0,
+        services: data.data.assets?.services || 0,
+        vulnerabilities: data.data.assets?.vulnerabilities || 0,
+        certificates: data.data.assets?.certificates || 0
+      }
     } else {
       throw new Error(data.message || '获取系统状态失败')
     }
