@@ -56,35 +56,32 @@ export const truncateText = (text: string, length: number): string => {
 export const buildQueryParams = (searchForm: any): URLSearchParams => {
   const params = new URLSearchParams();
   
-  // 添加基本查询参数（只添加非空值）
-  const trimmedName = searchForm.name?.trim();
-  const trimmedTarget = searchForm.target?.trim();
-  
-  if (trimmedName) {
-    params.append('name', trimmedName);
+  // 添加基本查询参数
+  if (searchForm.name !== undefined && searchForm.name !== null && searchForm.name !== '') {
+    params.append('name', searchForm.name);
   }
-  if (trimmedTarget) {
-    params.append('target', trimmedTarget);
+  if (searchForm.target !== undefined && searchForm.target !== null && searchForm.target !== '') {
+    params.append('target', searchForm.target);
   }
-  if (searchForm.status) {
+  if (searchForm.status !== undefined && searchForm.status !== null && searchForm.status !== '') {
     params.append('status', searchForm.status);
   }
-  if (searchForm.task_tag) {
+  if (searchForm.task_tag !== undefined && searchForm.task_tag !== null && searchForm.task_tag !== '') {
     params.append('task_tag', searchForm.task_tag);
   }
 
   // 添加选项查询参数
   const options: any = {};
-  if (searchForm['options.domain_brute'] !== undefined) {
+  if (searchForm['options.domain_brute'] !== undefined && searchForm['options.domain_brute'] !== null) {
     options.domain_brute = searchForm['options.domain_brute'];
   }
-  if (searchForm['options.domain_brute_type']) {
+  if (searchForm['options.domain_brute_type'] !== undefined && searchForm['options.domain_brute_type'] !== '') {
     options.domain_brute_type = searchForm['options.domain_brute_type'];
   }
-  if (searchForm['options.port_scan'] !== undefined) {
+  if (searchForm['options.port_scan'] !== undefined && searchForm['options.port_scan'] !== null) {
     options.port_scan = searchForm['options.port_scan'];
   }
-  if (searchForm['options.port_scan_type']) {
+  if (searchForm['options.port_scan_type'] !== undefined && searchForm['options.port_scan_type'] !== '') {
     options.port_scan_type = searchForm['options.port_scan_type'];
   }
 

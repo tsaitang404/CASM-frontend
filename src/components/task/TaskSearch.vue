@@ -5,17 +5,29 @@
         <!-- 基本查询条件 -->
         <a-col :span="6">
           <a-form-item label="任务名称">
-            <a-input v-model="searchForm.name" placeholder="请输入任务名称" allow-clear />
+            <a-input
+              id="task-name-input"
+              v-model:value="searchForm.name"
+              @change="handleInputChange('name', $event)"
+              placeholder="请输入任务名称"
+              allow-clear
+            />
           </a-form-item>
         </a-col>
         <a-col :span="6">
           <a-form-item label="任务目标">
-            <a-input v-model="searchForm.target" placeholder="请输入任务目标" allow-clear />
+            <a-input
+              id="task-target-input"
+              v-model:value="searchForm.target"
+              @change="handleInputChange('target', $event)"
+              placeholder="请输入任务目标"
+              allow-clear
+            />
           </a-form-item>
         </a-col>
         <a-col :span="6">
           <a-form-item label="任务状态">
-            <a-select v-model="searchForm.status" placeholder="请选择任务状态" allow-clear>
+            <a-select id="task-status-select" v-model="searchForm.status" placeholder="请选择任务状态" allow-clear>
               <a-select-option value="waiting">等待中</a-select-option>
               <a-select-option value="running">运行中</a-select-option>
               <a-select-option value="done">已完成</a-select-option>
@@ -26,7 +38,7 @@
         </a-col>
         <a-col :span="6">
           <a-form-item label="任务标签">
-            <a-select v-model="searchForm.task_tag" placeholder="请选择任务标签" allow-clear>
+            <a-select id="task-tag-select" v-model="searchForm.task_tag" placeholder="请选择任务标签" allow-clear>
               <a-select-option value="task">常规任务</a-select-option>
               <a-select-option value="risk_cruising">侦查任务</a-select-option>
             </a-select>
@@ -38,7 +50,7 @@
           <!-- 选项配置查询 -->
           <a-col :span="6">
             <a-form-item label="域名爆破类型">
-              <a-select v-model="searchForm['options.domain_brute_type']" placeholder="请选择" allow-clear>
+              <a-select id="domain-brute-type-select" v-model="searchForm['options.domain_brute_type']" placeholder="请选择" allow-clear>
                 <a-select-option value="small">小字典</a-select-option>
                 <a-select-option value="medium">中字典</a-select-option>
                 <a-select-option value="big">大字典</a-select-option>
@@ -47,7 +59,7 @@
           </a-col>
           <a-col :span="6">
             <a-form-item label="端口扫描类型">
-              <a-select v-model="searchForm['options.port_scan_type']" placeholder="请选择" allow-clear>
+              <a-select id="port-scan-type-select" v-model="searchForm['options.port_scan_type']" placeholder="请选择" allow-clear>
                 <a-select-option value="top100">Top100</a-select-option>
                 <a-select-option value="top1000">Top1000</a-select-option>
                 <a-select-option value="all">全部</a-select-option>
@@ -58,7 +70,7 @@
           <!-- 选项开关筛选 -->
           <a-col :span="6">
             <a-form-item label="域名爆破">
-              <a-select v-model="searchForm['options.domain_brute']" placeholder="请选择" allow-clear>
+              <a-select id="domain-brute-select" v-model="searchForm['options.domain_brute']" placeholder="请选择" allow-clear>
                 <a-select-option :value="true">开启</a-select-option>
                 <a-select-option :value="false">关闭</a-select-option>
               </a-select>
@@ -66,7 +78,7 @@
           </a-col>
           <a-col :span="6">
             <a-form-item label="端口扫描">
-              <a-select v-model="searchForm['options.port_scan']" placeholder="请选择" allow-clear>
+              <a-select id="port-scan-select" v-model="searchForm['options.port_scan']" placeholder="请选择" allow-clear>
                 <a-select-option :value="true">开启</a-select-option>
                 <a-select-option :value="false">关闭</a-select-option>
               </a-select>
@@ -78,14 +90,14 @@
             <a-form-item label="站点数量">
               <a-row :gutter="8">
                 <a-col :span="8">
-                  <a-select v-model="searchForm.siteCountCompare" placeholder="比较" allow-clear>
+                  <a-select id="site-count-compare-select" v-model="searchForm.siteCountCompare" placeholder="比较" allow-clear>
                     <a-select-option value="eq">等于</a-select-option>
                     <a-select-option value="gt">大于</a-select-option>
                     <a-select-option value="lt">小于</a-select-option>
                   </a-select>
                 </a-col>
                 <a-col :span="16">
-                  <a-input-number v-model="searchForm.siteCountValue" placeholder="数量" style="width: 100%" />
+                  <a-input-number id="site-count-value-input" v-model="searchForm.siteCountValue" placeholder="数量" style="width: 100%" />
                 </a-col>
               </a-row>
             </a-form-item>
@@ -94,14 +106,14 @@
             <a-form-item label="域名数量">
               <a-row :gutter="8">
                 <a-col :span="8">
-                  <a-select v-model="searchForm.domainCountCompare" placeholder="比较" allow-clear>
+                  <a-select id="domain-count-compare-select" v-model="searchForm.domainCountCompare" placeholder="比较" allow-clear>
                     <a-select-option value="eq">等于</a-select-option>
                     <a-select-option value="gt">大于</a-select-option>
                     <a-select-option value="lt">小于</a-select-option>
                   </a-select>
                 </a-col>
                 <a-col :span="16">
-                  <a-input-number v-model="searchForm.domainCountValue" placeholder="数量" style="width: 100%" />
+                  <a-input-number id="domain-count-value-input" v-model="searchForm.domainCountValue" placeholder="数量" style="width: 100%" />
                 </a-col>
               </a-row>
             </a-form-item>
@@ -110,14 +122,14 @@
             <a-form-item label="WIH数量">
               <a-row :gutter="8">
                 <a-col :span="8">
-                  <a-select v-model="searchForm.wihCountCompare" placeholder="比较" allow-clear>
+                  <a-select id="wih-count-compare-select" v-model="searchForm.wihCountCompare" placeholder="比较" allow-clear>
                     <a-select-option value="eq">等于</a-select-option>
                     <a-select-option value="gt">大于</a-select-option>
                     <a-select-option value="lt">小于</a-select-option>
                   </a-select>
                 </a-col>
                 <a-col :span="16">
-                  <a-input-number v-model="searchForm.wihCountValue" placeholder="数量" style="width: 100%" />
+                  <a-input-number id="wih-count-value-input" v-model="searchForm.wihCountValue" placeholder="数量" style="width: 100%" />
                 </a-col>
               </a-row>
             </a-form-item>
@@ -127,13 +139,13 @@
         <!-- 查询按钮区域 -->
         <a-col :span="24" style="text-align: right;">
           <a-space>
-            <a-button type="primary" @click="handleSearch">
+            <a-button id="search-button" type="primary" @click="handleSearch">
               <SearchOutlined /> 查询
             </a-button>
-            <a-button @click="handleReset">
+            <a-button id="reset-button" @click="handleReset">
               <ReloadOutlined /> 重置
             </a-button>
-            <a-button type="link" @click="toggleAdvanced">
+            <a-button id="toggle-advanced-button" type="link" @click="toggleAdvanced">
               {{ showAdvanced ? '收起' : '展开' }} <component :is="showAdvanced ? 'UpOutlined' : 'DownOutlined'" />
             </a-button>
           </a-space>
@@ -197,25 +209,44 @@ const toggleAdvanced = () => {
   showAdvanced.value = !showAdvanced.value
 }
 
+// 处理输入框值变化
+const handleInputChange = (field: keyof SearchForm, event: Event) => {
+  const value = (event.target as HTMLInputElement).value;
+  searchForm[field] = value;
+}
+
 // 处理查询
 const handleSearch = () => {
-  emit('search', { ...searchForm })
+  const form = { ...searchForm };
+  // 移除空值，但保留已输入的值（包括空字符串）
+  Object.keys(form).forEach(key => {
+    if (form[key] === undefined || form[key] === null) {
+      delete form[key];
+    }
+  });
+
+  emit('search', form);
 }
 
 // 处理重置
 const handleReset = () => {
-  // 重置表单数据
-  Object.keys(searchForm).forEach((key) => {
-    const k = key as keyof SearchForm
-    if (typeof searchForm[k] === 'number') {
-      searchForm[k] = null
-    } else if (typeof searchForm[k] === 'boolean') {
-      searchForm[k] = undefined
-    } else {
-      searchForm[k] = ''
-    }
-  })
-  emit('reset')
+  Object.assign(searchForm, {
+    name: '',
+    target: '',
+    status: '',
+    task_tag: '',
+    siteCountCompare: '',
+    siteCountValue: null,
+    domainCountCompare: '',
+    domainCountValue: null,
+    wihCountCompare: '',
+    wihCountValue: null,
+    'options.domain_brute': undefined,
+    'options.domain_brute_type': '',
+    'options.port_scan': undefined,
+    'options.port_scan_type': ''
+  });
+  emit('reset');
 }
 </script>
 

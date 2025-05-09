@@ -298,7 +298,6 @@ const fetchTaskList = (page: number = pagination.current, pageSize: number = pag
   fetch(`/api/task/?${queryString}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
       'Token': token
     }
   })
