@@ -1,142 +1,290 @@
 <template>
   <div class="status-view">
     <div class="status-card">
-      <h2>系统运行状态</h2>
-      
-      <el-card class="status-info">
-        <div class="status-item">
-          <span class="label">服务状态:</span>
-          <el-tag :type="systemStatus === 'running' ? 'success' : 'danger'">
-            {{ systemStatus === 'running' ? '运行中' : '停止' }}
-          </el-tag>
-        </div>
-        
-        <div class="status-item">
-          <span class="label">运行时间:</span>
-          <span>{{ uptime }}</span>
-        </div>
+      <!-- 系统状态卡片 -->
+      <a-card class="system-info" title="系统状态">
+        <a-row :gutter="24">
+          <a-col :span="24">
+            <div class="status-item">
+              <span class="label">MongoDB:</span>
+              <a-tag :color="mongoStatus === 'running' ? 'success' : 'error'">
+                {{ mongoStatus === 'running' ? '运行中' : '停止' }}
+              </a-tag>
+            </div>
 
-        <div class="status-item">
-          <span class="label">CPU使用率:</span>
-          <el-progress 
-            :percentage="cpuUsage" 
-            :color="getProgressColor(cpuUsage)"
-            :stroke-width="15"
-          />
-        </div>
+            <div class="status-item">
+              <span class="label">RabbitMQ:</span>
+              <a-tag :color="rabbitStatus === 'running' ? 'success' : 'error'">
+                {{ rabbitStatus === 'running' ? '运行中' : '停止' }}
+              </a-tag>
+            </div>
 
-        <div class="status-item">
-          <span class="label">内存使用率:</span>
-          <el-progress 
-            :percentage="memoryUsage" 
-            :color="getProgressColor(memoryUsage)"
-            :stroke-width="15"
-          />
-        </div>
-        
-        <div class="status-item">
-          <span class="label">磁盘使用率:</span>
-          <el-progress 
-            :percentage="diskUsage" 
-            :color="getProgressColor(diskUsage)"
-            :stroke-width="15"
-          />
-        </div>
-      </el-card>
+            <div class="status-item">
+              <span class="label">扫描节点:</span>
+              <a-tag :color="workerCount > 0 ? 'success' : 'warning'">
+                {{ workerCount }} 个工作节点
+              </a-tag>
+            </div>
+          </a-col>
+        </a-row>
+      </a-card>
 
-      <el-card class="task-stats">
-        <template #header>
-          <div class="card-header">
-            <span>任务统计</span>
-          </div>
-        </template>
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <div class="stat-box">
-              <h3>总任务数</h3>
-              <div class="stat-number">{{ taskStats.total || 0 }}</div>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="stat-box">
-              <h3>运行中</h3>
-              <div class="stat-number running">{{ taskStats.running || 0 }}</div>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="stat-box">
-              <h3>已完成</h3>
-              <div class="stat-number finished">{{ taskStats.finished || 0 }}</div>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="stat-box">
-              <h3>失败</h3>
-              <div class="stat-number failed">{{ taskStats.failed || 0 }}</div>
-            </div>
-          </el-col>
-        </el-row>
-      </el-card>
+      <!-- 任务队列状态卡片 -->
+      <a-card title="任务队列状态" style="margin-top: 24px;">
+        <a-table 
+          :columns="queueColumns" 
+          :data-source="queueStats"
+          :pagination="false"
+          size="middle"
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'status'">
+              <a-tag :color="getQueueStatusColor(record.status)">
+                {{ getQueueStatusText(record.status) }}
+              </a-tag>
+            </template>
+          </template>
+        </a-table>
+      </a-card>
+
+      <!-- 工作节点状态卡片 -->
+      <a-card title="工作节点状态" style="margin-top: 24px;">
+        <a-table 
+          :columns="workerColumns" 
+          :data-source="workerStats"
+          :pagination="false"
+          size="middle"
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'status'">
+              <a-tag :color="getWorkerStatusColor(record.status)">
+                {{ getWorkerStatusText(record.status) }}
+              </a-tag>
+            </template>
+          </template>
+        </a-table>
+      </a-card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import axios from 'axios'
+import { message } from 'ant-design-vue'
 
-const systemStatus = ref('running')
-const uptime = ref('0天0小时0分')
-const cpuUsage = ref(0)
-const memoryUsage = ref(0)
-const diskUsage = ref(0)
-const taskStats = ref({
-  total: 0,
-  running: 0,
-  finished: 0,
-  failed: 0
-})
+// 系统状态数据
+const mongoStatus = ref('running')
+const rabbitStatus = ref('running')
+const workerCount = ref(0)
+
+// 队列状态数据
+const queueStats = ref([])
+const queueColumns = [
+  {
+    title: '队列名称',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status',
+    width: 120,
+  },
+  {
+    title: '待处理任务',
+    dataIndex: 'pending',
+    key: 'pending',
+    width: 120,
+  },
+  {
+    title: '工作进程数',
+    dataIndex: 'workers',
+    key: 'workers',
+    width: 120,
+  }
+]
+
+// 工作节点状态数据
+const workerStats = ref([])
+const workerColumns = [
+  {
+    title: '节点ID',
+    dataIndex: 'id',
+    key: 'id',
+  },
+  {
+    title: '主机名',
+    dataIndex: 'hostname',
+    key: 'hostname',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status',
+    width: 120,
+  },
+  {
+    title: '当前任务',
+    dataIndex: 'current_task',
+    key: 'current_task',
+    width: 200,
+  }
+]
 
 // 获取系统状态
 const getSystemStatus = async () => {
   try {
-    const response = await axios.get('/api/status')
-    const data = response.data.data
-    
-    systemStatus.value = data.status
-    uptime.value = formatUptime(data.uptime)
-    cpuUsage.value = parseFloat(data.cpu_usage.toFixed(1))
-    memoryUsage.value = parseFloat(data.memory_usage.toFixed(1))
-    diskUsage.value = parseFloat(data.disk_usage.toFixed(1))
+    const token = localStorage.getItem('Token')
+    if (!token) {
+      message.error('您尚未登录或登录已过期')
+      return
+    }
+
+    const response = await fetch('/api/status/', {
+      headers: {
+        'Token': token
+      }
+    })
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        message.error('登录已过期，请重新登录')
+        return
+      }
+      throw new Error(`请求失败 (${response.status})`)
+    }
+
+    const data = await response.json()
+    if (data.code === 200) {
+      mongoStatus.value = data.data.mongo_status
+      rabbitStatus.value = data.data.rabbit_status
+      workerCount.value = data.data.worker_count || 0
+    } else {
+      throw new Error(data.message || '获取系统状态失败')
+    }
   } catch (error) {
-    ElMessage.error('获取系统状态失败')
+    message.error('获取系统状态失败：' + (error as Error).message)
+    console.error('获取系统状态错误:', error)
   }
 }
 
-// 获取任务统计
-const getTaskStats = async () => {
+// 获取队列状态
+const getQueueStats = async () => {
   try {
-    const response = await axios.get('/api/task/stats')
-    taskStats.value = response.data.data
+    const token = localStorage.getItem('Token')
+    if (!token) {
+      message.error('您尚未登录或登录已过期')
+      return
+    }
+
+    const response = await fetch('/api/scheduler/queues/', {
+      headers: {
+        'Token': token
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`请求失败 (${response.status})`)
+    }
+
+    const data = await response.json()
+    if (data.code === 200) {
+      queueStats.value = data.data || []
+    } else {
+      throw new Error(data.message || '获取队列状态失败')
+    }
   } catch (error) {
-    ElMessage.error('获取任务统计失败')
+    message.error('获取队列状态失败：' + (error as Error).message)
+    console.error('获取队列状态错误:', error)
   }
 }
 
-// 格式化运行时间
-const formatUptime = (seconds: number): string => {
-  const days = Math.floor(seconds / (24 * 60 * 60))
-  const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60))
-  const minutes = Math.floor((seconds % (60 * 60)) / 60)
-  return `${days}天${hours}小时${minutes}分`
+// 获取工作节点状态
+const getWorkerStats = async () => {
+  try {
+    const token = localStorage.getItem('Token')
+    if (!token) {
+      message.error('您尚未登录或登录已过期')
+      return
+    }
+
+    const response = await fetch('/api/scheduler/workers/', {
+      headers: {
+        'Token': token
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`请求失败 (${response.status})`)
+    }
+
+    const data = await response.json()
+    if (data.code === 200) {
+      workerStats.value = data.data || []
+    } else {
+      throw new Error(data.message || '获取工作节点状态失败')
+    }
+  } catch (error) {
+    message.error('获取工作节点状态失败：' + (error as Error).message)
+    console.error('获取工作节点状态错误:', error)
+  }
 }
 
-// 根据使用率返回不同的进度条颜色
-const getProgressColor = (percentage: number) => {
-  if (percentage < 60) return '#67C23A'
-  if (percentage < 80) return '#E6A23C'
-  return '#F56C6C'
+// 获取队列状态颜色
+const getQueueStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case 'running':
+      return 'success'
+    case 'stopped':
+      return 'error'
+    case 'paused':
+      return 'warning'
+    default:
+      return 'default'
+  }
+}
+
+// 获取队列状态文本
+const getQueueStatusText = (status: string) => {
+  switch (status.toLowerCase()) {
+    case 'running':
+      return '运行中'
+    case 'stopped':
+      return '已停止'
+    case 'paused':
+      return '已暂停'
+    default:
+      return '未知'
+  }
+}
+
+// 获取工作节点状态颜色
+const getWorkerStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case 'online':
+      return 'success'
+    case 'offline':
+      return 'error'
+    case 'busy':
+      return 'warning'
+    default:
+      return 'default'
+  }
+}
+
+// 获取工作节点状态文本
+const getWorkerStatusText = (status: string) => {
+  switch (status.toLowerCase()) {
+    case 'online':
+      return '在线'
+    case 'offline':
+      return '离线'
+    case 'busy':
+      return '繁忙'
+    default:
+      return '未知'
+  }
 }
 
 // 定时刷新数据
@@ -144,13 +292,15 @@ let timer: number
 const startTimer = () => {
   timer = window.setInterval(() => {
     getSystemStatus()
-    getTaskStats()
+    getQueueStats()
+    getWorkerStats()
   }, 30000) // 每30秒刷新一次
 }
 
 onMounted(() => {
   getSystemStatus()
-  getTaskStats()
+  getQueueStats()
+  getWorkerStats()
   startTimer()
 })
 
@@ -163,7 +313,7 @@ onUnmounted(() => {
 
 <style scoped>
 .status-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .status-card {
@@ -171,19 +321,10 @@ onUnmounted(() => {
   margin: 0 auto;
 }
 
-.status-card h2 {
-  margin-bottom: 20px;
-  color: #303133;
-}
-
-.status-info {
-  margin-bottom: 20px;
-}
-
 .status-item {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .status-item:last-child {
@@ -192,46 +333,23 @@ onUnmounted(() => {
 
 .status-item .label {
   width: 100px;
-  color: #606266;
+  color: rgba(0, 0, 0, 0.65);
+  margin-right: 16px;
 }
 
-.status-item .el-progress {
-  flex: 1;
-  margin-left: 20px;
+:deep(.ant-card-head) {
+  min-height: 48px;
 }
 
-.task-stats .el-row {
-  margin: 0 -10px;
+:deep(.ant-card-head-title) {
+  padding: 12px 0;
 }
 
-.stat-box {
-  background: #f5f7fa;
-  border-radius: 4px;
-  padding: 15px;
-  text-align: center;
+:deep(.ant-table-thead > tr > th) {
+  background: #fafafa;
 }
 
-.stat-box h3 {
-  color: #606266;
-  font-size: 14px;
-  margin: 0 0 10px 0;
-}
-
-.stat-number {
-  font-size: 24px;
-  font-weight: bold;
-  color: #303133;
-}
-
-.stat-number.running {
-  color: #409EFF;
-}
-
-.stat-number.finished {
-  color: #67C23A;
-}
-
-.stat-number.failed {
-  color: #F56C6C;
+:deep(.ant-table-tbody > tr > td) {
+  padding: 12px 16px;
 }
 </style>
