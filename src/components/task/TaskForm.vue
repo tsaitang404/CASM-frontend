@@ -3,13 +3,21 @@
     <!-- 基本信息 -->
     <a-row :gutter="20">
       <a-col :span="12">
-        <a-form-item name="name" label="任务名称">
-          <a-input v-model:value="formState.name" placeholder="请输入任务名称" />
+        <a-form-item name="name" label="任务名称" required>
+          <a-input 
+            v-model:value="formState.name" 
+            placeholder="请输入任务名称"
+            @change="updateModelValue" 
+          />
         </a-form-item>
       </a-col>
       <a-col :span="12">
-        <a-form-item name="target" label="目标">
-          <a-input v-model:value="formState.target" placeholder="请输入目标IP/域名" />
+        <a-form-item name="target" label="目标" required>
+          <a-input 
+            v-model:value="formState.target" 
+            placeholder="请输入目标IP/域名"
+            @change="updateModelValue"
+          />
         </a-form-item>
       </a-col>
     </a-row>
@@ -119,50 +127,89 @@ export default defineComponent({
       required: true
     }
   },
-  setup(props, { emit, expose }) {
+  emits: ['update:modelValue'],
+  setup(props, { emit }) {
     const formRef = ref<FormInstance>()
-    const formState = reactive<TaskForm>({ ...props.modelValue })
+    
+    // 表单状态
+    const formState = reactive<TaskForm>({
+      ...props.modelValue
+    })
 
-    watch(formState, (newVal) => {
-      emit('update:modelValue', { ...newVal })
-    }, { deep: true })
+    // 表单验证规则
+    const rules = {
+      name: [
+        { required: true, message: '请输入任务名称', trigger: ['blur', 'change'] },
+        { min: 2, max: 50, message: '任务名称长度应为2-50个字符', trigger: ['blur', 'change'] },
+        { whitespace: true, message: '任务名称不能为空白字符', trigger: ['blur', 'change'] }
+      ],
+      target: [
+        { required: true, message: '请输入目标IP/域名', trigger: ['blur', 'change'] },
+        { whitespace: true, message: '目标不能为空白字符', trigger: ['blur', 'change'] },
+        { 
+          validator: (rule: any, value: string) => {
+            const trimmedValue = value.trim();
+            if (!trimmedValue) {
+              return Promise.reject('目标不能为空');
+            }
+            // 简单的域名或IP格式验证
+            const isValidInput = /^([a-zA-Z0-9][-a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/.test(trimmedValue) || 
+                               /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(trimmedValue);
+            return isValidInput ? Promise.resolve() : Promise.reject('请输入有效的域名或IP地址');
+          },
+          trigger: ['blur', 'change']
+        }
+      ]
+    }
 
+    // 更新父组件的值
+    const updateModelValue = () => {
+      emit('update:modelValue', {
+        ...formState,
+        name: formState.name?.trim() || '',
+        target: formState.target?.trim() || ''
+      })
+    }
+
+    // 监听父组件传入的值变化
     watch(() => props.modelValue, (newVal) => {
       Object.assign(formState, newVal)
     }, { deep: true })
 
-    const rules = {
-      name: [
-        { required: true, message: '请输入任务名称', trigger: 'blur' },
-        { min: 1, max: 50, message: '任务名称长度应为1-50个字符', trigger: 'blur' }
-      ],
-      target: [
-        { required: true, message: '请输入目标IP/域名', trigger: 'blur' }
-      ],
-      domain_brute_type: [
-        { required: true, message: '请选择域名爆破类型', trigger: 'change' }
-      ],
-      port_scan_type: [
-        { required: true, message: '请选择端口扫描类型', trigger: 'change' }
-      ]
-    }
+    // 监听本地表单状态变化
+    watch(formState, () => {
+      updateModelValue()
+    }, { deep: true })
 
-    // 添加validate方法
+    // 对外暴露的方法
     const validate = () => {
-      return formRef.value?.validate()
+      return new Promise((resolve, reject) => {
+        formRef.value?.validate()
+          .then(() => {
+            // 验证成功时，确保数据已经trim
+            formState.name = formState.name?.trim() || ''
+            formState.target = formState.target?.trim() || ''
+            updateModelValue()
+            resolve(true)
+          })
+          .catch((errors) => {
+            reject(errors)
+          })
+      })
     }
 
-    // 暴露方法和引用给父组件
-    expose({
-      validate,
-      formRef,
-      resetFields: () => formRef.value?.resetFields()
-    })
+    const resetFields = () => {
+      formRef.value?.resetFields()
+      updateModelValue()
+    }
 
     return {
       formRef,
       formState,
-      rules
+      rules,
+      validate,
+      resetFields,
+      updateModelValue
     }
   }
 })

@@ -17,75 +17,60 @@
     
     <!-- 任务列表表格 -->
     <a-table
+      :dataSource="tasks"
       :columns="columns"
-      :data-source="tasks"
       :loading="loading"
+      :rowSelection="rowSelection"
       :pagination="pagination"
-      :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
-      :scroll="{ x: 1500 }"
       @change="handleTableChange"
-      row-key="_id"
+      :rowKey="_id"
       size="middle"
-      :components="resizableComponents"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'name'">
-          <a @click="handleViewDetail(record)">{{ record.name }}</a>
+        <template v-if="column.dataIndex === 'action'">
+          <a-space>
+            <a-button type="link" @click="handleView(record)">查看</a-button>
+            <a-button 
+              type="link" 
+              @click="handleRestart(record)"
+              :disabled="!['stop', 'error', 'done'].includes(record.status)"
+            >
+              重启
+            </a-button>
+            <a-button 
+              type="link" 
+              @click="handleStop(record)"
+              :disabled="!['waiting', 'running'].includes(record.status)"
+              danger
+            >
+              停止
+            </a-button>
+            <a-button type="link" @click="handleDelete(record)" danger>删除</a-button>
+          </a-space>
         </template>
         
-        <template v-if="column.key === 'target'">
-          <a-tooltip :title="record.target">
-            {{ truncateText(record.target, 30) }}
-          </a-tooltip>
-        </template>
-        
-        <template v-if="column.key === 'status'">
-          <a-tag :color="getStatusColor(record.status)">
-            {{ getStatusText(record.status) }}
+        <template v-else-if="column.dataIndex === 'status'">
+          <a-tag :color="getTaskStatusColor(record.status)">
+            {{ getTaskStatusText(record.status) }}
           </a-tag>
         </template>
         
-        <template v-if="column.key === 'options'">
-          <a-space>
-            <a-tag v-if="record.options?.domain_brute" color="blue">域名爆破</a-tag>
-            <a-tag v-if="record.options?.port_scan" color="green">端口扫描</a-tag>
-            <a-tag v-if="record.options?.service_detection" color="cyan">服务识别</a-tag>
-            <a-tag v-if="record.options?.nuclei_scan" color="orange">Nuclei</a-tag>
-            <a-tooltip title="查看全部选项">
-              <EyeOutlined @click="handleViewOptions(record)" />
-            </a-tooltip>
-          </a-space>
+        <template v-else-if="column.dataIndex === 'progress'">
+          <a-progress 
+            :percent="calculateProgress(record)" 
+            :status="record.status === 'error' ? 'exception' : undefined"
+            size="small"
+          />
         </template>
         
-        <template v-if="column.key === 'statistic'">
-          <a-space direction="vertical" size="small">
-            <span>站点数: {{ record.statistic?.site_cnt || 0 }}</span>
-            <span>域名数: {{ record.statistic?.domain_cnt || 0 }}</span>
-            <span>WIH数: {{ record.statistic?.wih_cnt || 0 }}</span>
-          </a-space>
+        <template v-else-if="column.dataIndex === 'target'">
+          <a-tooltip :title="record.target">
+            {{ truncateText(record.target) }}
+          </a-tooltip>
         </template>
         
-        <template v-if="column.key === 'action'">
-          <a-space>
-            <a-tooltip title="查看详情">
-              <a @click="handleViewDetail(record)"><EyeOutlined /></a>
-            </a-tooltip>
-            <a-tooltip title="导出任务">
-              <a @click="handleExport(record)"><DownloadOutlined /></a>
-            </a-tooltip>
-            <a-tooltip v-if="record.status === 'running' || record.status === 'waiting'" title="停止任务">
-              <a @click="handleStop(record)"><PauseCircleOutlined /></a>
-            </a-tooltip>
-            <a-tooltip v-if="record.status === 'done' || record.status === 'stop' || record.status === 'error'" title="重启任务">
-              <a @click="handleRestart(record)"><ReloadOutlined /></a>
-            </a-tooltip>
-            <a-tooltip title="同步到资产组">
-              <a @click="handleSync(record)"><PartitionOutlined /></a>
-            </a-tooltip>
-            <a-tooltip v-if="record.status === 'done' || record.status === 'stop' || record.status === 'error'" title="删除任务">
-              <a @click="handleDelete(record)"><DeleteOutlined /></a>
-            </a-tooltip>
-          </a-space>
+        <template v-else-if="column.dataIndex === 'statistics'">
+          {{ formatTaskStatistic(record) }}
         </template>
       </template>
     </a-table>
@@ -93,127 +78,194 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { TableColumnsType } from 'ant-design-vue'
-import { 
-  PauseCircleOutlined, 
-  DeleteOutlined, 
-  ReloadOutlined, 
-  EyeOutlined,
-  PartitionOutlined,
-  DownloadOutlined
-} from '@ant-design/icons-vue'
-import { useResizableTable } from '@/composables/useResizableTable'
-import { getStatusColor, getStatusText, truncateText } from '@/utils/taskHelper'
+import { ref, defineProps, defineEmits } from 'vue'
+import { Modal, message } from 'ant-design-vue'
+import { useRouter } from 'vue-router'
+import { PauseCircleOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import type { Task } from '@/types/task'
+import http from '@/plugins/http'
+import { 
+  getTaskStatusColor, 
+  getTaskStatusText, 
+  calculateProgress,
+  truncateText,
+  formatTaskStatistic 
+} from '@/utils/taskHelper'
 
-interface Props {
+const router = useRouter()
+
+const props = defineProps<{
   tasks: Task[]
   loading: boolean
+  selectedRowKeys: string[]
   pagination: {
     current: number
     pageSize: number
     total: number
   }
-}
+}>()
 
-interface Emits {
+const emit = defineEmits<{
   (e: 'update:selectedRowKeys', keys: string[]): void
-  (e: 'stop', task: Task): void
-  (e: 'delete', task: Task): void
-  (e: 'restart', task: Task): void
-  (e: 'export', task: Task): void
-  (e: 'sync', task: Task): void
-  (e: 'view-detail', task: Task): void
-  (e: 'view-options', task: Task): void
-  (e: 'batch-stop'): void
-  (e: 'batch-delete'): void
-  (e: 'batch-restart'): void
-  (e: 'change', pagination: any): void
-}
+  (e: 'reload'): void
+  (e: 'tableChange', pagination: any, filters: any, sorter: any): void
+}>()
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
-// 选中的行
-const selectedRowKeys = ref<string[]>([])
-
-// 表格列定义
-const columns: TableColumnsType = [
-  { 
-    title: '任务名称', 
-    dataIndex: 'name', 
-    key: 'name', 
-    ellipsis: true,
-    resizable: true,
-    width: 150
+const columns = [
+  {
+    title: '任务名称',
+    dataIndex: 'name',
+    width: 200,
   },
-  { 
-    title: '任务目标', 
-    dataIndex: 'target', 
-    key: 'target', 
-    ellipsis: true,
-    resizable: true,
-    width: 200 
+  {
+    title: '目标',
+    dataIndex: 'target',
+    width: 200,
   },
-  { 
-    title: '任务状态', 
-    dataIndex: 'status', 
-    key: 'status', 
-    width: 120,
-    resizable: true 
-  },
-  { 
-    title: '任务选项', 
-    dataIndex: 'options', 
-    key: 'options',
-    resizable: true,
-    width: 200
-  },
-  { 
-    title: '统计数据', 
-    dataIndex: 'statistic', 
-    key: 'statistic', 
+  {
+    title: '状态',
+    dataIndex: 'status',
     width: 100,
-    resizable: true
   },
-  { 
-    title: '操作', 
-    dataIndex: 'action', 
-    key: 'action', 
-    width: 210, 
-    fixed: 'right',
-    align: 'center'
+  {
+    title: '进度',
+    dataIndex: 'progress',
+    width: 150,
+  },
+  {
+    title: '统计信息',
+    dataIndex: 'statistics',
+    width: 250,
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'create_time',
+    width: 170,
+  },
+  {
+    title: '操作',
+    dataIndex: 'action',
+    width: 200,
+    fixed: 'right'
   }
 ]
 
-// 可调整列宽相关
-const { resizableComponents } = useResizableTable()
-
-// 表格选择变化
-const onSelectChange = (keys: string[]) => {
-  selectedRowKeys.value = keys
-  emit('update:selectedRowKeys', keys)
+const rowSelection = {
+  selectedRowKeys: props.selectedRowKeys,
+  onChange: (keys: string[]) => {
+    emit('update:selectedRowKeys', keys)
+  }
 }
 
-// 表格分页变化
-const handleTableChange = (pagination: any) => {
-  emit('change', pagination)
+const handleTableChange = (pagination: any, filters: any, sorter: any) => {
+  emit('tableChange', pagination, filters, sorter)
 }
 
-// 任务操作事件处理
-const handleStop = (task: Task) => emit('stop', task)
-const handleDelete = (task: Task) => emit('delete', task)
-const handleRestart = (task: Task) => emit('restart', task)
-const handleExport = (task: Task) => emit('export', task)
-const handleSync = (task: Task) => emit('sync', task)
-const handleViewDetail = (task: Task) => emit('view-detail', task)
-const handleViewOptions = (task: Task) => emit('view-options', task)
+const handleView = (record: Task) => {
+  // 导航到任务详情页
+  router.push(`/task-detail/${record._id}`)
+}
 
-// 批量操作事件处理
-const handleBatchStop = () => emit('batch-stop')
-const handleBatchDelete = () => emit('batch-delete')
-const handleBatchRestart = () => emit('batch-restart')
+const handleRestart = async (record: Task) => {
+  try {
+    await http.post(`/api/tasks/${record._id}/restart`)
+    message.success('重启任务成功')
+    emit('reload')
+  } catch (error) {
+    message.error('重启任务失败')
+  }
+}
+
+const handleStop = async (record: Task) => {
+  try {
+    await http.post(`/api/tasks/${record._id}/stop`)
+    message.success('停止任务成功')
+    emit('reload')
+  } catch (error) {
+    message.error('停止任务失败')
+  }
+}
+
+const handleDelete = (record: Task) => {
+  Modal.confirm({
+    title: '确认删除',
+    content: '确定要删除该任务吗？此操作不可恢复。',
+    okText: '确认',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        await http.delete(`/api/tasks/${record._id}`)
+        message.success('删除任务成功')
+        emit('reload')
+      } catch (error) {
+        message.error('删除任务失败')
+      }
+    }
+  })
+}
+
+const handleBatchStop = async () => {
+  Modal.confirm({
+    title: '确认停止',
+    content: `确定要停止选中的 ${props.selectedRowKeys.length} 个任务吗？`,
+    okText: '确认',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        await Promise.all(props.selectedRowKeys.map(id => 
+          http.post(`/api/tasks/${id}/stop`)
+        ))
+        message.success('批量停止任务成功')
+        emit('update:selectedRowKeys', [])
+        emit('reload')
+      } catch (error) {
+        message.error('批量停止任务失败')
+      }
+    }
+  })
+}
+
+const handleBatchRestart = async () => {
+  Modal.confirm({
+    title: '确认重启',
+    content: `确定要重启选中的 ${props.selectedRowKeys.length} 个任务吗？`,
+    okText: '确认',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        await Promise.all(props.selectedRowKeys.map(id => 
+          http.post(`/api/tasks/${id}/restart`)
+        ))
+        message.success('批量重启任务成功')
+        emit('update:selectedRowKeys', [])
+        emit('reload')
+      } catch (error) {
+        message.error('批量重启任务失败')
+      }
+    }
+  })
+}
+
+const handleBatchDelete = () => {
+  Modal.confirm({
+    title: '确认删除',
+    content: `确定要删除选中的 ${props.selectedRowKeys.length} 个任务吗？此操作不可恢复。`,
+    okText: '确认',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        await Promise.all(props.selectedRowKeys.map(id => 
+          http.delete(`/api/tasks/${id}`)
+        ))
+        message.success('批量删除任务成功')
+        emit('update:selectedRowKeys', [])
+        emit('reload')
+      } catch (error) {
+        message.error('批量删除任务失败')
+      }
+    }
+  })
+}
 </script>
 
 <style scoped>

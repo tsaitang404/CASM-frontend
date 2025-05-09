@@ -44,31 +44,31 @@ const confirmLoading = ref(false)
 
 // 表单数据初始值
 const defaultFormData = {
-  name: '',
-  target: '',
-  domain_brute_type: 'big',
+  name: '',  // 确保初始化为空字符串
+  target: '',  // 确保初始化为空字符串
+  domain_brute_type: 'small',  // 设置合理的默认值
   port_scan_type: 'top100',
-  domain_brute: true,
-  alt_dns: true,
-  dns_query_plugin: true,
-  casm_search: true,
-  port_scan: true,
-  service_detection: true,
-  os_detection: true,
-  ssl_cert: true,
-  skip_scan_cdn_ip: true,
-  site_identify: true,
-  search_engines: true,
+  domain_brute: false,  // 默认关闭各项功能
+  alt_dns: false,
+  dns_query_plugin: false,
+  casm_search: false,
+  port_scan: false,
+  service_detection: false,
+  os_detection: false,
+  ssl_cert: false,
+  skip_scan_cdn_ip: false,
+  site_identify: false,
+  search_engines: false,
   site_spider: false,
-  site_capture: true,
-  file_leak: true,
-  findvhost: true,
-  nuclei_scan: true,
-  web_info_hunter: true
+  site_capture: false,
+  file_leak: false,
+  findvhost: false,
+  nuclei_scan: false,
+  web_info_hunter: false
 }
 
 // 表单数据，使用 reactive 保持响应性
-const formData = reactive({ ...defaultFormData })
+const formData = reactive<typeof defaultFormData>({ ...defaultFormData })
 
 // 重置表单数据到初始状态
 const resetForm = () => {
@@ -79,82 +79,78 @@ const resetForm = () => {
 }
 
 // 提交表单
-const handleOk = () => {
+const handleOk = async () => {
   if (!formRef.value) return
 
-  formRef.value.validate()
-    .then(() => {
-      confirmLoading.value = true
-      
-      const taskData = {
-        name: formData.name,
-        target: formData.target,
-        options: {
-          domain_brute_type: formData.domain_brute_type,
-          port_scan_type: formData.port_scan_type,
-          domain_brute: formData.domain_brute,
-          alt_dns: formData.alt_dns,
-          dns_query_plugin: formData.dns_query_plugin,
-          casm_search: formData.casm_search,
-          port_scan: formData.port_scan,
-          service_detection: formData.service_detection,
-          os_detection: formData.os_detection,
-          ssl_cert: formData.ssl_cert,
-          skip_scan_cdn_ip: formData.skip_scan_cdn_ip,
-          site_identify: formData.site_identify,
-          search_engines: formData.search_engines,
-          site_spider: formData.site_spider,
-          site_capture: formData.site_capture,
-          file_leak: formData.file_leak,
-          findvhost: formData.findvhost,
-          nuclei_scan: formData.nuclei_scan,
-          web_info_hunter: formData.web_info_hunter
-        }
+  try {
+    confirmLoading.value = true
+    // 调用子组件的验证方法
+    await formRef.value.validate()
+    
+    // 二次验证任务名称和目标
+    const trimmedName = formData.name?.trim()
+    const trimmedTarget = formData.target?.trim()
+    
+    if (!trimmedName || !trimmedTarget) {
+      message.error('任务名称和目标不能为空')
+      return
+    }
+    
+    // 构造任务数据
+    const taskData = {
+      name: trimmedName,
+      target: trimmedTarget,
+      options: {
+        domain_brute_type: formData.domain_brute_type,
+        port_scan_type: formData.port_scan_type,
+        domain_brute: formData.domain_brute,
+        alt_dns: formData.alt_dns,
+        dns_query_plugin: formData.dns_query_plugin,
+        casm_search: formData.casm_search,
+        port_scan: formData.port_scan,
+        service_detection: formData.service_detection,
+        os_detection: formData.os_detection,
+        ssl_cert: formData.ssl_cert,
+        skip_scan_cdn_ip: formData.skip_scan_cdn_ip,
+        site_identify: formData.site_identify,
+        search_engines: formData.search_engines,
+        site_spider: formData.site_spider,
+        site_capture: formData.site_capture,
+        file_leak: formData.file_leak,
+        findvhost: formData.findvhost,
+        nuclei_scan: formData.nuclei_scan,
+        web_info_hunter: formData.web_info_hunter
       }
-      
-      const token = localStorage.getItem('Token')
-      if (!token) {
-        message.error('您尚未登录或登录已过期，请重新登录')
-        confirmLoading.value = false
-        return
-      }
-      
-      fetch('/api/task/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Token': token
-        },
-        body: JSON.stringify(taskData)
-      })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(err => {
-            throw new Error(err.message || '网络请求失败')
-          }).catch(() => {
-            throw new Error(`请求失败 (${response.status})`)
-          })
-        }
-        return response.json()
-      })
-      .then(data => {
-        if (data.code === 401) {
-          message.error('登录已过期，请重新登录')
-          return
-        }
-        
-        message.success('创建任务成功')
-        emit('success')  // 触发success事件，通知父组件刷新列表
-        resetForm()
-        emit('update:open', false)
-      })
-      .catch(error => {
-        message.error('创建任务失败: ' + error.message)
-      })
-      .then(() => {
-        confirmLoading.value = false
-      })
+    }
+
+    console.log('提交的任务数据:', taskData)
+
+    const response = await fetch('/api/task/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(taskData)
     })
+
+    const data = await response.json()
+
+    if (data.code === 200) {
+      message.success('任务创建成功')
+      emit('success')
+      emit('update:open', false)
+      resetForm()
+    } else if (data.code === 401) {
+      message.error('未登录或登录已过期，请重新登录')
+    } else {
+      throw new Error(data.message || '创建任务失败')
+    }
+  } catch (error: any) {
+    console.error('提交任务时出错:', error)
+    message.error(error.message || '表单验证失败，请检查输入')
+  } finally {
+    confirmLoading.value = false
+  }
 }
 
 // 取消操作
