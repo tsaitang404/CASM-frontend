@@ -29,7 +29,7 @@
         </a-row>
       </a-card>
 
-      <!-- 资产统计卡片 -->
+      <!-- 资产统计卡片 -->  
       <a-card title="资产统计" style="margin-top: 24px;">
         <a-row :gutter="16">
           <a-col :span="8">
@@ -55,41 +55,6 @@
         </a-row>
       </a-card>
 
-      <!-- 任务队列状态卡片 -->
-      <a-card title="任务队列状态" style="margin-top: 24px;">
-        <a-table 
-          :columns="queueColumns" 
-          :data-source="queueStats"
-          :pagination="false"
-          size="middle"
-        >
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'status'">
-              <a-tag :color="getQueueStatusColor(record.status)">
-                {{ getQueueStatusText(record.status) }}
-              </a-tag>
-            </template>
-          </template>
-        </a-table>
-      </a-card>
-
-      <!-- 工作节点状态卡片 -->
-      <a-card title="工作节点状态" style="margin-top: 24px;">
-        <a-table 
-          :columns="workerColumns" 
-          :data-source="workerStats"
-          :pagination="false"
-          size="middle"
-        >
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'status'">
-              <a-tag :color="getWorkerStatusColor(record.status)">
-                {{ getWorkerStatusText(record.status) }}
-              </a-tag>
-            </template>
-          </template>
-        </a-table>
-      </a-card>
     </div>
   </div>
 </template>
@@ -99,74 +64,19 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { message } from 'ant-design-vue'
 
 // 系统状态数据
-const mongoStatus = ref('running')
-const rabbitStatus = ref('running')
+const mongoStatus = ref('error')
+const rabbitStatus = ref('error')
 const workerCount = ref(0)
 
 // 资产统计数据
 const assetStats = ref({
   domains: 0,
-  ips: 0,
+  ips: 0,  
   sites: 0,
   services: 0,
   vulnerabilities: 0,
   certificates: 0
 })
-
-// 队列状态数据
-const queueStats = ref([])
-const queueColumns = [
-  {
-    title: '队列名称',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-    width: 120,
-  },
-  {
-    title: '待处理任务',
-    dataIndex: 'pending',
-    key: 'pending',
-    width: 120,
-  },
-  {
-    title: '工作进程数',
-    dataIndex: 'workers',
-    key: 'workers',
-    width: 120,
-  }
-]
-
-// 工作节点状态数据
-const workerStats = ref([])
-const workerColumns = [
-  {
-    title: '节点ID',
-    dataIndex: 'id',
-    key: 'id',
-  },
-  {
-    title: '主机名',
-    dataIndex: 'hostname',
-    key: 'hostname',
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-    width: 120,
-  },
-  {
-    title: '当前任务',
-    dataIndex: 'current_task',
-    key: 'current_task',
-    width: 200,
-  }
-]
 
 // 获取系统状态
 const getSystemStatus = async () => {
@@ -184,151 +94,40 @@ const getSystemStatus = async () => {
     })
 
     if (!response.ok) {
-      if (response.status === 401) {
-        message.error('登录已过期，请重新登录')
-        return
-      }
       throw new Error(`请求失败 (${response.status})`)
     }
 
     const data = await response.json()
-    if (data.code === 200) {
-      mongoStatus.value = data.data.mongo_status
-      rabbitStatus.value = data.data.rabbit_status
-      workerCount.value = data.data.worker_count || 0
-      // 更新资产统计数据
-      assetStats.value = {
-        domains: data.data.assets?.domains || 0,
-        ips: data.data.assets?.ips || 0,
-        sites: data.data.assets?.sites || 0,
-        services: data.data.assets?.services || 0,
-        vulnerabilities: data.data.assets?.vulnerabilities || 0,
-        certificates: data.data.assets?.certificates || 0
-      }
-    } else {
+    
+    // 修改错误处理逻辑
+    if (data.code === 401) {
+      message.error('登录已过期，请重新登录')
+      return
+    }
+    
+    if (data.code !== 200 || !data.data) {
       throw new Error(data.message || '获取系统状态失败')
     }
+
+    // 更新系统组件状态
+    mongoStatus.value = data.data.mongodb?.status || 'error'
+    rabbitStatus.value = data.data.rabbitmq?.status || 'error'
+    workerCount.value = Object.values(data.data.workers || {}).filter(w => w.status === 'running').length
+    
+    // 更新资产统计数据
+    if (data.data.assets) {
+      assetStats.value = {
+        domains: data.data.assets.domains || 0,
+        ips: data.data.assets.ips || 0,
+        sites: data.data.assets.sites || 0,
+        services: data.data.assets.services || 0,
+        vulnerabilities: data.data.assets.vulnerabilities || 0,
+        certificates: data.data.assets.certificates || 0
+      }
+    }
   } catch (error) {
-    message.error('获取系统状态失败：' + (error as Error).message)
     console.error('获取系统状态错误:', error)
-  }
-}
-
-// 获取队列状态
-const getQueueStats = async () => {
-  try {
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('您尚未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch('/api/scheduler/queues/', {
-      headers: {
-        'Token': token
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`请求失败 (${response.status})`)
-    }
-
-    const data = await response.json()
-    if (data.code === 200) {
-      queueStats.value = data.data || []
-    } else {
-      throw new Error(data.message || '获取队列状态失败')
-    }
-  } catch (error) {
-    message.error('获取队列状态失败：' + (error as Error).message)
-    console.error('获取队列状态错误:', error)
-  }
-}
-
-// 获取工作节点状态
-const getWorkerStats = async () => {
-  try {
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('您尚未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch('/api/scheduler/workers/', {
-      headers: {
-        'Token': token
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`请求失败 (${response.status})`)
-    }
-
-    const data = await response.json()
-    if (data.code === 200) {
-      workerStats.value = data.data || []
-    } else {
-      throw new Error(data.message || '获取工作节点状态失败')
-    }
-  } catch (error) {
-    message.error('获取工作节点状态失败：' + (error as Error).message)
-    console.error('获取工作节点状态错误:', error)
-  }
-}
-
-// 获取队列状态颜色
-const getQueueStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case 'running':
-      return 'success'
-    case 'stopped':
-      return 'error'
-    case 'paused':
-      return 'warning'
-    default:
-      return 'default'
-  }
-}
-
-// 获取队列状态文本
-const getQueueStatusText = (status: string) => {
-  switch (status.toLowerCase()) {
-    case 'running':
-      return '运行中'
-    case 'stopped':
-      return '已停止'
-    case 'paused':
-      return '已暂停'
-    default:
-      return '未知'
-  }
-}
-
-// 获取工作节点状态颜色
-const getWorkerStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case 'online':
-      return 'success'
-    case 'offline':
-      return 'error'
-    case 'busy':
-      return 'warning'
-    default:
-      return 'default'
-  }
-}
-
-// 获取工作节点状态文本
-const getWorkerStatusText = (status: string) => {
-  switch (status.toLowerCase()) {
-    case 'online':
-      return '在线'
-    case 'offline':
-      return '离线'
-    case 'busy':
-      return '繁忙'
-    default:
-      return '未知'
+    message.error('获取系统状态失败：' + (error as Error).message)
   }
 }
 
@@ -337,15 +136,11 @@ let timer: number
 const startTimer = () => {
   timer = window.setInterval(() => {
     getSystemStatus()
-    getQueueStats()
-    getWorkerStats()
   }, 30000) // 每30秒刷新一次
 }
 
 onMounted(() => {
   getSystemStatus()
-  getQueueStats()
-  getWorkerStats()
   startTimer()
 })
 
@@ -378,7 +173,7 @@ onUnmounted(() => {
 
 .status-item .label {
   width: 100px;
-  color: rgba(0, 0, 0, 0.65);
+  color: rgba(0, 0, 0, 0.65);  
   margin-right: 16px;
 }
 
@@ -396,5 +191,5 @@ onUnmounted(() => {
 
 :deep(.ant-table-tbody > tr > td) {
   padding: 12px 16px;
-}
+} 
 </style>
