@@ -65,13 +65,14 @@
           <span v-show="!collapsed">GitHub监控</span>
         </div>
       </a-menu-item>
-      <a-menu-item key="status" style="height: 56px; line-height: 56px;" :title="collapsed ? '系统状态' : ''">
-        <div class="menu-item-content">
-          <ion-icon name="stats-chart"></ion-icon>
-          <span v-show="!collapsed">系统状态</span>
-        </div>
-      </a-menu-item>
     </a-menu>
+    
+    <div class="status-link" :class="{ 'collapsed': collapsed }">
+      <a @click="handleSelect({ key: 'status' })">
+        <ion-icon name="stats-chart"></ion-icon>
+        <span v-show="!collapsed">系统状态</span>
+      </a>
+    </div>
   </a-layout-sider>
 </template>
 
@@ -114,6 +115,42 @@ function handleSelect({ key }) {
   }
 }
 </script>
+
+<style scoped>
+.status-link {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background-color: #001529;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-link.collapsed {
+  padding: 16px 0;
+  text-align: center;
+}
+
+.status-link a {
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.status-link a:hover {
+  color: #fff;
+}
+
+.status-link ion-icon {
+  font-size: 18px;
+}
+</style>
 
 <style>
 @import '@/assets/styles/components/sidebar.css';
