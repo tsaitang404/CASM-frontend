@@ -11,6 +11,7 @@ import PocInfoView from '@/views/PocInfoView.vue'
 import TaskScheduleView from '@/views/TaskScheduleView.vue'
 import GithubMonitorView from '@/views/GithubMonitorView.vue'
 import TaskDetailView from '@/views/TaskdetailView.vue'
+import StatusView from '@/views/StatusView.vue'
 
 const routes = [
   {
@@ -87,6 +88,12 @@ const routes = [
     path: '/github-monitor',
     name: 'github-monitor',
     component: GithubMonitorView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/status',
+    name: 'status',
+    component: StatusView,
     meta: { requiresAuth: true }
   },
   {

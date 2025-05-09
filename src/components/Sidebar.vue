@@ -65,6 +65,12 @@
           <span v-show="!collapsed">GitHub监控</span>
         </div>
       </a-menu-item>
+      <a-menu-item key="status" style="height: 56px; line-height: 56px;" :title="collapsed ? '系统状态' : ''">
+        <div class="menu-item-content">
+          <ion-icon name="stats-chart"></ion-icon>
+          <span v-show="!collapsed">系统状态</span>
+        </div>
+      </a-menu-item>
     </a-menu>
   </a-layout-sider>
 </template>
@@ -99,6 +105,7 @@ function handleSelect({ key }) {
     'pocinfo': '/pocinfo',
     'poc': '/poc',
     'github-monitor': '/github-monitor',
+    'status': '/status'
   }
   
   // 如果路由映射表中有对应的路由，则进行跳转
