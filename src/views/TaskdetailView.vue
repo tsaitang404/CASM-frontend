@@ -202,7 +202,7 @@ const fetchTaskDetail = async () => {
       return;
     }
 
-    const response = await fetch(`/api/task/${taskId}`, {
+    const response = await fetch(`/api/task/?_id=${taskId}`, {
       headers: {
         'Token': token
       }
@@ -223,7 +223,12 @@ const fetchTaskDetail = async () => {
       throw new Error(data.message || '获取任务详情失败');
     }
 
-    taskDetail.value = data.data;
+    // 由于返回的是列表，我们需要获取第一个任务的详情
+    if (data.items && data.items.length > 0) {
+      taskDetail.value = data.items[0];
+    } else {
+      throw new Error('未找到任务详情');
+    }
     
     // 模拟任务结果数据，实际项目中需要替换为真实的API调用
     taskResults.value = [
