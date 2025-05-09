@@ -1,7 +1,7 @@
 <template>
   <div class="task-manage-container">
     <div class="header-actions">
-      <a-button type="primary" @click="showCreateTaskModal">
+      <a-button type="primary" @click="showTaskCreateModal">
         <PlusOutlined /> 新建任务
       </a-button>
     </div>
@@ -28,25 +28,16 @@
       @batch-restart="handleBatchRestart"
     />
 
-    <!-- 新建任务弹窗 -->
-    <a-modal
-      v-model="createTaskModalVisible"
-      title="新建任务"
-      @ok="handleCreateTask"
-      @cancel="handleCancel"
-      :confirm-loading="confirmLoading"
-      width="600px"
-      :bodyStyle="{ padding: '24px' }"
-    >
-      <TaskForm
-        v-model="taskForm"
-        ref="taskFormRef"
-      />
-    </a-modal>
+    <!-- 新建任务组件弹窗 -->
+    <TaskCreate 
+      v-model:open="createTaskModalVisible"
+      @success="handleTaskCreateSuccess"
+      @cancel="handleTaskCreateCancel"
+    />
 
     <!-- 同步任务到资产组弹窗 -->
     <a-modal
-      v-model="syncTaskModalVisible"
+      v-model:open="syncTaskModalVisible"
       title="同步任务到资产组"
       @ok="handleSyncTask"
       @cancel="syncTaskModalVisible = false"
@@ -71,7 +62,7 @@
     
     <!-- 任务选项详情弹窗 -->
     <a-modal
-      v-model="taskOptionsModalVisible"
+      v-model:open="taskOptionsModalVisible"
       title="任务选项详情"
       :footer="null"
       width="700px"
@@ -91,6 +82,7 @@ import TaskList from '@/components/task/TaskList.vue'
 import TaskSearch from '@/components/task/TaskSearch.vue'
 import TaskForm from '@/components/task/TaskForm.vue'
 import TaskOptions from '@/components/task/TaskOptions.vue'
+import TaskCreate from '@/components/task/TaskCreate.vue'
 import { buildQueryParams } from '@/utils/taskHelper'
 import type { Task, TaskOptions as TaskOptionsType } from '@/types/task'
 
@@ -165,9 +157,19 @@ const currentTaskOptions = reactive<TaskOptionsType>({});
 const router = useRouter();
 
 // 显示创建任务弹窗
-const showCreateTaskModal = () => {
+const showTaskCreateModal = () => {
   createTaskModalVisible.value = true;
 };
+
+const handleTaskCreateSuccess = () => {
+  createTaskModalVisible.value = false
+  message.success('创建任务成功')
+  fetchTaskList()
+}
+
+const handleTaskCreateCancel = () => {
+  createTaskModalVisible.value = false
+}
 
 // 处理取消
 const handleCancel = () => {
