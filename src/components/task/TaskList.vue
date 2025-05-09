@@ -23,7 +23,7 @@
       :rowSelection="rowSelection"
       :pagination="pagination"
       @change="handleTableChange"
-      :rowKey="_id"
+      :row-key="(record) => record._id"
       size="middle"
     >
       <template #bodyCell="{ column, record }">

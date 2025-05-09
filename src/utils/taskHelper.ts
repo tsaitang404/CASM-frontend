@@ -47,12 +47,10 @@ export const getStatusText = (status: string): string => {
 };
 
 // 截断文本
-export function truncateText(text: string, length: number = 50): string {
-  if (text.length <= length) {
-    return text;
-  }
-  return text.slice(0, length) + '...';
-};
+export function truncateText(text: string, length: number = 30): string {
+  if (!text) return ''
+  return text.length > length ? text.slice(0, length) + '...' : text
+}
 
 /**
  * 构建任务查询参数
@@ -133,15 +131,6 @@ export function formatTaskStatistic(task: Task): string {
   const stats = task.statistics || task.statistic || {}
   const parts = []
   
-  if (stats.total !== undefined) {
-    parts.push(`总数: ${stats.total}`)
-  }
-  if (stats.success !== undefined) {
-    parts.push(`成功: ${stats.success}`)
-  }
-  if (stats.failed !== undefined) {
-    parts.push(`失败: ${stats.failed}`)
-  }
   if (stats.site_cnt !== undefined) {
     parts.push(`站点: ${stats.site_cnt}`)
   }
@@ -149,10 +138,10 @@ export function formatTaskStatistic(task: Task): string {
     parts.push(`域名: ${stats.domain_cnt}`)
   }
   if (stats.wih_cnt !== undefined) {
-    parts.push(`Web信息: ${stats.wih_cnt}`)
+    parts.push(`WIH: ${stats.wih_cnt}`)
   }
   
-  return parts.join(' | ') || '暂无统计'
+  return parts.join(' | ')
 }
 
 export function calculateProgress(task: Task): number {

@@ -121,7 +121,7 @@ interface ApiResponse<T> {
   code: number
   message?: string
   data?: T
-  items?: T[]
+  items?: T
   total?: number
   page?: number
   size?: number
@@ -149,14 +149,6 @@ interface TaskListResponse {
 const state = reactive({
   loading: false,
   data: [] as Task[],
-  pagination: {
-    current: 1,
-    pageSize: 10,
-    total: 0,
-    showTotal: (total: number) => `共 ${total} 条`,
-    showSizeChanger: true,
-    showQuickJumper: true
-  },
   queryParams: {
     name: '',
     target: '',
@@ -182,6 +174,16 @@ const selectedScopeId = ref<string | null>(null)
 const searchForm = ref({})
 const taskFormRef = ref<FormInstance>()
 const currentTaskOptions = reactive<Record<string, any>>({})
+
+// 分页配置
+const pagination = reactive({
+  current: 1,
+  pageSize: 10,
+  total: 0,
+  showTotal: (total: number) => `共 ${total} 条`,
+  showSizeChanger: true,
+  showQuickJumper: true
+})
 
 // 任务表单数据
 const taskForm = reactive({
@@ -255,9 +257,9 @@ const fetchTaskList = async (params: { page: number; pageSize: number }): Promis
     throw new Error('获取任务列表失败')
   }
   
-  const data: ApiResponse<Task> = await response.json()
+  const data: ApiResponse<Task[]> = await response.json()
   return {
-    data: data.items || [],
+    data: Array.isArray(data.items) ? data.items : [],
     total: data.total || 0
   }
 }
@@ -267,11 +269,11 @@ const loadTaskList = async () => {
   try {
     loading.value = true
     const result = await fetchTaskList({
-      page: state.pagination.current,
-      pageSize: state.pagination.pageSize
+      page: pagination.current,
+      pageSize: pagination.pageSize
     })
     taskList.value = result.data
-    state.pagination.total = result.total
+    pagination.total = result.total
   } catch (error) {
     console.error('加载任务列表失败:', error)
     message.error('加载任务列表失败')
@@ -299,7 +301,7 @@ const stopAutoRefresh = () => {
 
 // 事件处理函数
 const handleSearch = (values?: Record<string, any>) => {
-  state.pagination.current = 1
+  pagination.current = 1
   if (values) {
     state.queryParams = { ...state.queryParams, ...values }
   }
@@ -307,7 +309,7 @@ const handleSearch = (values?: Record<string, any>) => {
 }
 
 const handleSearchReset = () => {
-  state.pagination.current = 1
+  pagination.current = 1
   state.queryParams = {
     name: '',
     target: '',
@@ -317,8 +319,8 @@ const handleSearchReset = () => {
 }
 
 const handleTableChange = (pag: any) => {
-  state.pagination.current = pag.current
-  state.pagination.pageSize = pag.pageSize
+  pagination.current = pag.current
+  pagination.pageSize = pag.pageSize
   loadTaskList()
 }
 
@@ -593,6 +595,83 @@ const filterScopeOption = (input: string, option: any) => {
   return option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 }
 
+// 同步任务相关函数
+const showSyncTaskModal = (task: Task) => {
+  currentTaskId.value = task._id // 使用ref来存储当前任务ID
+  loadAssetScopes() // 加载资产组列表
+  syncTaskModalVisible.value = true
+}
+
+const loadAssetScopes = async () => {
+  try {
+    scopeLoading.value = true
+    const token = localStorage.getItem('Token')
+    if (!token) {
+      message.error('未登录或登录已过期')
+      return
+    }
+
+    const response = await fetch('/api/asset/scopes', {
+      headers: { 'Token': token }
+    })
+    const data: ApiResponse<AssetScope[]> = await response.json()
+    
+    if (data.code === 200 && data.items) {
+      assetScopes.value = data.items
+    }
+  } catch (error) {
+    console.error('加载资产组列表失败:', error)
+    message.error('加载资产组列表失败')
+  } finally {
+    scopeLoading.value = false
+  }
+}
+
+const currentTaskId = ref<string>('')
+
+const handleSyncTask = async () => {
+  if (!selectedScopeId.value) {
+    message.warning('请选择要同步到的资产组')
+    return
+  }
+
+  try {
+    confirmSyncLoading.value = true
+    const token = localStorage.getItem('Token')
+    if (!token) {
+      message.error('未登录或登录已过期')
+      return
+    }
+
+    const response = await fetch('/api/task/sync/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Token': token
+      },
+      body: JSON.stringify({
+        task_id: currentTaskId.value,
+        scope_id: selectedScopeId.value
+      })
+    })
+    const data: ApiResponse<any> = await response.json()
+    
+    if (data.code === 200) {
+      message.success('同步任务成功')
+      syncTaskModalVisible.value = false
+      selectedScopeId.value = null
+      loadTaskList()
+    } else {
+      message.error(data.message || '同步任务失败')
+    }
+  } catch (error) {
+    console.error('同步任务失败:', error)
+    message.error('同步任务失败')
+  } finally {
+    confirmSyncLoading.value = false
+  }
+}
+
 // 生命周期钩子
 onMounted(() => {
   loadTaskList()
@@ -611,7 +690,7 @@ onUnmounted(() => {
 
 // 监听器
 watch(() => state.queryParams, () => {
-  state.pagination.current = 1
+  pagination.current = 1
   loadTaskList()
 }, { deep: true })
 
