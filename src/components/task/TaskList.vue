@@ -168,7 +168,7 @@ const handleView = (record: Task) => {
 
 const handleRestart = async (record: Task) => {
   try {
-    await http.post(`/api/tasks/${record._id}/restart`)
+    await http.post(`/task/restart/${record._id}`)
     message.success('重启任务成功')
     emit('reload')
   } catch (error) {
@@ -178,7 +178,7 @@ const handleRestart = async (record: Task) => {
 
 const handleStop = async (record: Task) => {
   try {
-    await http.post(`/api/tasks/${record._id}/stop`)
+    await http.post(`/task/stop/${record._id}`)
     message.success('停止任务成功')
     emit('reload')
   } catch (error) {
@@ -194,7 +194,10 @@ const handleDelete = (record: Task) => {
     cancelText: '取消',
     onOk: async () => {
       try {
-        await http.delete(`/api/tasks/${record._id}`)
+        await http.post('/task/delete/', {
+          task_id: [record._id],
+          del_task_data: false
+        })
         message.success('删除任务成功')
         emit('reload')
       } catch (error) {
@@ -204,7 +207,7 @@ const handleDelete = (record: Task) => {
   })
 }
 
-const handleBatchStop = async () => {
+const handleBatchStop = () => {
   Modal.confirm({
     title: '确认停止',
     content: `确定要停止选中的 ${props.selectedRowKeys.length} 个任务吗？`,
@@ -212,9 +215,9 @@ const handleBatchStop = async () => {
     cancelText: '取消',
     onOk: async () => {
       try {
-        await Promise.all(props.selectedRowKeys.map(id => 
-          http.post(`/api/tasks/${id}/stop`)
-        ))
+        await http.post('/task/batch_stop/', {
+          task_id: props.selectedRowKeys
+        })
         message.success('批量停止任务成功')
         emit('update:selectedRowKeys', [])
         emit('reload')
@@ -233,9 +236,9 @@ const handleBatchRestart = async () => {
     cancelText: '取消',
     onOk: async () => {
       try {
-        await Promise.all(props.selectedRowKeys.map(id => 
-          http.post(`/api/tasks/${id}/restart`)
-        ))
+        await http.post('/task/batch_restart/', {
+          task_id: props.selectedRowKeys
+        })
         message.success('批量重启任务成功')
         emit('update:selectedRowKeys', [])
         emit('reload')
@@ -254,9 +257,10 @@ const handleBatchDelete = () => {
     cancelText: '取消',
     onOk: async () => {
       try {
-        await Promise.all(props.selectedRowKeys.map(id => 
-          http.delete(`/api/tasks/${id}`)
-        ))
+        await http.post('/task/delete/', {
+          task_id: props.selectedRowKeys,
+          del_task_data: false
+        })
         message.success('批量删除任务成功')
         emit('update:selectedRowKeys', [])
         emit('reload')

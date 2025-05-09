@@ -98,6 +98,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
 import { LeftOutlined } from '@ant-design/icons-vue';
+import http from '@/plugins/http'
 
 const router = useRouter();
 const route = useRoute();
@@ -196,28 +197,9 @@ const fetchTaskDetail = async () => {
   loading.value = true;
 
   try {
-    const token = localStorage.getItem('Token');
-    if (!token) {
-      message.error('您尚未登录或登录已过期，请重新登录');
-      return;
-    }
-
-    const response = await fetch(`/api/task/?_id=${taskId}`, {
-      headers: {
-        'Token': token
-      }
+    const { data } = await http.get('/task/', {
+      params: { _id: taskId }
     });
-
-    if (!response.ok) {
-      throw new Error(`请求失败 (${response.status})`);
-    }
-
-    const data = await response.json();
-    
-    if (data.code === 401) {
-      message.error('登录已过期，请重新登录');
-      return;
-    }
 
     if (data.code !== 200) {
       throw new Error(data.message || '获取任务详情失败');
@@ -226,27 +208,17 @@ const fetchTaskDetail = async () => {
     // 由于返回的是列表，我们需要获取第一个任务的详情
     if (data.items && data.items.length > 0) {
       taskDetail.value = data.items[0];
+
+      // 获取任务执行结果
+      const resultResponse = await http.get(`/task/result/${taskId}`);
+      if (resultResponse.data.code === 200) {
+        taskResults.value = resultResponse.data.items || [];
+      }
     } else {
       throw new Error('未找到任务详情');
     }
-    
-    // 模拟任务结果数据，实际项目中需要替换为真实的API调用
-    taskResults.value = [
-      {
-        time: '2025-05-09 10:00:00',
-        type: '域名发现',
-        content: '发现新域名: example.com',
-        status: 'success'
-      },
-      {
-        time: '2025-05-09 10:01:00',
-        type: '端口扫描',
-        content: '扫描到开放端口: 80, 443',
-        status: 'success'
-      }
-    ];
-  } catch (error) {
-    message.error('获取任务详情失败: ' + (error as Error).message);
+  } catch (error: any) {
+    message.error('获取任务详情失败: ' + error.message);
   } finally {
     loading.value = false;
   }

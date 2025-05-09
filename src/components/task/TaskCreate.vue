@@ -20,6 +20,7 @@ import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import TaskForm from './TaskForm.vue'
 import type { FormInstance } from 'ant-design-vue'
+import http from '@/plugins/http'
 
 interface Props {
   open: boolean
@@ -125,29 +126,18 @@ const handleOk = async () => {
 
     console.log('提交的任务数据:', taskData)
 
-    const response = await fetch('/api/task/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(taskData)
-    })
-
-    const data = await response.json()
-
+    const { data } = await http.post('/task/', taskData)
+    
     if (data.code === 200) {
       message.success('任务创建成功')
       emit('success')
       emit('update:open', false)
       resetForm()
-    } else if (data.code === 401) {
-      message.error('未登录或登录已过期，请重新登录')
-    } else {
-      throw new Error(data.message || '创建任务失败')
     }
+
   } catch (error: any) {
     console.error('提交任务时出错:', error)
-    message.error(error.message || '表单验证失败，请检查输入')
+    // 错误消息已由 axios 拦截器统一处理
   } finally {
     confirmLoading.value = false
   }

@@ -108,6 +108,7 @@ import TaskList from '@/components/task/TaskList.vue'
 import TaskSearch from '@/components/task/TaskSearch.vue'
 import TaskCreate from '@/components/task/TaskCreate.vue'
 import TaskOptions from '@/components/task/TaskOptions.vue'
+import http from '@/plugins/http'  // 修改这一行，从正确的路径导入
 
 // 类型定义
 interface Task {
@@ -244,23 +245,38 @@ const formatTaskStatistic = (task: Task): string => {
 
 // API 相关函数
 const fetchTaskList = async (params: { page: number; pageSize: number }): Promise<TaskListResponse> => {
-  const token = localStorage.getItem('Token')
-  if (!token) {
-    throw new Error('未登录或登录已过期')
-  }
-  
-  const response = await fetch(`/api/task/?page=${params.page}&size=${params.pageSize}`, {
-    headers: { 'Token': token }
-  })
-  
-  if (!response.ok) {
+  try {
+    // 构建查询参数，确保包含所有必要的查询条件
+    const queryParams = {
+      page: params.page,
+      size: params.pageSize,
+      name: state.queryParams.name || '',
+      target: state.queryParams.target || '',
+      ...state.queryParams  // 保留其他可能的查询参数
+    }
+
+    // 移除空值
+    Object.keys(queryParams).forEach(key => {
+      if (queryParams[key] === '' || queryParams[key] === undefined || queryParams[key] === null) {
+        delete queryParams[key]
+      }
+    })
+
+    // 打印查询参数和绑定值
+    console.log('当前查询参数:', queryParams)
+    console.log('状态中的查询条件:', state.queryParams)
+    console.log('搜索表单绑定值:', searchForm.value)
+
+    const { data } = await http.get('/task/', {
+      params: queryParams
+    })
+    
+    return {
+      data: Array.isArray(data.items) ? data.items : [],
+      total: data.total || 0
+    }
+  } catch (error) {
     throw new Error('获取任务列表失败')
-  }
-  
-  const data: ApiResponse<Task[]> = await response.json()
-  return {
-    data: Array.isArray(data.items) ? data.items : [],
-    total: data.total || 0
   }
 }
 
@@ -301,10 +317,12 @@ const stopAutoRefresh = () => {
 
 // 事件处理函数
 const handleSearch = (values?: Record<string, any>) => {
+  console.log('搜索表单提交的值:', values)
   pagination.current = 1
   if (values) {
     state.queryParams = { ...state.queryParams, ...values }
   }
+  console.log('更新后的查询条件:', state.queryParams)
   loadTaskList()
 }
 
@@ -315,6 +333,7 @@ const handleSearchReset = () => {
     target: '',
     status: undefined
   }
+  console.log('重置后的查询条件:', state.queryParams)
   loadTaskList()
 }
 
@@ -324,26 +343,12 @@ const handleTableChange = (pag: any) => {
   loadTaskList()
 }
 
-// 添加任务操作函数
+// 任务操作相关函数
 const stopTask = async (task: Task) => {
   try {
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch(`/api/task/stop/${task._id}`, {
-      headers: { 'Token': token }
-    })
-    const data: ApiResponse<any> = await response.json()
-    
-    if (data.code === 200) {
-      message.success('停止任务成功')
-      loadTaskList()
-    } else {
-      message.error(data.message || '停止任务失败')
-    }
+    await http.post(`/task/stop/${task._id}`)
+    message.success('停止任务成功')
+    loadTaskList()
   } catch (error) {
     console.error('停止任务失败:', error)
     message.error('停止任务失败')
@@ -352,31 +357,12 @@ const stopTask = async (task: Task) => {
 
 const deleteTask = async (task: Task) => {
   try {
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch('/api/task/delete/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Token': token
-      },
-      body: JSON.stringify({
-        task_id: [task._id],
-        del_task_data: false
-      })
+    await http.post('/task/delete/', {
+      task_id: [task._id],
+      del_task_data: false
     })
-    const data: ApiResponse<any> = await response.json()
-    
-    if (data.code === 200) {
-      message.success('删除任务成功')
-      loadTaskList()
-    } else {
-      message.error(data.message || '删除任务失败')
-    }
+    message.success('删除任务成功')
+    loadTaskList()
   } catch (error) {
     console.error('删除任务失败:', error)
     message.error('删除任务失败')
@@ -385,27 +371,9 @@ const deleteTask = async (task: Task) => {
 
 const restartTask = async (task: Task) => {
   try {
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch(`/api/task/restart/${task._id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Token': token
-      }
-    })
-    const data: ApiResponse<any> = await response.json()
-    
-    if (data.code === 200) {
-      message.success('重启任务成功')
-      loadTaskList()
-    } else {
-      message.error(data.message || '重启任务失败')
-    }
+    await http.post(`/task/restart/${task._id}`)
+    message.success('重启任务成功')
+    loadTaskList()
   } catch (error) {
     console.error('重启任务失败:', error)
     message.error('重启任务失败')
@@ -414,21 +382,11 @@ const restartTask = async (task: Task) => {
 
 const exportTask = async (task: Task) => {
   try {
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch(`/api/task/export/${task._id}`, {
-      headers: { 'Token': token }
+    const response = await http.get(`/task/export/${task._id}`, {
+      responseType: 'blob'
     })
     
-    if (!response.ok) {
-      throw new Error('导出任务失败')
-    }
-
-    const blob = await response.blob()
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.style.display = 'none'
@@ -470,31 +428,12 @@ const handleBatchStop = async () => {
   }
 
   try {
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch('/api/task/batch_stop/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Token': token
-      },
-      body: JSON.stringify({
-        task_id: selectedRowKeys.value
-      })
+    await http.post('/task/batch_stop/', {
+      task_id: selectedRowKeys.value
     })
-    const data: ApiResponse<any> = await response.json()
-    
-    if (data.code === 200) {
-      message.success('批量停止任务成功')
-      selectedRowKeys.value = []
-      loadTaskList()
-    } else {
-      message.error(data.message || '批量停止任务失败')
-    }
+    message.success('批量停止任务成功')
+    selectedRowKeys.value = []
+    loadTaskList()
   } catch (error) {
     console.error('批量停止任务失败:', error)
     message.error('批量停止任务失败')
@@ -515,32 +454,13 @@ const handleBatchDelete = async () => {
     cancelText: '取消',
     async onOk() {
       try {
-        const token = localStorage.getItem('Token')
-        if (!token) {
-          message.error('未登录或登录已过期')
-          return
-        }
-
-        const response = await fetch('/api/task/delete/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Token': token
-          },
-          body: JSON.stringify({
-            task_id: selectedRowKeys.value,
-            del_task_data: false
-          })
+        await http.post('/task/delete/', {
+          task_id: selectedRowKeys.value,
+          del_task_data: false
         })
-        const data: ApiResponse<any> = await response.json()
-        
-        if (data.code === 200) {
-          message.success('批量删除任务成功')
-          selectedRowKeys.value = []
-          loadTaskList()
-        } else {
-          message.error(data.message || '批量删除任务失败')
-        }
+        message.success('批量删除任务成功')
+        selectedRowKeys.value = []
+        loadTaskList()
       } catch (error) {
         console.error('批量删除任务失败:', error)
         message.error('批量删除任务失败')
@@ -556,31 +476,12 @@ const handleBatchRestart = async () => {
   }
 
   try {
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch('/api/task/batch_restart/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Token': token
-      },
-      body: JSON.stringify({
-        task_id: selectedRowKeys.value
-      })
+    await http.post('/task/batch_restart/', {
+      task_id: selectedRowKeys.value
     })
-    const data: ApiResponse<any> = await response.json()
-    
-    if (data.code === 200) {
-      message.success('批量重启任务成功')
-      selectedRowKeys.value = []
-      loadTaskList()
-    } else {
-      message.error(data.message || '批量重启任务失败')
-    }
+    message.success('批量重启任务成功')
+    selectedRowKeys.value = []
+    loadTaskList()
   } catch (error) {
     console.error('批量重启任务失败:', error)
     message.error('批量重启任务失败')
@@ -605,17 +506,7 @@ const showSyncTaskModal = (task: Task) => {
 const loadAssetScopes = async () => {
   try {
     scopeLoading.value = true
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch('/api/asset/scopes', {
-      headers: { 'Token': token }
-    })
-    const data: ApiResponse<AssetScope[]> = await response.json()
-    
+    const { data } = await http.get('/asset/scopes')
     if (data.code === 200 && data.items) {
       assetScopes.value = data.items
     }
@@ -637,33 +528,14 @@ const handleSyncTask = async () => {
 
   try {
     confirmSyncLoading.value = true
-    const token = localStorage.getItem('Token')
-    if (!token) {
-      message.error('未登录或登录已过期')
-      return
-    }
-
-    const response = await fetch('/api/task/sync/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Token': token
-      },
-      body: JSON.stringify({
-        task_id: currentTaskId.value,
-        scope_id: selectedScopeId.value
-      })
+    await http.post('/task/sync/', {
+      task_id: currentTaskId.value,
+      scope_id: selectedScopeId.value
     })
-    const data: ApiResponse<any> = await response.json()
-    
-    if (data.code === 200) {
-      message.success('同步任务成功')
-      syncTaskModalVisible.value = false
-      selectedScopeId.value = null
-      loadTaskList()
-    } else {
-      message.error(data.message || '同步任务失败')
-    }
+    message.success('同步任务成功')
+    syncTaskModalVisible.value = false
+    selectedScopeId.value = null
+    loadTaskList()
   } catch (error) {
     console.error('同步任务失败:', error)
     message.error('同步任务失败')

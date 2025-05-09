@@ -212,11 +212,13 @@ const toggleAdvanced = () => {
 // 处理输入框值变化
 const handleInputChange = (field: keyof SearchForm, event: Event) => {
   const value = (event.target as HTMLInputElement).value;
+  console.log(`输入框 ${field} 值变化:`, value);
   searchForm[field] = value;
 }
 
 // 处理查询
 const handleSearch = () => {
+  console.log('搜索前表单数据:', searchForm)
   const form = { ...searchForm };
   // 移除空值，但保留已输入的值（包括空字符串）
   Object.keys(form).forEach(key => {
@@ -225,11 +227,13 @@ const handleSearch = () => {
     }
   });
 
+  console.log('处理后的搜索参数:', form)
   emit('search', form);
 }
 
 // 处理重置
 const handleReset = () => {
+  console.log('重置前表单数据:', searchForm)
   Object.assign(searchForm, {
     name: '',
     target: '',
@@ -246,6 +250,7 @@ const handleReset = () => {
     'options.port_scan': undefined,
     'options.port_scan_type': ''
   });
+  console.log('重置后表单数据:', searchForm)
   emit('reset');
 }
 </script>
