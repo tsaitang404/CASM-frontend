@@ -1,19 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import Login from '@/views/Login.vue'
-import TaskManageView from '@/views/TaskManageView.vue'
-import AssetSearchView from '@/views/AssetSearchView.vue'
-import AssetMonitorView from '@/views/AssetMonitorView.vue'
-import AssetGroupView from '@/views/AssetGroupView.vue'
-import PolicyConfigView from '@/views/PolicyConfigView.vue'
-import FingerManageView from '@/views/FingerManageView.vue'
-import PocInfoView from '@/views/PocInfoView.vue'
-import TaskScheduleView from '@/views/TaskScheduleView.vue'
-import GithubMonitorView from '@/views/GithubMonitorView.vue'
-import TaskDetailView from '@/views/TaskdetailView.vue'
-import StatusView from '@/views/StatusView.vue'
+import type { RouteRecordRaw } from 'vue-router'
 
-const routes = [
+// 异步加载路由组件
+const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '/home',
@@ -21,7 +10,7 @@ const routes = [
   {
     path: '/home',
     name: 'home',
-    component: HomeView,
+    component: () => import('../views/HomeView.vue'),
     meta: { requiresAuth: true }
   },
   {
@@ -33,84 +22,79 @@ const routes = [
   { 
     path: '/login', 
     name: 'Login', 
-    component: Login,
+    component: () => import('../views/Login.vue'),
     meta: { guest: true }
   },
   {
     path: '/task',
     name: 'task',
-    component: TaskManageView,
+    component: () => import('../views/TaskManageView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/search',
     name: 'search',
-    component: AssetSearchView,
+    component: () => import('../views/AssetSearchView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/monitor',
     name: 'monitor',
-    component: AssetMonitorView,
+    component: () => import('../views/AssetMonitorView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/group',
     name: 'group',
-    component: AssetGroupView,
+    component: () => import('../views/AssetGroupView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/policy',
     name: 'policy',
-    component: PolicyConfigView,
+    component: () => import('../views/PolicyConfigView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/tags',
     name: 'tags',
-    component: FingerManageView,
+    component: () => import('../views/FingerManageView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/pocinfo',
     name: 'pocinfo',
-    component: PocInfoView,
+    component: () => import('../views/PocInfoView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/poc',
     name: 'poc',
-    component: TaskScheduleView,
+    component: () => import('../views/TaskScheduleView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/github-monitor',
     name: 'github-monitor',
-    component: GithubMonitorView,
+    component: () => import('../views/GithubMonitorView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/status',
     name: 'status',
-    component: StatusView,
+    component: () => import('../views/StatusView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/task/detail/:id',
     name: 'TaskDetail',
-    component: TaskDetailView,
+    component: () => import('../views/TaskdetailView.vue'),
     meta: { requiresAuth: true }
   }
 ]
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
-})
-
 // 简单的日志函数，避免使用可能被修改的console.log
-const safeLog = (message) => {
+const safeLog = (message: string) => {
   try {
     if (window.console && typeof window.console.log === 'function') {
       window.console.log(message);
@@ -119,6 +103,11 @@ const safeLog = (message) => {
     // 忽略日志错误
   }
 };
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
+})
 
 // 全局路由守卫，统一处理登录/登出跳转逻辑
 router.beforeEach(async (to, from, next) => {
