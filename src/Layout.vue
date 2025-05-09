@@ -23,56 +23,7 @@ import Sidebar from './components/Sidebar.vue'
 import Topbar from './components/Topbar.vue'
 import Footbar from './components/Footbar.vue'
 
-const router = useRouter()
-const route = useRoute()
-const currentView = ref('task')
-const contentRef = ref(null)
-const sidebarCollapsed = ref(false) // 控制侧边栏折叠状态
-
-// 根据当前路由路径更新currentView
-watch(() => route.path, (newPath) => {
-  // 移除前导斜杠，将路径转换为对应的菜单key
-  const path = newPath.substring(1)
-  if (path && viewNameMap[path]) {
-    currentView.value = path
-  }
-}, { immediate: true })
-
-// 切换侧边栏折叠状态
-const toggleSidebar = () => {
-  sidebarCollapsed.value = !sidebarCollapsed.value
-}
-
-// 调整内容区域大小的函数
-const adjustContentSize = () => {
-  if (!contentRef.value) return
-  
-  // 获取视口高度
-  const viewportHeight = window.innerHeight
-  
-  // 获取Topbar和Footbar的实际高度
-  const topbarHeight = document.querySelector('.topbar')?.offsetHeight || 48
-  const footbarHeight = document.querySelector('.footbar')?.offsetHeight || 40
-  
-  // 计算内容区域可用高度
-  const availableHeight = viewportHeight - topbarHeight - footbarHeight
-  
-  // 设置内容区域高度
-  contentRef.value.style.height = `${availableHeight}px`
-}
-
-onMounted(() => {
-  // 初始调整
-  setTimeout(adjustContentSize, 0)
-  
-  // 监听窗口大小变化
-  window.addEventListener('resize', adjustContentSize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', adjustContentSize)
-})
-
+// 先声明viewNameMap
 const viewNameMap = {
   task: '任务管理',
   search: '资产搜索',
@@ -85,6 +36,74 @@ const viewNameMap = {
   'github-monitor': 'GitHub监控',
   home: '首页'
 }
+
+const router = useRouter()
+const route = useRoute()
+const currentView = ref('task')
+const contentRef = ref(null)
+const sidebarCollapsed = ref(false) // 控制侧边栏折叠状态
+
+// 根据当前路由路径更新currentView
+watch(() => route.path, (newPath) => {
+  try {
+    // 移除前导斜杠，将路径转换为对应的菜单key
+    const path = newPath.substring(1)
+    if (path && viewNameMap[path]) {
+      currentView.value = path
+    }
+  } catch (error) {
+    console.error('路由路径处理错误:', error)
+    // 出错时使用默认值
+    currentView.value = 'task'
+  }
+}, { immediate: true })
+
+// 切换侧边栏折叠状态
+const toggleSidebar = () => {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+}
+
+// 调整内容区域大小的函数
+const adjustContentSize = () => {
+  try {
+    if (!contentRef.value) return
+    
+    // 获取视口高度
+    const viewportHeight = window.innerHeight
+    
+    // 获取Topbar和Footbar的实际高度
+    const topbarHeight = document.querySelector('.topbar')?.offsetHeight || 48
+    const footbarHeight = document.querySelector('.footbar')?.offsetHeight || 40
+    
+    // 计算内容区域可用高度
+    const availableHeight = viewportHeight - topbarHeight - footbarHeight
+    
+    // 设置内容区域高度
+    contentRef.value.style.height = `${availableHeight}px`
+  } catch (error) {
+    console.error('调整内容区域大小时出错:', error)
+  }
+}
+
+onMounted(() => {
+  try {
+    // 初始调整
+    setTimeout(adjustContentSize, 0)
+    
+    // 监听窗口大小变化
+    window.addEventListener('resize', adjustContentSize)
+  } catch (error) {
+    console.error('组件挂载时出错:', error)
+  }
+})
+
+onUnmounted(() => {
+  try {
+    window.removeEventListener('resize', adjustContentSize)
+  } catch (error) {
+    console.error('组件卸载时出错:', error)
+  }
+})
 </script>
 
 <style>

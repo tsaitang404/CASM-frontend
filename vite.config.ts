@@ -17,21 +17,16 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
-    },
+    }
   },
   server: {
     port: 5020,
-    host: '127.0.0.1',
-    hmr: {
-      host: '127.0.0.1',
-      port: 5020,
-    },
+    host: true, // 允许外部访问
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:5018',
-        changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, '/api'),
-      },
-    },
-  },
+        target: 'http://localhost:5018',
+        changeOrigin: true
+      }
+    }
+  }
 })
