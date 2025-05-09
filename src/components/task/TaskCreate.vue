@@ -144,7 +144,7 @@ const handleOk = () => {
         }
         
         message.success('创建任务成功')
-        emit('success')
+        emit('success')  // 触发success事件，通知父组件刷新列表
         resetForm()
         emit('update:open', false)
       })
