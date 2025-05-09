@@ -2,7 +2,6 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,8 +12,7 @@ export default defineConfig({
           isCustomElement: (tag) => tag.startsWith('ion-')
         }
       }
-    }),
-    vueDevTools(),
+    })
   ],
   resolve: {
     alias: {
@@ -29,7 +27,6 @@ export default defineConfig({
       port: 5020,
     },
     proxy: {
-      // 假设你的 API 路径以 /api 开头
       '/api': {
         target: 'http://127.0.0.1:5018',
         changeOrigin: true,
