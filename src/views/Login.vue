@@ -66,7 +66,7 @@ const handleLogin = async () => {
   isLoading.value = true
   
   try {
-    const res = await fetch('/user/login', {
+    const res = await fetch('/api/user/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
