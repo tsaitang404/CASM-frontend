@@ -13,6 +13,9 @@
       <a-tab-pane key="ssl" tab="SSL证书搜索">
         <SslSearch />
       </a-tab-pane>
+      <a-tab-pane key="service" tab="服务搜索">
+        <ServiceSearch />
+      </a-tab-pane>
     </a-tabs>
   </div>
 </template>
@@ -23,6 +26,7 @@ import SiteSearch from '../components/asset/SiteSearch.vue'
 import DomainSearch from '../components/asset/DomainSearch.vue'
 import IpSearch from '../components/asset/IpSearch.vue'
 import SslSearch from '../components/asset/SslSearch.vue'
+import ServiceSearch from '../components/asset/ServiceSearch.vue'
 
 const activeTab = ref('site')
 </script>
