@@ -61,13 +61,25 @@
     <a-card title="统计信息" :bordered="false" class="detail-card">
       <a-row :gutter="16">
         <a-col :span="8">
-          <a-statistic title="站点数量" :value="taskDetail.statistic?.site_cnt || 0" />
+          <a-statistic title="站点数量" :value="taskDetail.statistic?.site_cnt || taskDetail.statistics?.site_cnt || 0" />
         </a-col>
         <a-col :span="8">
-          <a-statistic title="域名数量" :value="taskDetail.statistic?.domain_cnt || 0" />
+          <a-statistic title="域名数量" :value="taskDetail.statistic?.domain_cnt || taskDetail.statistics?.domain_cnt || 0" />
         </a-col>
         <a-col :span="8">
-          <a-statistic title="WIH数量" :value="taskDetail.statistic?.wih_cnt || 0" />
+          <a-statistic title="WIH数量" :value="taskDetail.statistic?.wih_cnt || taskDetail.statistics?.wih_cnt || 0" />
+        </a-col>
+        <a-col :span="8">
+          <a-statistic title="端口数量" :value="taskDetail.statistic?.port_cnt || taskDetail.statistics?.port_cnt || 0" />
+        </a-col>
+        <a-col :span="8">
+          <a-statistic title="IP数量" :value="taskDetail.statistic?.ip_cnt || taskDetail.statistics?.ip_cnt || 0" />
+        </a-col>
+        <a-col :span="8">
+          <a-statistic title="服务数量" :value="taskDetail.statistic?.service_cnt || taskDetail.statistics?.service_cnt || 0" />
+        </a-col>
+        <a-col :span="8">
+          <a-statistic title="漏洞数量" :value="taskDetail.statistic?.vuln_cnt || taskDetail.statistics?.vuln_cnt || 0" />
         </a-col>
       </a-row>
     </a-card>
