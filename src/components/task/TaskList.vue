@@ -176,7 +176,9 @@ const handleRestart = async (record: Task) => {
       task_id: [record._id]
     })
     message.success('重启任务成功')
-    emit('reload')
+    setTimeout(() => {
+      emit('reload')
+    }, 500)
   } catch (error) {
     message.error('重启任务失败')
   }
@@ -205,7 +207,9 @@ const handleDelete = (record: Task) => {
           del_task_data: false
         })
         message.success('删除任务成功')
-        emit('reload')
+        setTimeout(() => {
+          emit('reload')
+        }, 500)
       } catch (error) {
         message.error('删除任务失败')
       }
@@ -268,8 +272,9 @@ const handleBatchDelete = () => {
           del_task_data: false
         })
         message.success('批量删除任务成功')
-        emit('update:selectedRowKeys', [])
-        emit('reload')
+        setTimeout(() => {
+          emit('reload')
+        }, 500)
       } catch (error) {
         message.error('批量删除任务失败')
       }

@@ -40,6 +40,7 @@
       :loading="loading"
       :pagination="pagination"
       v-model:selectedRowKeys="selectedRowKeys"
+      @reload="loadTaskList"
       @change="handleTableChange"
       @stop="stopTask"
       @delete="deleteTask"
