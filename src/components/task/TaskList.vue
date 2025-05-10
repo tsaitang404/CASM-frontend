@@ -12,6 +12,9 @@
         <a-button :disabled="!selectedRowKeys.length" @click="handleBatchRestart">
           <ReloadOutlined /> 批量重启
         </a-button>
+        <a-button @click="handleRefresh">
+          <ReloadOutlined /> 刷新
+        </a-button>
       </a-space>
     </div>
     
@@ -272,6 +275,10 @@ const handleBatchDelete = () => {
       }
     }
   })
+}
+
+const handleRefresh = () => {
+  emit('reload')
 }
 </script>
 
