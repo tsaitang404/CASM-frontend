@@ -110,13 +110,14 @@ const columns = [
     title: 'IP地址',
     dataIndex: 'ip',
     key: 'ip',
-    width: 150
+    width: 130,
+    fixed: 'left'
   },
   {
     title: '域名',
     dataIndex: 'domain',
     key: 'domain',
-    width: 200,
+    minWidth: 200,
     ellipsis: true,
     render: (domains: string[]) => domains?.join(', ') || '-'
   },
@@ -124,7 +125,7 @@ const columns = [
     title: '端口信息',
     dataIndex: 'port_info',
     key: 'port_info',
-    width: 300,
+    width: 250,
     ellipsis: true,
     render: (ports: any[]) => ports?.map(p => `${p.port_id}(${p.service_name})`).join(', ') || '-'
   },
@@ -132,7 +133,8 @@ const columns = [
     title: '操作系统',
     dataIndex: ['os_info', 'name'],
     key: 'os_name',
-    width: 120
+    width: 120,
+    ellipsis: true
   },
   {
     title: 'IP类型',
@@ -246,5 +248,25 @@ handleSearch()
 
 .search-result {
   margin-top: 20px;
+  overflow-x: auto;
+}
+
+:deep(.ant-table-wrapper) {
+  overflow-x: auto;
+}
+
+:deep(.ant-table-header),
+:deep(.ant-table-body) {
+  overflow-y: auto !important;
+}
+
+:deep(.ant-table-cell-ellipsis) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:deep(.ant-table-fixed) {
+  background: #fff;
 }
 </style>

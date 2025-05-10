@@ -44,34 +44,36 @@ const columns = [
     title: '记录类型',
     dataIndex: 'record_type',
     key: 'record_type',
-    width: 120
+    width: 100,
+    fixed: 'left'
   },
   {
     title: '内容',
     dataIndex: 'content',
     key: 'content',
-    width: 300,
+    minWidth: 200,
     ellipsis: true
   },
   {
     title: '来源JS',
     dataIndex: 'source',
     key: 'source',
-    width: 300,
+    width: 250,
     ellipsis: true
   },
   {
     title: '站点',
     dataIndex: 'site',
     key: 'site',
-    width: 200,
+    width: 180,
     ellipsis: true
   },
   {
     title: '创建时间',
     dataIndex: 'create_time',
     key: 'create_time',
-    width: 180,
+    width: 160,
+    fixed: 'right',
     sorter: true
   }
 ];
@@ -120,5 +122,21 @@ watch(() => props.taskId, () => fetchData());
 <style scoped>
 .asset-list {
   margin: 16px 0;
+  overflow-x: auto;
+}
+
+:deep(.ant-table-wrapper) {
+  overflow-x: auto;
+}
+
+:deep(.ant-table-header),
+:deep(.ant-table-body) {
+  overflow-y: auto !important;
+}
+
+:deep(.ant-table-cell-ellipsis) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
