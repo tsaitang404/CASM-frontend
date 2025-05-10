@@ -168,7 +168,10 @@ const handleView = (record: Task) => {
 
 const handleRestart = async (record: Task) => {
   try {
-    await http.post(`/task/restart/${record._id}`)
+    // 按接口文档，重启任务应为 POST /task/restart/，参数为 { task_id: [id] }
+    await http.post('/task/restart/', {
+      task_id: [record._id]
+    })
     message.success('重启任务成功')
     emit('reload')
   } catch (error) {
