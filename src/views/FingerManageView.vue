@@ -133,8 +133,8 @@ async function fetchList() {
     if (params.update_date__dgt) params.update_date__dgt = params.update_date__dgt.format?.('YYYY-MM-DD') || params.update_date__dgt
     if (params.update_date__dlt) params.update_date__dlt = params.update_date__dlt.format?.('YYYY-MM-DD') || params.update_date__dlt
     const { data } = await http.get('/fingerprint/', { params })
-    list.value = data.data.items
-    pagination.total = data.data.total
+    list.value = data.items
+    pagination.total = data.total
   } catch (e) {
     // 错误已全局处理
   } finally {
