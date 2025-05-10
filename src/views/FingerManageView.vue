@@ -67,8 +67,28 @@
         <a-form-item label="指纹名称" required>
           <a-input v-model:value="addForm.name" placeholder="请输入指纹名称" />
         </a-form-item>
-        <a-form-item label="指纹规则 (JSON格式)" required>
-          <a-textarea v-model:value="addForm.human_rule" placeholder='{"html": ["特征"]}' :rows="5" />
+        <a-form-item label="指纹规则 (键值对)" required>
+          <div v-for="(rule, index) in addRules" :key="index" style="display: flex; align-items: center;">
+            <a-select v-model:value="rule.key" :options="supportedKeys" placeholder="选择字段" style="margin-right: 8px; width: 40%" />
+            <a-input v-model:value="rule.value" placeholder="值(长度>6)" style="margin-right: 8px; width: 50%" />
+            <a-button @click="removeRule(addRules, index)" type="link" danger v-if="addRules.length > 1">删除</a-button>
+          </div>
+          <a-button @click="addRule(addRules)" type="dashed" style="width: 100%; margin-top: 8px;">添加规则</a-button>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-modal v-model:open="showEditModal" title="编辑指纹" @ok="handleEdit" @cancel="resetEditForm" :confirmLoading="editLoading" :okButtonProps="{ disabled: !isEditChanged() }">
+      <a-form :model="editForm" layout="vertical">
+        <a-form-item label="指纹名称" required>
+          <a-input v-model:value="editForm.name" placeholder="请输入指纹名称" />
+        </a-form-item>
+        <a-form-item label="指纹规则 (键值对)" required>
+          <div v-for="(rule, index) in editRules" :key="index" style="display: flex; align-items: center;">
+            <a-select v-model:value="rule.key" :options="supportedKeys" placeholder="选择字段" style="margin-right: 8px; width: 40%" />
+            <a-input v-model:value="rule.value" placeholder="值(长度>6)" style="margin-right: 8px; width: 50%" />
+            <a-button @click="removeRule(editRules, index)" type="link" danger v-if="editRules.length > 1">删除</a-button>
+          </div>
+          <a-button @click="addRule(editRules)" type="dashed" style="width: 100%; margin-top: 8px;">添加规则</a-button>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -76,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { computed, ref, reactive } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import http from '@/plugins/http'
 
@@ -98,12 +118,12 @@ const pagination = reactive({
   showQuickJumper: true
 })
 const selectedRowKeys = ref<string[]>([])
-const rowSelection = {
+const rowSelection = computed(() => ({
   selectedRowKeys: selectedRowKeys.value,
   onChange: (keys: string[]) => {
     selectedRowKeys.value = keys
   }
-}
+}))
 const searchForm = reactive({
   name: '',
   update_date__dgt: null as string | null,
@@ -119,7 +139,9 @@ const columns = [
 
 function truncateText(text: string, len = 24) {
   if (!text) return ''
-  return text.length > len ? text.slice(0, len) + '...' : text
+  let t = text
+  if (t.endsWith('"')) t = t.slice(0, -1) // 去掉末尾的双引号
+  return t.length > len ? t.slice(0, len) + '...' : t
 }
 
 async function fetchList() {
@@ -159,32 +181,74 @@ function resetSearch() {
 const showAddModal = ref(false)
 const addForm = reactive({ name: '', human_rule: '' })
 const addLoading = ref(false)
+
+// 指纹规则动态表单
+const addRules = ref([{ key: '', value: '' }])
+const editRules = ref([{ key: '', value: '' }])
+
+// 支持的 key 列表
+const supportedKeys = [
+  { label: 'body', value: 'body' },
+  { label: 'title', value: 'title' },
+  { label: 'header', value: 'header' },
+  { label: 'icon_hash', value: 'icon_hash' }
+]
+
+function addRule(rulesArr: any) {
+  rulesArr.push({ key: '', value: '' })
+}
+function removeRule(rulesArr: any, idx: number) {
+  if (rulesArr.length > 1) rulesArr.splice(idx, 1)
+}
+function resetAddRules() {
+  addRules.value = [{ key: '', value: '' }]
+}
+function resetEditRules() {
+  editRules.value = [{ key: '', value: '' }]
+}
+
+// 组装规则为 key="value"，多个用 || 分隔，校验 key/value
+function buildRuleStr(rulesArr: any[]) {
+  const exprs: string[] = []
+  for (const r of rulesArr) {
+    if (!r.key || !supportedKeys.some(k => k.value === r.key)) {
+      message.warning('请选择有效字段')
+      return ''
+    }
+    let v = r.value.replace(/^['"“”]+|['"“”]+$/g, '')
+    if (v.length <= 6) {
+      message.warning('值长度需大于6')
+      return ''
+    }
+    v = `"${v.replace(/"/g, '\"')}"`
+    exprs.push(`${r.key}=${v}`)
+  }
+  return exprs.join(' || ')
+}
+
 async function handleAdd() {
-  if (!addForm.name || !addForm.human_rule) {
+  if (!addForm.name) {
     message.warning('请填写完整信息')
     return
   }
-  let ruleObj
-  try {
-    ruleObj = JSON.parse(addForm.human_rule)
-  } catch {
-    message.error('规则需为合法JSON')
-    return
-  }
+  const ruleStr = buildRuleStr(addRules.value)
+  if (!ruleStr) return
   addLoading.value = true
   try {
-    await http.post('/fingerprint/', { name: addForm.name, human_rule: addForm.human_rule })
+    await http.post('/fingerprint/', { name: addForm.name, human_rule: ruleStr })
     message.success('添加成功')
     showAddModal.value = false
     resetAddForm()
+    resetAddRules()
     fetchList()
   } finally {
     addLoading.value = false
   }
 }
+
 function resetAddForm() {
   addForm.name = ''
-  addForm.human_rule = ''
+  resetAddRules()
 }
 
 // 删除指纹
@@ -223,9 +287,90 @@ async function handleUpload(file: File) {
   return false // 阻止自动上传
 }
 
-// 编辑功能预留
+// 编辑指纹
+const showEditModal = ref(false)
+const editForm = reactive({ _id: '', name: '', human_rule: '' })
+const editLoading = ref(false)
+const originalEditForm = ref({ name: '', rules: [] as {key: string, value: string}[] })
+
 function showEdit(record: Fingerprint) {
-  message.info('暂不支持编辑，可删除后重新添加')
+  editForm._id = record._id
+  editForm.name = record.name
+  // 兼容 human_rule 为 JSON 或 k=v 字符串
+  let parsed = false
+  try {
+    const obj = JSON.parse(record.human_rule)
+    if (typeof obj === 'object' && obj !== null) {
+      editRules.value = Object.entries(obj).map(([key, value]) => ({ key, value }))
+      parsed = true
+    }
+  } catch {}
+  if (!parsed) {
+    // 兼容 body="xxx" 或 body=xxx 或 title="xxx" 等格式
+    const arr: {key: string, value: string}[] = []
+    const ruleStr = record.human_rule.trim()
+    // 支持多条规则用换行分隔
+    const lines = ruleStr.split(/\n|;/).map(l => l.trim()).filter(Boolean)
+    for (const line of lines) {
+      // 匹配 key="value" 或 key='value' 或 key=value
+      const m = line.match(/^(\w+)\s*=\s*(["']?)(.+?)\2$/)
+      if (m) {
+        arr.push({ key: m[1], value: m[3] })
+      }
+    }
+    if (arr.length > 0) {
+      editRules.value = arr
+    } else {
+      editRules.value = [{ key: '', value: '' }]
+    }
+  }
+  // 保存原始数据用于对比
+  originalEditForm.value = {
+    name: editForm.name,
+    rules: editRules.value.map(r => ({ key: r.key, value: r.value }))
+  }
+  showEditModal.value = true
+}
+
+function isEditChanged() {
+  if (editForm.name !== originalEditForm.value.name) return true
+  if (editRules.value.length !== originalEditForm.value.rules.length) return true
+  for (let i = 0; i < editRules.value.length; i++) {
+    if (editRules.value[i].key !== originalEditForm.value.rules[i]?.key ||
+        editRules.value[i].value !== originalEditForm.value.rules[i]?.value) {
+      return true
+    }
+  }
+  return false
+}
+
+async function handleEdit() {
+  if (!editForm.name) {
+    message.warning('请填写完整信息')
+    return
+  }
+  const ruleStr = buildRuleStr(editRules.value)
+  if (!ruleStr) return
+  editLoading.value = true
+  try {
+    await http.put(`/fingerprint/${editForm._id}/`, {
+      name: editForm.name,
+      human_rule: ruleStr
+    })
+    message.success('修改成功')
+    showEditModal.value = false
+    resetEditForm()
+    resetEditRules()
+    fetchList()
+  } finally {
+    editLoading.value = false
+  }
+}
+
+function resetEditForm() {
+  editForm._id = ''
+  editForm.name = ''
+  resetEditRules()
 }
 
 fetchList()

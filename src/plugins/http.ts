@@ -29,6 +29,10 @@ http.interceptors.request.use(
 // 响应拦截器
 http.interceptors.response.use(
   (response) => {
+    // 如果是文件流，直接返回
+    if (response.config.responseType === 'blob') {
+      return response
+    }
     const res = response.data
     if (res.code === 200) {
       return response
