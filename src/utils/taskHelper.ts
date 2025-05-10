@@ -25,26 +25,38 @@ export const getStatusColor = (status: string): string => {
 
 // 获取任务状态文本
 export const getStatusText = (status: string): string => {
-  if (status !== 'waiting' && 
-      status !== 'done' && 
-      status !== 'stop' && 
-      status !== 'error') {
-    return `运行中: ${status}`;
+  const textMap: Record<string, string> = {
+    waiting: '等待中',
+    running: '运行中',
+    done: '已完成',
+    stop: '已停止',
+    error: '失败',
+    completed: '已完成',
+    failed: '失败',
+    paused: '已暂停',
+    domain_brute: '域名爆破',
+    dns_query_plugin: 'DNS查询插件调用',
+    casm_search: 'CASM历史查询',
+    alt_dns: 'DNS字典智能生成',
+    find_site: '发现站点',
+    port_scan: '端口扫描',
+    ssl_cert: 'SSL证书获取',
+    npoc_service_detection: '服务检测',
+    FETCH_SITE: '站点基本信息获取',
+    SITE_IDENTIFY: '站点识别',
+    SITE_CAPTURE: '站点截图',
+    SEARCH_ENGINES: '搜索引擎调用',
+    SITE_SPIDER: '站点爬虫',
+    FILE_LEAK: '文件泄露检测',
+    POC_RUN: 'POC检测',
+    NUCLEI_SCAN: 'Nuclei扫描',
+    Info_Hunter: 'WEB JS信息收集',
+    weak_brute: '服务弱口令爆破',
+    SEARCH: '正在搜索',
+    FETCH: '正在获取内容'
   }
-  
-  switch (status) {
-    case 'waiting':
-      return '等待中';
-    case 'done':
-      return '已完成';
-    case 'stop':
-      return '已停止';
-    case 'error':
-      return '失败';
-    default:
-      return '未知';
-  }
-};
+  return textMap[status] || textMap['running']
+}
 
 // 截断文本
 export function truncateText(text: string, length: number = 30): string {
@@ -87,9 +99,29 @@ export function getTaskStatusText(status: string): string {
     error: '错误',
     completed: '已完成',
     failed: '失败',
-    paused: '已暂停'
+    paused: '已暂停',
+    domain_brute: '域名爆破',
+    dns_query_plugin: 'DNS查询插件调用',
+    casm_search: 'CASM历史查询',
+    alt_dns: 'DNS字典智能生成',
+    find_site: '发现站点',
+    port_scan: '端口扫描',
+    ssl_cert: 'SSL证书获取',
+    npoc_service_detection: '服务检测',
+    FETCH_SITE: '站点基本信息获取',
+    SITE_IDENTIFY: '站点识别',
+    SITE_CAPTURE: '站点截图',
+    SEARCH_ENGINES: '搜索引擎调用',
+    SITE_SPIDER: '站点爬虫',
+    FILE_LEAK: '文件泄露检测',
+    POC_RUN: 'POC检测',
+    NUCLEI_SCAN: 'Nuclei扫描',
+    Info_Hunter: 'WEB JS信息收集',
+    weak_brute: '服务弱口令爆破',
+    SEARCH: '正在搜索',
+    FETCH: '正在获取内容'
   }
-  return textMap[status] || '未知状态'
+  return textMap[status] || textMap['running']
 }
 
 /**
