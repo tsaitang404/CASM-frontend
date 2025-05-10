@@ -5,19 +5,26 @@
         <a-form-item label="IP地址">
           <a-input v-model:value="form.ip" placeholder="请输入IP地址" allow-clear />
         </a-form-item>
-        <a-form-item label="归属地">
-          <a-input v-model:value="form.location" placeholder="请输入归属地" allow-clear />
-        </a-form-item>
-        <a-form-item label="运营商">
-          <a-input v-model:value="form.isp" placeholder="请输入运营商" allow-clear />
-        </a-form-item>
         <a-form-item label="端口">
           <a-input v-model:value="form.port" placeholder="请输入端口" allow-clear />
+        </a-form-item>
+        <a-form-item label="服务名称">
+          <a-input v-model:value="form.serviceName" placeholder="请输入服务名称" allow-clear />
+        </a-form-item>
+        <a-form-item label="操作系统">
+          <a-input v-model:value="form.osName" placeholder="请输入操作系统" allow-clear />
+        </a-form-item>
+        <a-form-item label="IP类型">
+          <a-select v-model:value="form.ipType" placeholder="请选择IP类型" allow-clear style="width: 120px">
+            <a-select-option value="PUBLIC">公网</a-select-option>
+            <a-select-option value="PRIVATE">内网</a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item>
           <a-space>
             <a-button type="primary" @click="handleSearch" :loading="loading">搜索</a-button>
             <a-button @click="handleReset">重置</a-button>
+            <a-button @click="handleExport">导出</a-button>
           </a-space>
         </a-form-item>
       </a-form>
@@ -27,10 +34,10 @@
       <a-table 
         :dataSource="tableData" 
         :columns="columns" 
-        bordered 
         :pagination="pagination"
-        @change="handleTableChange"
         :loading="loading"
+        @change="handleTableChange"
+        bordered 
       />
     </div>
   </div>
@@ -48,30 +55,47 @@ export default defineComponent({
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import http from '@/plugins/http'
+import http from '../../plugins/http'
 
-interface IpAsset {
+interface IpData {
   _id: string
   ip: string
-  location: string
-  isp: string
-  ports: string[]
-  lastScan: string
+  domain: string[]
+  port_info: Array<{
+    port_id: number
+    service_name: string
+    product: string
+    version: string
+  }>
+  os_info: {
+    name: string
+    accuracy: number
+  }
+  ip_type: string
+  cdn_name: string
+  geo_asn: {
+    number: number
+    organization: string
+  }
+  geo_city: {
+    region_name: string
+    country: string
+  }
+  task_id: string
+  create_time: string
 }
 
-// 查询表单
 const form = reactive({
   ip: '',
-  location: '',
-  isp: '',
-  port: ''
+  port: '',
+  serviceName: '',
+  osName: '',
+  ipType: undefined as string | undefined
 })
 
-// 表格数据
-const tableData = ref<IpAsset[]>([])
+const tableData = ref<IpData[]>([])
 const loading = ref(false)
 
-// 分页配置
 const pagination = reactive<TablePaginationConfig>({
   total: 0,
   current: 1,
@@ -81,78 +105,130 @@ const pagination = reactive<TablePaginationConfig>({
   showQuickJumper: true
 })
 
-// 表格列定义
 const columns = [
   {
     title: 'IP地址',
     dataIndex: 'ip',
     key: 'ip',
+    width: 150
   },
   {
-    title: '归属地',
-    dataIndex: 'location',
-    key: 'location',
+    title: '域名',
+    dataIndex: 'domain',
+    key: 'domain',
+    width: 200,
+    ellipsis: true,
+    render: (domains: string[]) => domains?.join(', ') || '-'
   },
   {
-    title: '运营商',
-    dataIndex: 'isp',
-    key: 'isp',
+    title: '端口信息',
+    dataIndex: 'port_info',
+    key: 'port_info',
+    width: 300,
+    ellipsis: true,
+    render: (ports: any[]) => ports?.map(p => `${p.port_id}(${p.service_name})`).join(', ') || '-'
   },
   {
-    title: '开放端口',
-    dataIndex: 'ports',
-    key: 'ports',
-    customRender: ({ text }: { text: string[] }) => text?.join(', ') || '-'
+    title: '操作系统',
+    dataIndex: ['os_info', 'name'],
+    key: 'os_name',
+    width: 120
   },
   {
-    title: '最后扫描时间',
-    dataIndex: 'lastScan',
-    key: 'lastScan',
+    title: 'IP类型',
+    dataIndex: 'ip_type',
+    key: 'ip_type',
+    width: 100,
+    render: (text: string) => text === 'PUBLIC' ? '公网' : '内网'
   },
+  {
+    title: '地理位置',
+    dataIndex: ['geo_city', 'region_name'],
+    key: 'region_name',
+    width: 150
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'create_time',
+    key: 'create_time',
+    width: 180
+  }
 ]
 
-// 搜索IP资产
-const handleSearch = async () => {
+const handleSearch = async (pag?: TablePaginationConfig) => {
   loading.value = true
   try {
     const params = new URLSearchParams()
     if (form.ip) params.append('ip', form.ip)
-    if (form.location) params.append('location', form.location)
-    if (form.isp) params.append('isp', form.isp)
-    if (form.port) params.append('port', form.port)
-    params.append('page', String(pagination.current))
-    params.append('size', String(pagination.pageSize))
+    if (form.port) params.append('port_info.port_id', form.port)
+    if (form.serviceName) params.append('port_info.service_name', form.serviceName)
+    if (form.osName) params.append('os_info.name', form.osName)
+    if (form.ipType) params.append('ip_type', form.ipType)
+    
+    const page = pag?.current || pagination.current
+    const size = pag?.pageSize || pagination.pageSize
+    params.append('page', String(page))
+    params.append('size', String(size))
 
-    const res = await http.get(`/asset_ip/?${params.toString()}`)
-    const { code, message: msg, items, total } = res.data
-    if (code === 200) {
-      tableData.value = items || []
-      pagination.total = total || 0
+    const res = await http.get(`/ip/?${params.toString()}`)
+    if (res.data.code === 200) {
+      tableData.value = res.data.items || []
+      pagination.total = res.data.total || 0
+      pagination.current = page
+      pagination.pageSize = size
     } else {
-      throw new Error(msg || '查询失败')
+      throw new Error(res.data.message || '查询失败')
     }
   } catch (error) {
     console.error('IP搜索错误:', error)
+    message.error('搜索失败')
   } finally {
     loading.value = false
   }
 }
 
-// 重置表单
 const handleReset = () => {
   form.ip = ''
-  form.location = ''
-  form.isp = ''
   form.port = ''
+  form.serviceName = ''
+  form.osName = ''
+  form.ipType = undefined
   pagination.current = 1
   handleSearch()
 }
 
-// 处理表格分页、排序、筛选变化
 const handleTableChange = (pag: TablePaginationConfig) => {
-  pagination.current = pag.current || 1
-  pagination.pageSize = pag.pageSize || 10
-  handleSearch()
+  handleSearch(pag)
+}
+
+const handleExport = async () => {
+  try {
+    const params = new URLSearchParams()
+    if (form.ip) params.append('ip', form.ip)
+    if (form.port) params.append('port_info.port_id', form.port)
+    if (form.serviceName) params.append('port_info.service_name', form.serviceName)
+    if (form.osName) params.append('os_info.name', form.osName)
+    if (form.ipType) params.append('ip_type', form.ipType)
+
+    const res = await http.get(`/ip/export/?${params.toString()}`, {
+      responseType: 'blob'
+    })
+    
+    const blob = new Blob([res.data], { type: 'text/plain' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `ip_export_${new Date().getTime()}.txt`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    message.success('导出成功')
+  } catch (error) {
+    console.error('导出错误:', error)
+    message.error('导出失败')
+  }
 }
 
 // 初始加载

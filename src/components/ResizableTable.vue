@@ -2,11 +2,24 @@
   <a-table :columns="columns" :data-source="data" :pagination="false" bordered />
 </template>
 
-<script setup lang="ts">
-import { defineProps } from 'vue'
+<script lang="ts">
+import { defineComponent } from 'vue'
 
-const props = defineProps<{
-  columns: any[],
-  data: any[]
-}>()
+export default defineComponent({
+  name: 'ResizableTable',
+  props: {
+    columns: {
+      type: Array,
+      required: true
+    },
+    data: {
+      type: Array,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    }
+  }
+})
 </script>
