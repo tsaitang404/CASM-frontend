@@ -105,27 +105,25 @@ const handleOk = async () => {
     const requestData = {
       name: formData.name.trim(),
       target: formData.target.trim(),
-      options: {
-        domain_brute_type: formData.domain_brute_type || 'small',
-        port_scan_type: formData.port_scan_type || 'top100',
-        domain_brute: Boolean(formData.domain_brute),
-        alt_dns: Boolean(formData.alt_dns),
-        dns_query_plugin: Boolean(formData.dns_query_plugin),
-        casm_search: Boolean(formData.casm_search),
-        port_scan: Boolean(formData.port_scan),
-        service_detection: Boolean(formData.service_detection),
-        os_detection: Boolean(formData.os_detection),
-        ssl_cert: Boolean(formData.ssl_cert),
-        skip_scan_cdn_ip: Boolean(formData.skip_scan_cdn_ip),
-        site_identify: Boolean(formData.site_identify),
-        search_engines: Boolean(formData.search_engines),
-        site_spider: Boolean(formData.site_spider),
-        site_capture: Boolean(formData.site_capture),
-        file_leak: Boolean(formData.file_leak),
-        findvhost: Boolean(formData.findvhost),
-        nuclei_scan: Boolean(formData.nuclei_scan),
-        web_info_hunter: Boolean(formData.web_info_hunter)
-      }
+      domain_brute_type: formData.domain_brute_type || 'small',
+      port_scan_type: formData.port_scan_type || 'top100',
+      domain_brute: Boolean(formData.domain_brute),
+      alt_dns: Boolean(formData.alt_dns),
+      dns_query_plugin: Boolean(formData.dns_query_plugin),
+      casm_search: Boolean(formData.casm_search),
+      port_scan: Boolean(formData.port_scan),
+      service_detection: Boolean(formData.service_detection),
+      os_detection: Boolean(formData.os_detection),
+      ssl_cert: Boolean(formData.ssl_cert),
+      skip_scan_cdn_ip: Boolean(formData.skip_scan_cdn_ip),
+      site_identify: Boolean(formData.site_identify),
+      search_engines: Boolean(formData.search_engines),
+      site_spider: Boolean(formData.site_spider),
+      site_capture: Boolean(formData.site_capture),
+      file_leak: Boolean(formData.file_leak),
+      findvhost: Boolean(formData.findvhost),
+      nuclei_scan: Boolean(formData.nuclei_scan),
+      web_info_hunter: Boolean(formData.web_info_hunter)
     }
 
     // 打印请求数据用于调试
