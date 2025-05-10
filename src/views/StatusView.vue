@@ -6,14 +6,21 @@
         <a-row :gutter="24">
           <a-col :span="24">
             <div class="status-item">
-              <span class="label">MongoDB:</span>
+              <span class="label">Mongo数据库:</span>
               <a-tag :color="mongoStatus === 'running' ? 'success' : 'error'">
                 {{ mongoStatus === 'running' ? '运行中' : '停止' }}
               </a-tag>
             </div>
 
             <div class="status-item">
-              <span class="label">RabbitMQ:</span>
+              <span class="label">调度器:</span>
+              <a-tag :color="schedulerStatus === 'running' ? 'success' : 'error'">
+                {{ schedulerStatus === 'running' ? '运行中' : '停止' }}
+              </a-tag>
+            </div>
+
+            <div class="status-item">
+              <span class="label">消息队列:</span>
               <a-tag :color="rabbitStatus === 'running' ? 'success' : 'error'">
                 {{ rabbitStatus === 'running' ? '运行中' : '停止' }}
               </a-tag>
@@ -68,6 +75,11 @@ const mongoStatus = ref('error')
 const rabbitStatus = ref('error')
 const workerCount = ref(0)
 
+// 调度器状态数据
+const schedulerStatus = ref('error')
+const schedulerNodeCount = ref(0)
+const schedulerLastTime = ref('')
+
 // 资产统计数据
 const assetStats = ref({
   domains: 0,
@@ -114,6 +126,11 @@ const getSystemStatus = async () => {
     rabbitStatus.value = data.data.rabbitmq?.status || 'error'
     workerCount.value = Object.values(data.data.workers || {}).filter(w => w.status === 'running').length
     
+    // 更新调度器状态
+    schedulerStatus.value = data.data.scheduler?.status || 'error'
+    schedulerNodeCount.value = data.data.scheduler?.nodeCount || 0
+    schedulerLastTime.value = data.data.scheduler?.lastTime || ''
+
     // 更新资产统计数据
     if (data.data.assets) {
       assetStats.value = {
