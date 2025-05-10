@@ -59,11 +59,16 @@
         </template>
         
         <template v-else-if="column.dataIndex === 'progress'">
-          <a-progress 
-            :percent="calculateProgress(record)" 
-            :status="record.status === 'error' ? 'exception' : undefined"
-            size="small"
-          />
+          <div>
+            <a-tag
+              v-for="key in getEnabledFeatures(record)"
+              :key="key"
+              :color="getFeatureTagColor(key)"
+              style="margin-bottom: 4px;"
+            >
+              {{ featureNameMap[key] }}
+            </a-tag>
+          </div>
         </template>
         
         <template v-else-if="column.dataIndex === 'target'">
@@ -166,9 +171,9 @@ const columns = [
     width: 100,
   },
   {
-    title: '进度',
+    title: '功能', // 原为“进度”
     dataIndex: 'progress',
-    width: 150,
+    width: 260, // 增大列宽
   },
   {
     title: '统计信息',
@@ -343,6 +348,56 @@ const statTypeTitleMap: Record<string, string> = {
   vuln: '漏洞列表',
   wih: 'Web信息收集列表',
   port: '端口列表' // 如有端口列表组件可补充
+}
+
+// 功能名映射
+const featureNameMap: Record<string, string> = {
+  domain_brute: '域名爆破',
+  alt_dns: 'DNS生成',
+  dns_query_plugin: 'DNS解析',
+  casm_search: '历史查询',
+  port_scan: '端口扫描',
+  service_detection: '服务识别',
+  os_detection: '操作系统识别',
+  ssl_cert: 'SSL证书',
+  skip_scan_cdn_ip: '跳过CDN IP',
+  site_identify: '站点识别',
+  search_engines: '搜索引擎',
+  site_spider: '站点爬虫',
+  site_capture: '站点截图',
+  file_leak: '文件泄露',
+  findvhost: '虚拟主机',
+  nuclei_scan: 'Nuclei扫描',
+  web_info_hunter: 'Web信息猎手'
+}
+
+const featureTagColorMap: Record<string, string> = {
+  domain_brute: 'purple',
+  alt_dns: 'geekblue',
+  dns_query_plugin: 'cyan',
+  casm_search: 'volcano',
+  port_scan: 'orange',
+  service_detection: 'blue',
+  os_detection: 'gold',
+  ssl_cert: 'green',
+  skip_scan_cdn_ip: 'lime',
+  site_identify: 'magenta',
+  search_engines: 'red',
+  site_spider: 'cyan',
+  site_capture: 'blue',
+  file_leak: 'volcano',
+  findvhost: 'gold',
+  nuclei_scan: 'green',
+  web_info_hunter: 'geekblue'
+}
+
+function getFeatureTagColor(key: string) {
+  return featureTagColorMap[key] || 'default'
+}
+
+function getEnabledFeatures(record: any) {
+  if (!record.options) return []
+  return Object.keys(record.options).filter(key => record.options[key] && featureNameMap[key])
 }
 
 const openStatModal = (type: string, taskId: string) => {
