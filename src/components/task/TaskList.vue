@@ -74,27 +74,27 @@
         
         <template v-else-if="column.dataIndex === 'statistics'">
           <div class="stat-bar stat-bar-table stat-bar-table-rows">
-            <div class="stat-item stat-domain">
+            <div class="stat-item stat-domain" @click="openStatModal('domain', record._id)">
               <span class="stat-label">域名</span>
               <span class="stat-value">{{ record.statistic?.domain_cnt || record.statistics?.domain_cnt || 0 }}</span>
             </div>
-            <div class="stat-item stat-wih">
+            <div class="stat-item stat-wih" @click="openStatModal('wih', record._id)">
               <span class="stat-label">WIH</span>
               <span class="stat-value">{{ record.statistic?.wih_cnt || record.statistics?.wih_cnt || 0 }}</span>
             </div>
-            <div class="stat-item stat-port">
+            <div class="stat-item stat-port" @click="openStatModal('port', record._id)">
               <span class="stat-label">端口</span>
               <span class="stat-value">{{ record.statistic?.port_cnt || record.statistics?.port_cnt || 0 }}</span>
             </div>
-            <div class="stat-item stat-ip">
+            <div class="stat-item stat-ip" @click="openStatModal('ip', record._id)">
               <span class="stat-label">IP</span>
               <span class="stat-value">{{ record.statistic?.ip_cnt || record.statistics?.ip_cnt || 0 }}</span>
             </div>
-            <div class="stat-item stat-service">
+            <div class="stat-item stat-service" @click="openStatModal('service', record._id)">
               <span class="stat-label">服务</span>
               <span class="stat-value">{{ record.statistic?.service_cnt || record.statistics?.service_cnt || 0 }}</span>
             </div>
-            <div class="stat-item stat-vuln">
+            <div class="stat-item stat-vuln" @click="openStatModal('vuln', record._id)">
               <span class="stat-label">漏洞</span>
               <span class="stat-value">{{ record.statistic?.vuln_cnt || record.statistics?.vuln_cnt || 0 }}</span>
             </div>
@@ -102,11 +102,15 @@
         </template>
       </template>
     </a-table>
+    <!-- 统计项弹窗 -->
+    <a-modal v-model:open="statModalVisible" :title="statModalTitle" width="900px" :footer="null" @cancel="closeStatModal">
+      <component :is="currentListComponent" v-if="currentListComponent" :taskId="currentTaskId" />
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref, defineProps, defineEmits, computed } from 'vue'
 import { Modal, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { PauseCircleOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons-vue'
@@ -119,6 +123,12 @@ import {
   truncateText,
   formatTaskStatistic 
 } from '@/utils/taskHelper'
+import DomainSearch from '@/components/asset/DomainSearch.vue'
+import IpSearch from '@/components/asset/IpSearch.vue'
+import SiteSearch from '@/components/asset/SiteSearch.vue'
+import ServiceList from '@/components/asset/ServiceList.vue'
+import VulnList from '@/components/asset/VulnList.vue'
+import WihList from '@/components/asset/WihList.vue'
 
 const router = useRouter()
 
@@ -310,6 +320,41 @@ const handleBatchDelete = () => {
 const handleRefresh = () => {
   emit('reload')
 }
+
+const statModalVisible = ref(false)
+const currentStatType = ref('')
+const currentTaskId = ref('')
+
+const statTypeMap: Record<string, any> = {
+  domain: DomainSearch,
+  ip: IpSearch,
+  site: SiteSearch,
+  service: ServiceList,
+  vuln: VulnList,
+  wih: WihList
+  // 端口、证书等可后续补充
+}
+
+const statTypeTitleMap: Record<string, string> = {
+  domain: '域名列表',
+  ip: 'IP列表',
+  site: '站点列表',
+  service: '服务列表',
+  vuln: '漏洞列表',
+  wih: 'Web信息收集列表',
+  port: '端口列表' // 如有端口列表组件可补充
+}
+
+const openStatModal = (type: string, taskId: string) => {
+  currentStatType.value = type
+  currentTaskId.value = taskId
+  statModalVisible.value = true
+}
+const closeStatModal = () => {
+  statModalVisible.value = false
+}
+const currentListComponent = computed(() => statTypeMap[currentStatType.value] || null)
+const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] || '详情')
 </script>
 
 <style scoped>
