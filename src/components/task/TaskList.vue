@@ -367,4 +367,64 @@ const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] ||
 }
 
 /* 其他样式继承自 task-manage.css */
+.stat-bar-table .stat-item {
+  min-width: 40px;
+  max-width: 60px;
+  width: 40px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 4px 4px 4px 0;
+  background: #fafbfc;
+  transition: box-shadow 0.2s;
+}
+.stat-bar-table .stat-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #f0f5ff;
+}
+.stat-bar-table .stat-label {
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.stat-bar-table .stat-value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.stat-bar-table .stat-domain {
+  background: #f9f0ff;
+  color: #722ed1;
+}
+.stat-bar-table .stat-wih {
+  background: #fffbe6;
+  color: #faad14;
+}
+.stat-bar-table .stat-port {
+  background: #fff0f6;
+  color: #eb2f96;
+}
+.stat-bar-table .stat-ip {
+  background: #f6ffed;
+  color: #52c41a;
+}
+.stat-bar-table .stat-service {
+  background: #f0f5ff;
+  color: #2f54eb;
+}
+.stat-bar-table .stat-vuln {
+  background: #fff1f0;
+  color: #f5222d;
+}
+.stat-bar-table .stat-item {
+  /* 保证文字颜色优先于背景色 */
+  transition: box-shadow 0.2s, background 0.2s, color 0.2s;
+}
+.stat-bar-table .stat-item:hover {
+  filter: brightness(0.97);
+}
 </style>
