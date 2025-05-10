@@ -26,7 +26,7 @@
       :rowSelection="rowSelection"
       :pagination="pagination"
       @change="handleTableChange"
-      :row-key="(record) => record._id"
+      row-key="_id"
       size="middle"
     >
       <template #bodyCell="{ column, record }">
@@ -79,6 +79,10 @@
         
         <template v-else-if="column.dataIndex === 'statistics'">
           <div class="stat-bar stat-bar-table stat-bar-table-rows">
+            <div class="stat-item stat-site" @click="openStatModal('site', record._id)">
+              <span class="stat-label">站点</span>
+              <span class="stat-value">{{ record.statistic?.site_cnt || record.statistics?.site_cnt || 0 }}</span>
+            </div>
             <div class="stat-item stat-domain" @click="openStatModal('domain', record._id)">
               <span class="stat-label">域名</span>
               <span class="stat-value">{{ record.statistic?.domain_cnt || record.statistics?.domain_cnt || 0 }}</span>
@@ -87,21 +91,45 @@
               <span class="stat-label">WIH</span>
               <span class="stat-value">{{ record.statistic?.wih_cnt || record.statistics?.wih_cnt || 0 }}</span>
             </div>
-            <div class="stat-item stat-port" @click="openStatModal('port', record._id)">
-              <span class="stat-label">端口</span>
-              <span class="stat-value">{{ record.statistic?.port_cnt || record.statistics?.port_cnt || 0 }}</span>
-            </div>
             <div class="stat-item stat-ip" @click="openStatModal('ip', record._id)">
               <span class="stat-label">IP</span>
               <span class="stat-value">{{ record.statistic?.ip_cnt || record.statistics?.ip_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-cip" @click="openStatModal('cip', record._id)">
+              <span class="stat-label">整数IP</span>
+              <span class="stat-value">{{ record.statistic?.cip_cnt || record.statistics?.cip_cnt || 0 }}</span>
             </div>
             <div class="stat-item stat-service" @click="openStatModal('service', record._id)">
               <span class="stat-label">服务</span>
               <span class="stat-value">{{ record.statistic?.service_cnt || record.statistics?.service_cnt || 0 }}</span>
             </div>
+            <div class="stat-item stat-npoc" @click="openStatModal('npoc_service', record._id)">
+              <span class="stat-label">服务识别</span>
+              <span class="stat-value">{{ record.statistic?.npoc_service_cnt || record.statistics?.npoc_service_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-cert" @click="openStatModal('cert', record._id)">
+              <span class="stat-label">证书</span>
+              <span class="stat-value">{{ record.statistic?.cert_cnt || record.statistics?.cert_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-fileleak" @click="openStatModal('fileleak', record._id)">
+              <span class="stat-label">泄露</span>
+              <span class="stat-value">{{ record.statistic?.fileleak_cnt || record.statistics?.fileleak_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-url" @click="openStatModal('url', record._id)">
+              <span class="stat-label">URL</span>
+              <span class="stat-value">{{ record.statistic?.url_cnt || record.statistics?.url_cnt || 0 }}</span>
+            </div>
             <div class="stat-item stat-vuln" @click="openStatModal('vuln', record._id)">
               <span class="stat-label">漏洞</span>
               <span class="stat-value">{{ record.statistic?.vuln_cnt || record.statistics?.vuln_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-nuclei" @click="openStatModal('nuclei_result', record._id)">
+              <span class="stat-label">Nuclei</span>
+              <span class="stat-value">{{ record.statistic?.nuclei_result_cnt || record.statistics?.nuclei_result_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-finger" @click="openStatModal('stat_finger', record._id)">
+              <span class="stat-label">指纹</span>
+              <span class="stat-value">{{ record.statistic?.stat_finger_cnt || record.statistics?.stat_finger_cnt || 0 }}</span>
             </div>
           </div>
         </template>
@@ -159,44 +187,71 @@ const columns = [
     title: '任务名称',
     dataIndex: 'name',
     width: 200,
+    minWidth: 150,
   },
   {
     title: '目标',
     dataIndex: 'target',
     width: 200,
+    minWidth: 150,
   },
   {
     title: '状态',
     dataIndex: 'status',
     width: 100,
+    minWidth: 80,
   },
   {
-    title: '功能', // 原为“进度”
+    title: '功能',
     dataIndex: 'progress',
-    width: 260, // 增大列宽
+    width: 260,
+    minWidth: 200,
   },
   {
     title: '统计信息',
     dataIndex: 'statistics',
-    width: 250,
+    width: 600,
+    minWidth: 500,
   },
   {
     title: '创建时间',
     dataIndex: 'create_time',
     width: 170,
+    minWidth: 150,
+  },
+  {
+    title: '开始时间',
+    dataIndex: 'start_time',  
+    width: 170,
+    minWidth: 150,
+  },
+  {
+    title: '结束时间',
+    dataIndex: 'end_time',
+    width: 170,
+    minWidth: 150,
   },
   {
     title: '操作',
     dataIndex: 'action',
     width: 200,
+    minWidth: 180,
     fixed: 'right'
   }
 ]
 
 const rowSelection = {
+  type: 'checkbox',
   selectedRowKeys: props.selectedRowKeys,
-  onChange: (keys: string[]) => {
+  onChange: (selectedRowKeys: string[], selectedRows: Task[]) => {
+    emit('update:selectedRowKeys', selectedRowKeys)
+  },
+  onSelectAll: (selected: boolean, selectedRows: Task[], changeRows: Task[]) => {
+    const keys = selected ? props.tasks?.map(row => row._id) || [] : []
     emit('update:selectedRowKeys', keys)
+  },
+  onSelect: (record: Task, selected: boolean, selectedRows: Task[]) => {
+    emit('update:selectedRowKeys', selectedRows.map(row => row._id))
   }
 }
 
@@ -422,11 +477,22 @@ const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] ||
 }
 
 /* 其他样式继承自 task-manage.css */
+.stat-bar-table {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 500px;  /* 设置最小宽度 */
+  max-width: 100%;   /* 最大宽度不超过容器 */
+  overflow-x: auto;  /* 在需要时显示横向滚动条 */
+  padding: 4px;      /* 增加内边距 */
+}
+
 .stat-bar-table .stat-item {
-  min-width: 40px;
-  max-width: 60px;
-  width: 40px;
-  height: 60px;
+  flex: 0 0 80px;    /* 设置固定宽度，不允许压缩 */
+  width: 80px;
+  height: 70px;
+  min-width: 80px;   /* 设置最小宽度 */
+  padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -434,23 +500,26 @@ const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] ||
   box-sizing: border-box;
   cursor: pointer;
   border-radius: 8px;
-  margin: 4px 4px 4px 0;
   background: #fafbfc;
-  transition: box-shadow 0.2s;
-}
-.stat-bar-table .stat-item:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  background: #f0f5ff;
-}
-.stat-bar-table .stat-label {
-  font-size: 13px;
-  margin-bottom: 2px;
-}
-.stat-bar-table .stat-value {
-  font-size: 18px;
-  font-weight: bold;
+  transition: all 0.2s ease;
 }
 
+.stat-bar-table .stat-label {
+  font-size: 12px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
+}
+
+.stat-bar-table .stat-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* 统计项的背景色和文字颜色 */
 .stat-bar-table .stat-domain {
   background: #f9f0ff;
   color: #722ed1;
@@ -459,27 +528,49 @@ const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] ||
   background: #fffbe6;
   color: #faad14;
 }
-.stat-bar-table .stat-port {
-  background: #fff0f6;
-  color: #eb2f96;
-}
 .stat-bar-table .stat-ip {
   background: #f6ffed;
   color: #52c41a;
+}
+.stat-bar-table .stat-cip {
+  background: #e6f7ff;
+  color: #1890ff;
 }
 .stat-bar-table .stat-service {
   background: #f0f5ff;
   color: #2f54eb;
 }
+.stat-bar-table .stat-npoc {
+  background: #fff2e8;
+  color: #fa541c;
+}
+.stat-bar-table .stat-cert {
+  background: #f4ffb8;
+  color: #7cb305;
+}
+.stat-bar-table .stat-fileleak {
+  background: #fff0f6;
+  color: #eb2f96;
+}
+.stat-bar-table .stat-url {
+  background: #f5f5f5;
+  color: #595959;
+}
 .stat-bar-table .stat-vuln {
   background: #fff1f0;
   color: #f5222d;
 }
-.stat-bar-table .stat-item {
-  /* 保证文字颜色优先于背景色 */
-  transition: box-shadow 0.2s, background 0.2s, color 0.2s;
+.stat-bar-table .stat-nuclei {
+  background: #fcffe6;
+  color: #a0d911;
 }
+.stat-bar-table .stat-finger {
+  background: #e6fffb;
+  color: #13c2c2;
+}
+
 .stat-bar-table .stat-item:hover {
-  filter: brightness(0.97);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 </style>

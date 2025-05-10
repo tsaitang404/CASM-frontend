@@ -19,8 +19,10 @@
           </a-tag>
         </a-descriptions-item>
         <a-descriptions-item label="任务目标">{{ taskDetail.target }}</a-descriptions-item>
-        <a-descriptions-item label="开始时间">{{ taskDetail.start_time }}</a-descriptions-item>
-        <a-descriptions-item label="结束时间">{{ taskDetail.end_time }}</a-descriptions-item>
+        <a-descriptions-item label="创建时间">{{ taskDetail.create_time || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="开始时间">{{ taskDetail.start_time || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="结束时间">{{ taskDetail.end_time || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="Celery ID">{{ taskDetail.celery_id }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
 
@@ -72,21 +74,45 @@
           <span class="stat-label">WIH</span>
           <span class="stat-value">{{ taskDetail.statistic?.wih_cnt || taskDetail.statistics?.wih_cnt || 0 }}</span>
         </div>
-        <div class="stat-item stat-port">
-          <span class="stat-label">端口</span>
-          <span class="stat-value">{{ taskDetail.statistic?.port_cnt || taskDetail.statistics?.port_cnt || 0 }}</span>
-        </div>
         <div class="stat-item stat-ip">
           <span class="stat-label">IP</span>
           <span class="stat-value">{{ taskDetail.statistic?.ip_cnt || taskDetail.statistics?.ip_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-cip">
+          <span class="stat-label">整数IP</span>
+          <span class="stat-value">{{ taskDetail.statistic?.cip_cnt || taskDetail.statistics?.cip_cnt || 0 }}</span>
         </div>
         <div class="stat-item stat-service">
           <span class="stat-label">服务</span>
           <span class="stat-value">{{ taskDetail.statistic?.service_cnt || taskDetail.statistics?.service_cnt || 0 }}</span>
         </div>
+        <div class="stat-item stat-npoc">
+          <span class="stat-label">服务识别</span>
+          <span class="stat-value">{{ taskDetail.statistic?.npoc_service_cnt || taskDetail.statistics?.npoc_service_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-cert">
+          <span class="stat-label">证书</span>
+          <span class="stat-value">{{ taskDetail.statistic?.cert_cnt || taskDetail.statistics?.cert_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-fileleak">
+          <span class="stat-label">泄露</span>
+          <span class="stat-value">{{ taskDetail.statistic?.fileleak_cnt || taskDetail.statistics?.fileleak_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-url">
+          <span class="stat-label">URL</span>
+          <span class="stat-value">{{ taskDetail.statistic?.url_cnt || taskDetail.statistics?.url_cnt || 0 }}</span>
+        </div>
         <div class="stat-item stat-vuln">
           <span class="stat-label">漏洞</span>
           <span class="stat-value">{{ taskDetail.statistic?.vuln_cnt || taskDetail.statistics?.vuln_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-nuclei">
+          <span class="stat-label">Nuclei</span>
+          <span class="stat-value">{{ taskDetail.statistic?.nuclei_result_cnt || taskDetail.statistics?.nuclei_result_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-finger">
+          <span class="stat-label">指纹</span>
+          <span class="stat-value">{{ taskDetail.statistic?.stat_finger_cnt || taskDetail.statistics?.stat_finger_cnt || 0 }}</span>
         </div>
       </div>
     </a-card>

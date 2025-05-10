@@ -39,7 +39,8 @@
       :tasks="taskList"
       :loading="loading"
       :pagination="pagination"
-      v-model:selectedRowKeys="selectedRowKeys"
+      :selectedRowKeys="selectedRowKeys"
+      @update:selectedRowKeys="handleSelectionChange"
       @reload="loadTaskList"
       @change="handleTableChange"
       @stop="stopTask"
@@ -166,6 +167,12 @@ const taskList = ref<Task[]>([])
 const selectedRowKeys = ref<string[]>([])
 const refreshInterval = ref<number | null>(null)
 const autoRefresh = ref(true)
+
+// 处理选择行变化
+const handleSelectionChange = (keys: string[]) => {
+  selectedRowKeys.value = keys
+}
+
 const createTaskModalVisible = ref(false)
 const confirmLoading = ref(false)
 const syncTaskModalVisible = ref(false)
@@ -286,6 +293,7 @@ const fetchTaskList = async (params: { page: number; pageSize: number }): Promis
 const loadTaskList = async () => {
   try {
     loading.value = true
+    selectedRowKeys.value = [] // 重置选择项
     const result = await fetchTaskList({
       page: pagination.current,
       pageSize: pagination.pageSize
