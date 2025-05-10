@@ -59,29 +59,36 @@
 
     <!-- 任务统计信息卡片 -->
     <a-card title="统计信息" :bordered="false" class="detail-card">
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-statistic title="站点数量" :value="taskDetail.statistic?.site_cnt || taskDetail.statistics?.site_cnt || 0" />
-        </a-col>
-        <a-col :span="8">
-          <a-statistic title="域名数量" :value="taskDetail.statistic?.domain_cnt || taskDetail.statistics?.domain_cnt || 0" />
-        </a-col>
-        <a-col :span="8">
-          <a-statistic title="WIH数量" :value="taskDetail.statistic?.wih_cnt || taskDetail.statistics?.wih_cnt || 0" />
-        </a-col>
-        <a-col :span="8">
-          <a-statistic title="端口数量" :value="taskDetail.statistic?.port_cnt || taskDetail.statistics?.port_cnt || 0" />
-        </a-col>
-        <a-col :span="8">
-          <a-statistic title="IP数量" :value="taskDetail.statistic?.ip_cnt || taskDetail.statistics?.ip_cnt || 0" />
-        </a-col>
-        <a-col :span="8">
-          <a-statistic title="服务数量" :value="taskDetail.statistic?.service_cnt || taskDetail.statistics?.service_cnt || 0" />
-        </a-col>
-        <a-col :span="8">
-          <a-statistic title="漏洞数量" :value="taskDetail.statistic?.vuln_cnt || taskDetail.statistics?.vuln_cnt || 0" />
-        </a-col>
-      </a-row>
+      <div class="stat-bar">
+        <div class="stat-item stat-site">
+          <span class="stat-label">站点</span>
+          <span class="stat-value">{{ taskDetail.statistic?.site_cnt || taskDetail.statistics?.site_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-domain">
+          <span class="stat-label">域名</span>
+          <span class="stat-value">{{ taskDetail.statistic?.domain_cnt || taskDetail.statistics?.domain_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-wih">
+          <span class="stat-label">WIH</span>
+          <span class="stat-value">{{ taskDetail.statistic?.wih_cnt || taskDetail.statistics?.wih_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-port">
+          <span class="stat-label">端口</span>
+          <span class="stat-value">{{ taskDetail.statistic?.port_cnt || taskDetail.statistics?.port_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-ip">
+          <span class="stat-label">IP</span>
+          <span class="stat-value">{{ taskDetail.statistic?.ip_cnt || taskDetail.statistics?.ip_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-service">
+          <span class="stat-label">服务</span>
+          <span class="stat-value">{{ taskDetail.statistic?.service_cnt || taskDetail.statistics?.service_cnt || 0 }}</span>
+        </div>
+        <div class="stat-item stat-vuln">
+          <span class="stat-label">漏洞</span>
+          <span class="stat-value">{{ taskDetail.statistic?.vuln_cnt || taskDetail.statistics?.vuln_cnt || 0 }}</span>
+        </div>
+      </div>
     </a-card>
 
     <!-- 任务进度/结果列表 -->

@@ -128,20 +128,25 @@ export function setupTaskRefresh(callback: () => void, interval: number = 10000)
  * @returns 格式化后的统计信息
  */
 export function formatTaskStatistic(task: Task): string {
-  const stats = task.statistics || task.statistic || {}
-  const parts = []
-  
-  if (stats.site_cnt !== undefined) {
-    parts.push(`站点: ${stats.site_cnt}`)
+  const stats = task.statistics || task.statistic || {};
+  const parts = [];
+
+  if (stats.site_cnt !== undefined) parts.push(`站点: ${stats.site_cnt}`);
+  if (stats.domain_cnt !== undefined) parts.push(`域名: ${stats.domain_cnt}`);
+  if (stats.wih_cnt !== undefined) parts.push(`WIH: ${stats.wih_cnt}`);
+  if (stats.port_cnt !== undefined) parts.push(`端口: ${stats.port_cnt}`);
+  if (stats.ip_cnt !== undefined) parts.push(`IP: ${stats.ip_cnt}`);
+  if (stats.service_cnt !== undefined) parts.push(`服务: ${stats.service_cnt}`);
+  if (stats.vuln_cnt !== undefined) parts.push(`漏洞: ${stats.vuln_cnt}`);
+
+  // 兼容旧数据结构
+  if (parts.length === 0 && task.options) {
+    if (task.options.domains_count) parts.push(`域名: ${task.options.domains_count}`);
+    if (task.options.ips_count) parts.push(`IP: ${task.options.ips_count}`);
+    if (task.options.ports_count) parts.push(`端口: ${task.options.ports_count}`);
   }
-  if (stats.domain_cnt !== undefined) {
-    parts.push(`域名: ${stats.domain_cnt}`)
-  }
-  if (stats.wih_cnt !== undefined) {
-    parts.push(`WIH: ${stats.wih_cnt}`)
-  }
-  
-  return parts.join(' | ')
+
+  return parts.join(' | ');
 }
 
 export function calculateProgress(task: Task): number {

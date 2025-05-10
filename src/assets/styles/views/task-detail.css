@@ -43,3 +43,89 @@
   font-size: 24px;
   font-weight: 600;
 }
+
+/* 状态栏风格统计信息 */
+.stat-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 8px 0 4px 0;
+  align-items: center;
+  justify-content: flex-start;
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #f5f7fa;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  font-size: 15px;
+  font-weight: 500;
+  transition: box-shadow 0.2s;
+}
+.stat-item .stat-label {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.stat-item .stat-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #222;
+}
+.stat-site { background: #e6f7ff; color: #1890ff; }
+.stat-domain { background: #f9f0ff; color: #722ed1; }
+.stat-wih { background: #fffbe6; color: #faad14; }
+.stat-port { background: #fff0f6; color: #eb2f96; }
+.stat-ip { background: #f6ffed; color: #52c41a; }
+.stat-service { background: #f0f5ff; color: #2f54eb; }
+.stat-vuln { background: #fff1f0; color: #f5222d; }
+
+/* 表格内紧凑状态栏风格统计信息 */
+.stat-bar-table {
+  gap: 8px;
+  padding: 0;
+}
+.stat-bar-table .stat-item {
+  min-width: 56px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: none;
+}
+.stat-bar-table .stat-label {
+  font-size: 11px;
+  margin-bottom: 0;
+}
+.stat-bar-table .stat-value {
+  font-size: 15px;
+}
+
+/* 表格内按行排布的紧凑状态栏风格统计信息，每行3个 */
+.stat-bar-table.stat-bar-table-rows {
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 0;
+  justify-content: flex-start;
+}
+.stat-bar-table.stat-bar-table-rows .stat-item {
+  width: 32%;
+  margin: 2px 1% 2px 0;
+  min-width: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 13px;
+}
+.stat-bar-table.stat-bar-table-rows .stat-label {
+  font-size: 11px;
+  margin-bottom: 0;
+}
+.stat-bar-table.stat-bar-table-rows .stat-value {
+  font-size: 15px;
+}

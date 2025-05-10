@@ -73,7 +73,32 @@
         </template>
         
         <template v-else-if="column.dataIndex === 'statistics'">
-          {{ formatTaskStatistic(record) }}
+          <div class="stat-bar stat-bar-table stat-bar-table-rows">
+            <div class="stat-item stat-domain">
+              <span class="stat-label">域名</span>
+              <span class="stat-value">{{ record.statistic?.domain_cnt || record.statistics?.domain_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-wih">
+              <span class="stat-label">WIH</span>
+              <span class="stat-value">{{ record.statistic?.wih_cnt || record.statistics?.wih_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-port">
+              <span class="stat-label">端口</span>
+              <span class="stat-value">{{ record.statistic?.port_cnt || record.statistics?.port_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-ip">
+              <span class="stat-label">IP</span>
+              <span class="stat-value">{{ record.statistic?.ip_cnt || record.statistics?.ip_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-service">
+              <span class="stat-label">服务</span>
+              <span class="stat-value">{{ record.statistic?.service_cnt || record.statistics?.service_cnt || 0 }}</span>
+            </div>
+            <div class="stat-item stat-vuln">
+              <span class="stat-label">漏洞</span>
+              <span class="stat-value">{{ record.statistic?.vuln_cnt || record.statistics?.vuln_cnt || 0 }}</span>
+            </div>
+          </div>
         </template>
       </template>
     </a-table>
