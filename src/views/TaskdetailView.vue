@@ -197,6 +197,7 @@ const fetchTaskDetail = async () => {
   loading.value = true;
 
   try {
+    // 按接口文档，直接通过 /task/?_id=xxx 获取任务详情和结果
     const { data } = await http.get('/task/', {
       params: { _id: taskId }
     });
@@ -205,15 +206,10 @@ const fetchTaskDetail = async () => {
       throw new Error(data.message || '获取任务详情失败');
     }
 
-    // 由于返回的是列表，我们需要获取第一个任务的详情
     if (data.items && data.items.length > 0) {
       taskDetail.value = data.items[0];
-
-      // 获取任务执行结果
-      const resultResponse = await http.get(`/task/result/${taskId}`);
-      if (resultResponse.data.code === 200) {
-        taskResults.value = resultResponse.data.items || [];
-      }
+      // 任务结果直接从详情数据中获取（如有）
+      taskResults.value = data.items[0].results || [];
     } else {
       throw new Error('未找到任务详情');
     }
