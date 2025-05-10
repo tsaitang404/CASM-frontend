@@ -5,51 +5,47 @@
     @ok="handleOk"
     @cancel="handleCancel"
     :confirmLoading="confirmLoading"
-    @update:open="(val) => $emit('update:open', val)"
+    @update:open="(val) => emit('update:open', val)"
     width="800px"
   >
     <TaskForm
       ref="formRef"
-      v-model="formData"
+      v-model:modelValue="formData"
     />
   </a-modal>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import TaskForm from './TaskForm.vue'
 import type { FormInstance } from 'ant-design-vue'
-import http from '@/plugins/http'
+import http from '../../plugins/http'
+import TaskForm from './TaskForm.vue'
 
 interface Props {
   open: boolean
 }
 
-interface Emits {
-  (e: 'update:open', open: boolean): void
-  (e: 'success'): void
-  (e: 'cancel'): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   open: false
 })
-const emit = defineEmits<Emits>()
 
-// 表单引用
+const emit = defineEmits<{
+  'update:open': [value: boolean]
+  'success': []
+  'cancel': []
+}>()
+
 const formRef = ref<FormInstance>()
-
-// 确认加载状态
 const confirmLoading = ref(false)
 
 // 表单数据初始值
 const defaultFormData = {
-  name: '',  // 确保初始化为空字符串
-  target: '',  // 确保初始化为空字符串
-  domain_brute_type: 'small',  // 设置合理的默认值
+  name: '',
+  target: '',
+  domain_brute_type: 'small',
   port_scan_type: 'top100',
-  domain_brute: false,  // 默认关闭各项功能
+  domain_brute: false,
   alt_dns: false,
   dns_query_plugin: false,
   casm_search: false,
@@ -68,85 +64,106 @@ const defaultFormData = {
   web_info_hunter: false
 }
 
-// 表单数据，使用 reactive 保持响应性
-const formData = reactive<typeof defaultFormData>({ ...defaultFormData })
+// 使用reactive来创建响应式数据
+const formData = reactive({ ...defaultFormData })
 
-// 重置表单数据到初始状态
+// 重置表单数据
 const resetForm = () => {
+  // 重置所有字段到初始状态
   Object.assign(formData, defaultFormData)
-  if (formRef.value) {
-    formRef.value.resetFields()
-  }
+  // 重置表单校验状态
+  formRef.value?.formRef?.resetFields()
 }
 
-// 提交表单
+// 当弹窗打开时重置表单
+watch(() => props.open, (newVal) => {
+  if (newVal) {
+    resetForm()
+  }
+})
+
+// 提交处理
 const handleOk = async () => {
-  if (!formRef.value) return
+  console.log('handleOk formData:', formData)
+  if (!formRef.value) {
+    message.error('表单组件未初始化')
+    return
+  }
 
   try {
     confirmLoading.value = true
-    // 调用子组件的验证方法
-    await formRef.value.validate()
     
-    // 二次验证任务名称和目标
-    const trimmedName = formData.name?.trim()
-    const trimmedTarget = formData.target?.trim()
-    
-    if (!trimmedName || !trimmedTarget) {
-      message.error('任务名称和目标不能为空')
-      return
+    // 先验证必填字段
+    if (!formData.name?.trim() || !formData.target?.trim()) {
+      throw new Error(formData.name?.trim() ? '任务目标不能为空' : '任务名称不能为空')
     }
-    
-    // 构造任务数据
-    const taskData = {
-      name: trimmedName,
-      target: trimmedTarget,
+
+    // 进行表单验证
+    await formRef.value.validate()
+
+    // 构造请求数据
+    const requestData = {
+      name: formData.name.trim(),
+      target: formData.target.trim(),
       options: {
-        domain_brute_type: formData.domain_brute_type,
-        port_scan_type: formData.port_scan_type,
-        domain_brute: formData.domain_brute,
-        alt_dns: formData.alt_dns,
-        dns_query_plugin: formData.dns_query_plugin,
-        casm_search: formData.casm_search,
-        port_scan: formData.port_scan,
-        service_detection: formData.service_detection,
-        os_detection: formData.os_detection,
-        ssl_cert: formData.ssl_cert,
-        skip_scan_cdn_ip: formData.skip_scan_cdn_ip,
-        site_identify: formData.site_identify,
-        search_engines: formData.search_engines,
-        site_spider: formData.site_spider,
-        site_capture: formData.site_capture,
-        file_leak: formData.file_leak,
-        findvhost: formData.findvhost,
-        nuclei_scan: formData.nuclei_scan,
-        web_info_hunter: formData.web_info_hunter
+        domain_brute_type: formData.domain_brute_type || 'small',
+        port_scan_type: formData.port_scan_type || 'top100',
+        domain_brute: Boolean(formData.domain_brute),
+        alt_dns: Boolean(formData.alt_dns),
+        dns_query_plugin: Boolean(formData.dns_query_plugin),
+        casm_search: Boolean(formData.casm_search),
+        port_scan: Boolean(formData.port_scan),
+        service_detection: Boolean(formData.service_detection),
+        os_detection: Boolean(formData.os_detection),
+        ssl_cert: Boolean(formData.ssl_cert),
+        skip_scan_cdn_ip: Boolean(formData.skip_scan_cdn_ip),
+        site_identify: Boolean(formData.site_identify),
+        search_engines: Boolean(formData.search_engines),
+        site_spider: Boolean(formData.site_spider),
+        site_capture: Boolean(formData.site_capture),
+        file_leak: Boolean(formData.file_leak),
+        findvhost: Boolean(formData.findvhost),
+        nuclei_scan: Boolean(formData.nuclei_scan),
+        web_info_hunter: Boolean(formData.web_info_hunter)
       }
     }
 
-    console.log('提交的任务数据:', taskData)
+    // 打印请求数据用于调试
+    console.log('准备发送的请求数据:', requestData)
 
-    const { data } = await http.post('/task/', taskData)
+    // 确保所有必填字段都有值
+    if (!requestData.name || !requestData.target) {
+      throw new Error('任务名称和目标不能为空')
+    }
+
+    // 发送请求
+    const response = await http.post('/task/', requestData)
     
-    if (data.code === 200) {
+    if (response.data?.code === 200) {
       message.success('任务创建成功')
       emit('success')
       emit('update:open', false)
       resetForm()
+    } else {
+      throw new Error(response.data?.message || '创建任务失败')
     }
-
   } catch (error: any) {
     console.error('提交任务时出错:', error)
-    // 错误消息已由 axios 拦截器统一处理
+    if (error.errorFields) {
+      const errors = error.errorFields.map((field: any) => field.errors[0])
+      message.error(errors.join(', '))
+    } else {
+      message.error(error.message || '创建任务失败，请检查输入')
+    }
   } finally {
     confirmLoading.value = false
   }
 }
 
-// 取消操作
+// 取消处理
 const handleCancel = () => {
-  emit('cancel')
   resetForm()
+  emit('cancel')
   emit('update:open', false)
 }
 </script>

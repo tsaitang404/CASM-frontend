@@ -1,0 +1,47 @@
+/* 资产分组页面样式 */
+.asset-group-container {
+  padding: 24px;
+}
+
+.group-header {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.group-card {
+  background: #fff;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.group-list {
+  margin-top: 16px;
+}
+
+.loading-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* 操作按钮组样式 */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+  .asset-group-container {
+    padding: 16px;
+  }
+  
+  .group-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+}

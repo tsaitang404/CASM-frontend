@@ -80,3 +80,27 @@ export interface TaskSearchForm {
   'options.port_scan'?: boolean;
   'options.port_scan_type'?: string;
 }
+
+export interface TaskForm {
+  name: string;
+  target: string;
+  domain_brute_type: string;
+  port_scan_type: string;
+  domain_brute: boolean;
+  alt_dns: boolean;
+  dns_query_plugin: boolean;
+  casm_search: boolean;
+  port_scan: boolean;
+  service_detection: boolean;
+  os_detection: boolean;
+  ssl_cert: boolean;
+  skip_scan_cdn_ip: boolean;
+  site_identify: boolean;
+  search_engines: boolean;
+  site_spider: boolean;
+  site_capture: boolean;
+  file_leak: boolean;
+  findvhost: boolean;
+  nuclei_scan: boolean;
+  web_info_hunter: boolean;
+}

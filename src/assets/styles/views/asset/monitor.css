@@ -1,0 +1,40 @@
+/* 资产监控页面样式 */
+.asset-monitor-container {
+  padding: 24px;
+}
+
+.monitor-header {
+  margin-bottom: 24px;
+}
+
+.monitor-card {
+  background: #fff;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.monitor-chart {
+  min-height: 300px;
+}
+
+.monitor-table {
+  margin-top: 24px;
+}
+
+.loading-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+  .asset-monitor-container {
+    padding: 16px;
+  }
+  
+  .monitor-header {
+    margin-bottom: 16px;
+  }
+}

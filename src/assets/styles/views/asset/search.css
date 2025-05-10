@@ -1,0 +1,36 @@
+/* 资产搜索页面样式 */
+.asset-search-container {
+  padding: 24px;
+}
+
+.search-form {
+  margin-bottom: 24px;
+}
+
+.result-section {
+  background: #fff;
+  padding: 24px;
+  border-radius: 4px;
+}
+
+.result-header {
+  margin-bottom: 16px;
+}
+
+.loading-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+  .asset-search-container {
+    padding: 16px;
+  }
+  
+  .search-form {
+    margin-bottom: 16px;
+  }
+}

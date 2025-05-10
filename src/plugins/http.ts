@@ -3,7 +3,7 @@ import { message } from 'ant-design-vue'
 import router from '@/router'
 
 // 创建 axios 实例
-const http = axios.create({
+export const http = axios.create({
   baseURL: '/api',
   timeout: 30000,
   headers: {

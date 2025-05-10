@@ -56,6 +56,7 @@
     <!-- 新建任务组件弹窗 -->
     <TaskCreate 
       v-model:open="createTaskModalVisible"
+      v-model:modelValue="taskForm"
       @success="handleTaskCreateSuccess"
       @cancel="handleTaskCreateCancel"
     />
@@ -489,6 +490,29 @@ const handleBatchRestart = async () => {
 }
 
 const showTaskCreateModal = () => {
+  Object.assign(taskForm, {
+    name: '',
+    target: '',
+    domain_brute_type: 'big',
+    port_scan_type: 'top100',
+    domain_brute: true,
+    alt_dns: true,
+    dns_query_plugin: true,
+    casm_search: true,
+    port_scan: true,
+    service_detection: true,
+    os_detection: true,
+    ssl_cert: true,
+    skip_scan_cdn_ip: true,
+    site_identify: true,
+    search_engines: true,
+    site_spider: false,
+    site_capture: true,
+    file_leak: true,
+    findvhost: true,
+    nuclei_scan: true,
+    web_info_hunter: true
+  })
   createTaskModalVisible.value = true
 }
 
