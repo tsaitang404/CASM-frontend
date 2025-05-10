@@ -88,7 +88,7 @@ async function fetchData(params: TablePaginationConfig = { current: 1, pageSize:
       size: String(params.pageSize)
     });
 
-    const res = await http.get(`/api/wih/?${queryParams.toString()}`);
+    const res = await http.get(`/wih/?${queryParams.toString()}`);
     if (res.data.code === 200) {
       data.value = res.data.items || [];
       pagination.total = res.data.total || 0;
