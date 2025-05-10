@@ -145,8 +145,8 @@ const handleSearch = async () => {
     params.append('page', String(pagination.current))
     params.append('size', String(pagination.pageSize))
 
-    const { code, message: msg, items, total } = await http.get(`/cert/?${params.toString()}`)
-    
+    const res = await http.get(`/cert/?${params.toString()}`)
+    const { code, message: msg, items, total } = res.data
     if (code === 200) {
       tableData.value = items || []
       pagination.total = total || 0

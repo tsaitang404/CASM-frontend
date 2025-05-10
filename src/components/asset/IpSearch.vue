@@ -115,7 +115,6 @@ const columns = [
 const handleSearch = async () => {
   loading.value = true
   try {
-    // 构建查询参数
     const params = new URLSearchParams()
     if (form.ip) params.append('ip', form.ip)
     if (form.location) params.append('location', form.location)
@@ -124,9 +123,8 @@ const handleSearch = async () => {
     params.append('page', String(pagination.current))
     params.append('size', String(pagination.pageSize))
 
-    // 使用 http 客户端发送请求
-    const { code, message: msg, items, total } = await http.get(`/asset_ip/?${params.toString()}`)
-    
+    const res = await http.get(`/asset_ip/?${params.toString()}`)
+    const { code, message: msg, items, total } = res.data
     if (code === 200) {
       tableData.value = items || []
       pagination.total = total || 0

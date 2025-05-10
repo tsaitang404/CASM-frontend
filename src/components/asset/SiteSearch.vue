@@ -123,11 +123,12 @@ const handleSearch = async () => {
     params.append('page', String(pagination.current))
     params.append('size', String(pagination.pageSize))
 
-    const { code, message: msg, items, total } = await http.get(`/asset_site/?${params.toString()}`)
-    
+    const res = await http.get(`/asset_site/?${params.toString()}`)
+    const { code, message: msg, items, total } = res.data
     if (code === 200) {
       tableData.value = items || []
       pagination.total = total || 0
+      // 不再抛出异常，空数据为正常情况
     } else {
       throw new Error(msg || '查询失败')
     }
