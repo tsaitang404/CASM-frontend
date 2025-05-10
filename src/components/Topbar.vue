@@ -94,7 +94,7 @@ async function onPwdSubmit() {
   const token = localStorage.getItem('Token')
   
   try {
-    const res = await fetch('/api/user/change_pass', {
+    const res = await fetch('/user/change_pass', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ function onLogout() {
   const token = localStorage.getItem('Token')
   // 先调用后端的注销接口
   if (token) {
-    fetch('/api/user/logout', {
+    fetch('/user/logout', {
       method: 'GET',
       headers: {
         'Token': token

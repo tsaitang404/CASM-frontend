@@ -43,7 +43,7 @@
             <a-button 
               type="link" 
               @click="handleStop(record)"
-              :disabled="!['waiting', 'running'].includes(record.status)"
+              :disabled="['done', 'stop', 'error', 'completed', 'failed', 'paused'].includes(record.status)"
               danger
             >
               停止
@@ -226,7 +226,7 @@ const handleRestart = async (record: Task) => {
 
 const handleStop = async (record: Task) => {
   try {
-    await http.post(`/task/stop/${record._id}`)
+    await http.get(`/task/stop/${record._id}`)
     message.success('停止任务成功')
     emit('reload')
   } catch (error) {

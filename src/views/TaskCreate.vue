@@ -55,7 +55,7 @@ const handleSubmit = async () => {
     loading.value = true
     await formRef.value.validate()
     
-    const response = await http.post('/api/tasks', formData.value)
+    const response = await http.post('/tasks', formData.value)
     if (response.data.code === 0) {
       message.success('任务创建成功')
       router.push('/task-manage')
