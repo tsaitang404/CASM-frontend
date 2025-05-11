@@ -703,10 +703,10 @@ const fetchPolicyList = async () => {
 
     const res = await http.get(`/policy/?${params.toString()}`)
     if (res.data.code === 200) {
-      tableData.value = res.data.data.items || []
-      pagination.total = res.data.data.total || 0
-      pagination.current = res.data.data.page || searchForm.page
-      pagination.pageSize = res.data.data.size || searchForm.size
+      tableData.value = res.data.items || []
+      pagination.total = res.data.total || 0
+      pagination.current = res.data.page || searchForm.page
+      pagination.pageSize = res.data.size || searchForm.size
     } else {
       message.error(res.data.message || '获取策略列表失败')
     }
