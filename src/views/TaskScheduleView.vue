@@ -246,6 +246,7 @@
             format="YYYY-MM-DD HH:mm"
             style="width: 100%"
             placeholder="请选择执行时间"
+            @change="handleDateChange"
           />
         </a-form-item>
         
@@ -453,10 +454,10 @@ const fetchTaskSchedules = async (params: any = {}) => {
     
     const res = await http.get(`/task_schedule/?${queryParams.toString()}`);
     if (res.data && res.data.code === 200) {
-      tableData.value = res.data.data.items || [];
-      pagination.total = res.data.data.total || 0;
-      pagination.current = res.data.data.page || page;
-      pagination.pageSize = res.data.data.size || size;
+      tableData.value = res.data.items || [];
+      pagination.total = res.data.total || 0;
+      pagination.current = res.data.page || page;
+      pagination.pageSize = res.data.size || size;
     } else {
       throw new Error(res.data?.message || '获取计划任务失败');
     }
@@ -474,7 +475,7 @@ const fetchPolicies = async () => {
   try {
     const res = await http.get('/policy/?size=100');
     if (res.data && res.data.code === 200) {
-      policies.value = res.data.data.items || [];
+      policies.value = res.data.items || [];
     } else {
       throw new Error(res.data?.message || '获取策略列表失败');
     }
@@ -573,7 +574,8 @@ const handleCreateSubmit = async () => {
         submitLoading.value = false;
         return;
       }
-      submitData.start_date = datePickerValue.value.format('YYYY-MM-DDTHH:mm:00.000Z');
+      // 修改日期格式，不使用Z时区标识符，而是使用ISO格式但不包含时区信息
+      submitData.start_date = datePickerValue.value.format('YYYY-MM-DDTHH:mm:00');
     }
     
     // 提交创建请求
@@ -728,6 +730,19 @@ const getScheduleTypeText = (type: string) => {
     case 'future_scan': return '定时任务';
     case 'recurrent_scan': return '周期任务';
     default: return type;
+  }
+};
+
+// 处理日期选择变化
+const handleDateChange = (date: Dayjs | null) => {
+  if (date) {
+    // 直接设置表单中的start_date字段，确保它不为空，使用与提交一致的格式
+    createForm.start_date = date.format('YYYY-MM-DDTHH:mm:00');
+    
+    // 通知表单验证系统值已更新
+    createFormRef.value?.validateFields(['start_date']);
+  } else {
+    createForm.start_date = '';
   }
 };
 </script>
