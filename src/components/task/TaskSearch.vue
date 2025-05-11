@@ -29,7 +29,14 @@
         </a-col>
         <a-col :span="6" :xs="24" :sm="12" :md="8" :lg="6" :xl="5">
           <a-form-item label="任务状态" class="compact-form-item">
-            <a-select id="task-status-select" v-model="searchForm.status" placeholder="状态" allow-clear class="compact-select">
+            <a-select 
+              id="task-status-select" 
+              v-model="searchForm.status" 
+              placeholder="状态" 
+              allow-clear 
+              class="compact-select"
+              @change="handleStatusChange"
+            >
               <a-select-option value="waiting">等待中</a-select-option>
               <a-select-option value="running">运行中</a-select-option>
               <a-select-option value="done">已完成</a-select-option>
@@ -40,7 +47,14 @@
         </a-col>
         <a-col :span="6" :xs="24" :sm="12" :md="8" :lg="6" :xl="5">
           <a-form-item label="任务标签" class="compact-form-item">
-            <a-select id="task-tag-select" v-model="searchForm.task_tag" placeholder="标签" allow-clear class="compact-select">
+            <a-select 
+              id="task-tag-select" 
+              v-model="searchForm.task_tag" 
+              placeholder="标签" 
+              allow-clear 
+              class="compact-select"
+              @change="handleTagChange"
+            >
               <a-select-option value="task">常规任务</a-select-option>
               <a-select-option value="risk_cruising">侦查任务</a-select-option>
             </a-select>
@@ -219,18 +233,54 @@ const handleInputChange = (field: keyof SearchForm, event: Event) => {
   searchForm[field] = value;
 }
 
+// 处理任务状态变化
+const handleStatusChange = (value: string) => {
+  console.log('任务状态变化:', value);
+  searchForm.status = value;
+}
+
+// 处理任务标签变化
+const handleTagChange = (value: string) => {
+  /* 
+   * 注意: 这个函数看似多余，但实际上非常关键。
+   * 
+   * 异常现象: 当使用Ant Design Vue的Select组件时，即使已经用v-model绑定了值，
+   * 但如果不显式添加@change处理函数，在用户清除选择时，虽然searchForm.task_tag的值
+   * 会正确更新为undefined，但在提交请求时这个参数不会被正确处理。
+   *
+   * 原因分析: 
+   * 1. Ant Design Vue的Select组件在清除操作时可能有特殊行为
+   * 2. 可能涉及Vue响应式系统的更新时机和事件处理顺序
+   * 3. 显式的@change处理函数确保了值的变化被正确追踪和处理
+   *
+   * 解决方案: 为Select组件添加@change事件处理函数，即使只是简单地赋值，
+   * 也能确保后续表单提交和参数过滤逻辑正常工作。
+   */
+  console.log('任务标签变化:', value);
+  searchForm.task_tag = value;
+}
+
 // 处理查询
 const handleSearch = () => {
-  console.log('搜索前表单数据:', searchForm)
+  console.log('----- TaskSearch: 开始搜索处理 -----')
+  console.log('表单原始数据:', JSON.stringify(searchForm))
+  console.log('status原始值:', searchForm.status, '类型:', typeof searchForm.status)
+  console.log('task_tag原始值:', searchForm.task_tag, '类型:', typeof searchForm.task_tag)
+  
   const form = { ...searchForm };
-  // 移除空值，但保留已输入的值（包括空字符串）
+  // 移除空值，包括undefined、null和空字符串
   Object.keys(form).forEach(key => {
-    if (form[key] === undefined || form[key] === null) {
+    if (form[key] === undefined || form[key] === null || form[key] === '') {
+      console.log(`删除键 ${key} 因为值为:`, form[key])
       delete form[key];
     }
   });
 
-  console.log('处理后的搜索参数:', form)
+  console.log('处理后要发送的参数:', JSON.stringify(form))
+  console.log('处理后status值:', form.status, '类型:', typeof form.status)
+  console.log('处理后task_tag值:', form.task_tag, '类型:', typeof form.task_tag)
+  console.log('----- TaskSearch: 结束搜索处理 -----')
+  
   emit('search', form);
 }
 
@@ -311,7 +361,7 @@ const handleReset = () => {
 }
 
 .compact-form :deep(.ant-input-number-input) {
-  height: 30px !important;
+  height: 30px !重要;
 }
 
 /* 修复输入框内边距 */

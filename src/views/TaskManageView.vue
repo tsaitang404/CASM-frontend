@@ -163,7 +163,8 @@ const state = reactive({
   queryParams: {
     name: '',
     target: '',
-    status: undefined as string | undefined
+    status: '',
+    task_tag: ''
   }
 })
 
@@ -262,36 +263,53 @@ const formatTaskStatistic = (task: Task): string => {
 // API 相关函数
 const fetchTaskList = async (params: { page: number; pageSize: number }): Promise<TaskListResponse> => {
   try {
-    // 构建查询参数，确保包含所有必要的查询条件
-    const queryParams = {
+    console.log('-------开始fetchTaskList-------')
+    console.log('查询参数state.queryParams:', JSON.stringify(state.queryParams))
+    console.log('status值:', state.queryParams.status, '类型:', typeof state.queryParams.status)
+    
+    // 构建查询参数对象
+    const queryParams: Record<string, any> = {
       page: params.page,
-      size: params.pageSize,
-      name: state.queryParams.name || '',
-      target: state.queryParams.target || '',
-      ...state.queryParams  // 保留其他可能的查询参数
+      size: params.pageSize
     }
-
-    // 移除空值
-    Object.keys(queryParams).forEach(key => {
-      if (queryParams[key] === '' || queryParams[key] === undefined || queryParams[key] === null) {
-        delete queryParams[key]
+    
+    // 添加有效的状态和标签参数
+    if (state.queryParams.status && state.queryParams.status !== '') {
+      queryParams.status = state.queryParams.status
+      console.log('添加状态参数:', state.queryParams.status)
+    }
+    
+    if (state.queryParams.task_tag && state.queryParams.task_tag !== '') {
+      queryParams.task_tag = state.queryParams.task_tag
+      console.log('添加标签参数:', state.queryParams.task_tag)
+    }
+    
+    // 添加其他有效查询参数
+    Object.entries(state.queryParams).forEach(([key, value]) => {
+      if (key !== 'status' && key !== 'task_tag' && 
+          value !== undefined && value !== null && value !== '') {
+        queryParams[key] = value
+        console.log(`添加参数 ${key}:`, value)
       }
     })
-
-    // 打印查询参数和绑定值
-    console.log('当前查询参数:', queryParams)
-    console.log('状态中的查询条件:', state.queryParams)
-    console.log('搜索表单绑定值:', searchForm.value)
-
-    const { data } = await http.get('/task/', {
-      params: queryParams
+    
+    console.log('最终请求参数:', queryParams)
+    
+    // 使用axios标准请求参数方式
+    const response = await http.get('/task/', { 
+      params: queryParams 
     })
     
+    console.log('请求URL:', response.request.responseURL) // 打印实际请求的URL
+    const data = response.data
+    
+    console.log('-------结束fetchTaskList-------')
     return {
       data: Array.isArray(data.items) ? data.items : [],
       total: data.total || 0
     }
   } catch (error) {
+    console.error('获取任务列表失败:', error)
     throw new Error('获取任务列表失败')
   }
 }
@@ -334,12 +352,55 @@ const stopAutoRefresh = () => {
 
 // 事件处理函数
 const handleSearch = (values?: Record<string, any>) => {
-  console.log('搜索表单提交的值:', values)
   pagination.current = 1
+  
   if (values) {
-    state.queryParams = { ...state.queryParams, ...values }
+    // 完全替换queryParams而不是合并，避免残留旧值
+    state.queryParams = {
+      name: values.name || '',
+      target: values.target || '',
+      // 确保只有在值存在且不是空字符串时才添加status和task_tag
+      ...(values.status ? { status: values.status } : {}),
+      ...(values.task_tag ? { task_tag: values.task_tag } : {})
+    }
+    
+    // 添加高级选项和其他参数
+    if (values.siteCountCompare && values.siteCountValue !== null) {
+      const compareOp = values.siteCountCompare === 'eq' ? '' : 
+                       (values.siteCountCompare === 'gt' ? '__gt' : '__lt')
+      state.queryParams[`statistic.site_cnt${compareOp}`] = values.siteCountValue
+    }
+    
+    if (values.domainCountCompare && values.domainCountValue !== null) {
+      const compareOp = values.domainCountCompare === 'eq' ? '' : 
+                       (values.domainCountCompare === 'gt' ? '__gt' : '__lt')
+      state.queryParams[`statistic.domain_cnt${compareOp}`] = values.domainCountValue
+    }
+    
+    if (values.wihCountCompare && values.wihCountValue !== null) {
+      const compareOp = values.wihCountCompare === 'eq' ? '' : 
+                       (values.wihCountCompare === 'gt' ? '__gt' : '__lt')
+      state.queryParams[`statistic.wih_cnt${compareOp}`] = values.wihCountValue
+    }
+    
+    // 处理各种选项参数
+    if ('options.domain_brute' in values) {
+      state.queryParams['options.domain_brute'] = values['options.domain_brute']
+    }
+    
+    if (values['options.domain_brute_type']) {
+      state.queryParams['options.domain_brute_type'] = values['options.domain_brute_type']
+    }
+    
+    if ('options.port_scan' in values) {
+      state.queryParams['options.port_scan'] = values['options.port_scan']
+    }
+    
+    if (values['options.port_scan_type']) {
+      state.queryParams['options.port_scan_type'] = values['options.port_scan_type']
+    }
   }
-  console.log('更新后的查询条件:', state.queryParams)
+  
   loadTaskList()
 }
 
@@ -348,15 +409,27 @@ const handleSearchReset = () => {
   state.queryParams = {
     name: '',
     target: '',
-    status: undefined
+    status: undefined,
+    task_tag: undefined
   }
   console.log('重置后的查询条件:', state.queryParams)
   loadTaskList()
 }
 
-const handleTableChange = (pag: any) => {
+const handleTableChange = (pag: any, filters?: any, sorter?: any) => {
+  // 只更新分页信息，保留筛选条件
   pagination.current = pag.current
   pagination.pageSize = pag.pageSize
+  
+  // 如果有排序信息，也可以添加到查询参数中
+  if (sorter && sorter.field && sorter.order) {
+    state.queryParams.sort_field = sorter.field
+    state.queryParams.sort_order = sorter.order === 'ascend' ? 'asc' : 'desc'
+  }
+  
+  // 调试日志
+  console.log('分页切换时的查询参数:', state.queryParams)
+  
   loadTaskList()
 }
 
