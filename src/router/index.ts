@@ -4,7 +4,13 @@ import type { RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/task'
+    redirect: '/home'
+  },
+  {
+    path: '/home',
+    name: 'home',
+    component: () => import('../views/HomeView.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/login',
