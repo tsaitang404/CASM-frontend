@@ -1,33 +1,35 @@
 <template>
   <a-card class="search-card" :bordered="false">
-    <a-form layout="inline" :model="searchForm">
-      <a-row :gutter="[16, 16]" style="width: 100%">
+    <a-form layout="inline" :model="searchForm" class="compact-form">
+      <a-row :gutter="[8, 4]" style="width: 100%">
         <!-- 基本查询条件 -->
-        <a-col :span="6">
-          <a-form-item label="任务名称">
+        <a-col :span="6" :xs="24" :sm="12" :md="8" :lg="6" :xl="5">
+          <a-form-item label="任务名称" class="compact-form-item">
             <a-input
               id="task-name-input"
               v-model:value="searchForm.name"
               @change="handleInputChange('name', $event)"
-              placeholder="请输入任务名称"
+              placeholder="任务名称"
               allow-clear
+              class="compact-input"
             />
           </a-form-item>
         </a-col>
-        <a-col :span="6">
-          <a-form-item label="任务目标">
+        <a-col :span="6" :xs="24" :sm="12" :md="8" :lg="6" :xl="5">
+          <a-form-item label="任务目标" class="compact-form-item">
             <a-input
               id="task-target-input"
               v-model:value="searchForm.target"
               @change="handleInputChange('target', $event)"
-              placeholder="请输入任务目标"
+              placeholder="任务目标"
               allow-clear
+              class="compact-input"
             />
           </a-form-item>
         </a-col>
-        <a-col :span="6">
-          <a-form-item label="任务状态">
-            <a-select id="task-status-select" v-model="searchForm.status" placeholder="请选择任务状态" allow-clear>
+        <a-col :span="6" :xs="24" :sm="12" :md="8" :lg="6" :xl="5">
+          <a-form-item label="任务状态" class="compact-form-item">
+            <a-select id="task-status-select" v-model="searchForm.status" placeholder="状态" allow-clear class="compact-select">
               <a-select-option value="waiting">等待中</a-select-option>
               <a-select-option value="running">运行中</a-select-option>
               <a-select-option value="done">已完成</a-select-option>
@@ -36,12 +38,28 @@
             </a-select>
           </a-form-item>
         </a-col>
-        <a-col :span="6">
-          <a-form-item label="任务标签">
-            <a-select id="task-tag-select" v-model="searchForm.task_tag" placeholder="请选择任务标签" allow-clear>
+        <a-col :span="6" :xs="24" :sm="12" :md="8" :lg="6" :xl="5">
+          <a-form-item label="任务标签" class="compact-form-item">
+            <a-select id="task-tag-select" v-model="searchForm.task_tag" placeholder="标签" allow-clear class="compact-select">
               <a-select-option value="task">常规任务</a-select-option>
               <a-select-option value="risk_cruising">侦查任务</a-select-option>
             </a-select>
+          </a-form-item>
+        </a-col>
+        
+        <a-col :span="24" :xs="24" :sm="24" :md="24" :lg="24" :xl="4" class="action-col">
+          <a-form-item class="action-form-item">
+            <a-space size="small">
+              <a-button id="search-button" type="primary" @click="handleSearch" size="middle">
+                <SearchOutlined /> 查询
+              </a-button>
+              <a-button id="reset-button" @click="handleReset" size="middle">
+                <ReloadOutlined /> 重置
+              </a-button>
+              <a-button id="toggle-advanced-button" type="link" @click="toggleAdvanced" size="middle">
+                {{ showAdvanced ? '收起' : '展开' }} <component :is="showAdvanced ? 'UpOutlined' : 'DownOutlined'" />
+              </a-button>
+            </a-space>
           </a-form-item>
         </a-col>
         
@@ -135,21 +153,6 @@
             </a-form-item>
           </a-col>
         </template>
-        
-        <!-- 查询按钮区域 -->
-        <a-col :span="24" style="text-align: right;">
-          <a-space>
-            <a-button id="search-button" type="primary" @click="handleSearch">
-              <SearchOutlined /> 查询
-            </a-button>
-            <a-button id="reset-button" @click="handleReset">
-              <ReloadOutlined /> 重置
-            </a-button>
-            <a-button id="toggle-advanced-button" type="link" @click="toggleAdvanced">
-              {{ showAdvanced ? '收起' : '展开' }} <component :is="showAdvanced ? 'UpOutlined' : 'DownOutlined'" />
-            </a-button>
-          </a-space>
-        </a-col>
       </a-row>
     </a-form>
   </a-card>
@@ -257,6 +260,89 @@ const handleReset = () => {
 
 <style scoped>
 .search-card {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
+}
+
+.search-card :deep(.ant-card-body) {
+  padding: 8px 12px;
+}
+
+.compact-form :deep(.ant-form-item-label) {
+  padding-bottom: 0;
+  line-height: 28px;
+  font-size: 13px;
+  flex: 0 0 auto;
+  min-width: 70px;
+}
+
+.compact-form-item {
+  margin-bottom: 4px;
+  margin-right: 4px;
+}
+
+.compact-input {
+  width: 100%;
+  max-width: 180px;
+  height: 32px !important; /* 统一输入框高度 */
+}
+
+.compact-select {
+  width: 100%;
+  max-width: 180px;
+}
+
+/* 统一所有表单控件的高度 */
+.compact-form :deep(.ant-input),
+.compact-form :deep(.ant-select-selector),
+.compact-form :deep(.ant-input-number),
+.compact-form :deep(.ant-btn) {
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 13px;
+}
+
+.compact-form :deep(.ant-select-single .ant-select-selector) {
+  height: 32px !important;
+  padding: 0 8px !important;
+}
+
+.compact-form :deep(.ant-select-single .ant-select-selection-item) {
+  line-height: 30px !important;
+}
+
+.compact-form :deep(.ant-input-number-input) {
+  height: 30px !important;
+}
+
+/* 修复输入框内边距 */
+.compact-form :deep(.ant-form-item-control-input-content) {
+  line-height: 32px !important;
+}
+
+/* 按钮区域样式 */
+.action-col {
+  text-align: right;
+}
+
+.action-form-item {
+  margin-right: 0;
+}
+
+/* 将行间距调整得更小 */
+.compact-form :deep(.ant-row) {
+  margin-bottom: -4px !important;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .action-col {
+    text-align: left;
+  }
+}
+
+@media (max-width: 576px) {
+  .compact-input, .compact-select {
+    max-width: 100%;
+  }
 }
 </style>

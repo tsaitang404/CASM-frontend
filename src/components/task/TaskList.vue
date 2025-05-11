@@ -1,7 +1,7 @@
 <template>
   <div class="task-list">
-    <!-- 表格操作区域 -->
-    <div class="table-operations">
+    <!-- 表格操作区域，根据hideOperations属性决定是否显示 -->
+    <div class="table-operations" v-if="!hideOperations">
       <a-space>
         <a-button type="danger" :disabled="!selectedRowKeys.length" @click="handleBatchStop">
           <PauseCircleOutlined /> 批量停止
@@ -180,6 +180,7 @@ const props = defineProps<{
     pageSize: number
     total: number
   }
+  hideOperations?: boolean // 新增属性，用于控制是否隐藏操作区域
 }>()
 
 const emit = defineEmits<{

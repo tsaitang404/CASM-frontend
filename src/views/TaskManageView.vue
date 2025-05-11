@@ -1,59 +1,67 @@
 <template>
   <div class="task-manage-container">
-    <div class="header-actions">
-      <a-button type="primary" @click="showTaskCreateModal">
-        <PlusOutlined /> 新建任务
-      </a-button>
+    <!-- 整合的操作按钮栏 -->
+    <div class="integrated-actions">
+      <div class="left-actions">
+        <a-button type="primary" @click="showTaskCreateModal">
+          <PlusOutlined /> 新建任务
+        </a-button>
+        <a-divider type="vertical" />
+        <a-button type="danger" :disabled="!selectedRowKeys.length" @click="handleBatchStop">
+          <PauseCircleOutlined /> 批量停止
+        </a-button>
+        <a-button type="danger" :disabled="!selectedRowKeys.length" @click="handleBatchDelete" style="margin-left: 8px;">
+          <DeleteOutlined /> 批量删除
+        </a-button>
+        <a-button :disabled="!selectedRowKeys.length" @click="handleBatchRestart" style="margin-left: 8px;">
+          <ReloadOutlined /> 批量重启
+        </a-button>
+      </div>
+      <div class="right-actions">
+        <a-switch
+          v-model:checked="autoRefresh"
+          checked-children="自动刷新"
+          un-checked-children="手动刷新"
+          class="auto-refresh-switch"
+        />
+        <a-button @click="loadTaskList" :loading="loading" style="margin-left: 8px;">
+          <ReloadOutlined /> 刷新
+        </a-button>
+        <span v-if="selectedRowKeys.length" class="selected-count">
+          已选择 {{ selectedRowKeys.length }} 项
+        </span>
+      </div>
     </div>
 
-    <div class="operation-bar">
-      <a-button 
-        type="primary" 
-        danger 
-        :disabled="!selectedRowKeys.length"
-        @click="handleBatchStop"
-      >
-        批量停止
-      </a-button>
-      <a-button 
-        type="primary"
-        :disabled="!selectedRowKeys.length"
-        @click="handleBatchRestart"
-      >
-        批量重启
-      </a-button>
-      <a-button 
-        danger 
-        :disabled="!selectedRowKeys.length"
-        @click="handleBatchDelete"
-      >
-        批量删除
-      </a-button>
+    <!-- 搜索组件放在按钮下方 -->
+    <div class="search-form-wrapper">
+      <TaskSearch @search="handleSearch" @reset="handleSearchReset" />
     </div>
-
-    <!-- 搜索组件 -->
-    <TaskSearch @search="handleSearch" @reset="handleSearchReset" />
     
-    <!-- 任务列表组件 -->
-    <TaskList
-      :tasks="taskList"
-      :loading="loading"
-      :pagination="pagination"
-      :selectedRowKeys="selectedRowKeys"
-      @update:selectedRowKeys="handleSelectionChange"
-      @reload="loadTaskList"
-      @change="handleTableChange"
-      @stop="stopTask"
-      @delete="deleteTask"
-      @restart="restartTask"
-      @export="exportTask"
-      @sync="showSyncTaskModal"
-      @view-detail="showTaskDetail"
-      @view-options="showTaskOptions"
-      @batch-stop="handleBatchStop"
-      @batch-delete="handleBatchDelete"
-      @batch-restart="handleBatchRestart"
-    />
+    <!-- 任务列表结果区域 -->
+    <div class="search-result">
+      <!-- 任务列表组件 - 移除了重复的按钮栏 -->
+      <TaskList
+        :tasks="taskList"
+        :loading="loading"
+        :pagination="pagination"
+        :selectedRowKeys="selectedRowKeys"
+        @update:selectedRowKeys="handleSelectionChange"
+        @reload="loadTaskList"
+        @change="handleTableChange"
+        @stop="stopTask"
+        @delete="deleteTask"
+        @restart="restartTask"
+        @export="exportTask"
+        @sync="showSyncTaskModal"
+        @view-detail="showTaskDetail"
+        @view-options="showTaskOptions"
+        @batch-stop="handleBatchStop"
+        @batch-delete="handleBatchDelete"
+        @batch-restart="handleBatchRestart"
+        :hideOperations="true"
+      />
+    </div>
 
     <!-- 新建任务组件弹窗 -->
     <TaskCreate 
@@ -105,8 +113,7 @@ import { h } from 'vue'
 import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
-import type { FormInstance } from 'ant-design-vue'
+import { PlusOutlined, ReloadOutlined, PauseCircleOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import TaskList from '@/components/task/TaskList.vue'
 import TaskSearch from '@/components/task/TaskSearch.vue'
 import TaskCreate from '@/components/task/TaskCreate.vue'
@@ -610,4 +617,64 @@ watch(autoRefresh, (newVal) => {
 
 <style>
 @import '@/assets/styles/views/task-manage.css';
+
+/* 任务管理页面样式 */
+.task-manage-container {
+  padding: 20px;
+  background-color: #f0f2f5;
+}
+
+/* 搜索表单样式 */
+.search-form-wrapper {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
+}
+
+/* 整合操作栏样式 */
+.integrated-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.left-actions {
+  display: flex;
+  align-items: center;
+}
+
+.right-actions {
+  display: flex;
+  align-items: center;
+}
+
+.auto-refresh-switch {
+  margin-right: 8px;
+}
+
+.selected-count {
+  margin-left: 16px;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.ant-divider-vertical {
+  height: 24px;
+  margin: 0 12px;
+}
+
+/* 搜索结果区域 */
+.search-result {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* 确保圆角正确显示 */
+}
 </style>
