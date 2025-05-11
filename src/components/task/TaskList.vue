@@ -499,17 +499,17 @@ const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] ||
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  min-width: 500px;  /* 设置最小宽度 */
-  max-width: 100%;   /* 最大宽度不超过容器 */
-  overflow-x: auto;  /* 在需要时显示横向滚动条 */
-  padding: 4px;      /* 增加内边距 */
+  min-width: 500px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 4px;
 }
 
 .stat-bar-table .stat-item {
-  flex: 0 0 80px;    /* 设置固定宽度，不允许压缩 */
+  flex: 0 0 80px;
   width: 80px;
   height: 70px;
-  min-width: 80px;   /* 设置最小宽度 */
+  min-width: 80px;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -518,18 +518,18 @@ const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] ||
   box-sizing: border-box;
   cursor: pointer;
   border-radius: 8px;
-  background: #fafbfc;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .stat-bar-table .stat-label {
-  font-size: 12px;
-  margin-bottom: 4px;
+  font-size: 13px;
+  margin-bottom: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
   text-align: center;
+  font-weight: 500;
 }
 
 .stat-bar-table .stat-value {
@@ -539,16 +539,16 @@ const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] ||
 
 /* 统计项的背景色和文字颜色 */
 .stat-bar-table .stat-domain {
-  background: #f9f0ff;
-  color: #722ed1;
+  background: #f0e6ff;
+  color: #531dab;
 }
 .stat-bar-table .stat-wih {
-  background: #fffbe6;
-  color: #faad14;
+  background: #fff7e6;
+  color: #d46b08;
 }
 .stat-bar-table .stat-ip {
   background: #f6ffed;
-  color: #52c41a;
+  color: #389e0d;
 }
 .stat-bar-table .stat-cip {
   background: #e6f7ff;
@@ -560,27 +560,27 @@ const statModalTitle = computed(() => statTypeTitleMap[currentStatType.value] ||
 }
 .stat-bar-table .stat-npoc {
   background: #fff2e8;
-  color: #fa541c;
+  color: #d4380d;
 }
 .stat-bar-table .stat-cert {
-  background: #f4ffb8;
-  color: #7cb305;
+  background: #fcffe6;
+  color: #5b8c00;
 }
 .stat-bar-table .stat-fileleak {
   background: #fff0f6;
   color: #eb2f96;
 }
 .stat-bar-table .stat-url {
-  background: #f5f5f5;
-  color: #595959;
+  background: #fafafa;
+  color: #262626;
 }
 .stat-bar-table .stat-vuln {
   background: #fff1f0;
-  color: #f5222d;
+  color: #cf1322;
 }
 .stat-bar-table .stat-nuclei {
-  background: #fcffe6;
-  color: #a0d911;
+  background: #f9ffe6;
+  color: #7cb305;
 }
 .stat-bar-table .stat-finger {
   background: #e6fffb;

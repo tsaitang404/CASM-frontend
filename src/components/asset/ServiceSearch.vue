@@ -48,7 +48,7 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, h } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
@@ -86,6 +86,20 @@ const pagination = reactive<TablePaginationConfig>({
   showQuickJumper: true
 })
 
+const getRandomColor = () => {
+  const colors = [
+    { bg: '#e6f7ff', text: '#1890ff' }, // 蓝色
+    { bg: '#f6ffed', text: '#52c41a' }, // 绿色
+    { bg: '#fff7e6', text: '#fa8c16' }, // 橙色
+    { bg: '#f9f0ff', text: '#722ed1' }, // 紫色
+    { bg: '#fff0f6', text: '#eb2f96' }, // 粉色
+    { bg: '#f4ffb8', text: '#7cb305' }, // 黄绿色
+    { bg: '#fff2e8', text: '#fa541c' }, // 红橙色
+    { bg: '#e6fffb', text: '#13c2c2' }  // 青色
+  ]
+  return colors[Math.floor(Math.random() * colors.length)]
+}
+
 const columns = [
   {
     title: '服务名称',
@@ -98,10 +112,27 @@ const columns = [
     dataIndex: 'service_info',
     key: 'service_info',
     width: 500,
-    render: (info: any[]) => {
-      return info?.map(item => 
-        `${item.ip}:${item.port_id} (${item.product || '-'} ${item.version || '-'})`
-      ).join(', ') || '-'
+    customRender: ({ text: info }) => {
+      if (!info || !Array.isArray(info) || info.length === 0) return '-'
+      return h('div', { 
+        class: 'service-info-bar'
+      }, info.map(item => {
+        const color = getRandomColor()
+        return h('div', {
+          class: 'service-item',
+          style: {
+            padding: '4px 8px',
+            margin: '2px',
+            borderRadius: '4px',
+            display: 'inline-block',
+            fontSize: '13px',
+            background: color.bg,
+            color: color.text,
+            cursor: 'pointer',
+            transition: 'all 0.3s'
+          }
+        }, `${item.ip}:${item.port_id} (${item.product || '-'} ${item.version || '-'})`)
+      }))
     }
   },
   {
@@ -180,5 +211,25 @@ handleSearch()
 
 .search-result {
   margin-top: 20px;
+  overflow-x: auto;
+}
+
+.service-info-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.service-info-bar .service-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+:deep(.ant-table-wrapper) {
+  overflow-x: auto;
+}
+
+:deep(.ant-table-cell) {
+  vertical-align: top;
 }
 </style>

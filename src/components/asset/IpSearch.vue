@@ -52,7 +52,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, h } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
@@ -105,6 +105,20 @@ const pagination = reactive<TablePaginationConfig>({
   showQuickJumper: true
 })
 
+const getRandomColor = () => {
+  const colors = [
+    { bg: '#e6f7ff', text: '#1890ff' }, // 蓝色
+    { bg: '#f6ffed', text: '#52c41a' }, // 绿色
+    { bg: '#fff7e6', text: '#fa8c16' }, // 橙色
+    { bg: '#f9f0ff', text: '#722ed1' }, // 紫色
+    { bg: '#fff0f6', text: '#eb2f96' }, // 粉色
+    { bg: '#f4ffb8', text: '#7cb305' }, // 黄绿色
+    { bg: '#fff2e8', text: '#fa541c' }, // 红橙色
+    { bg: '#e6fffb', text: '#13c2c2' }  // 青色
+  ]
+  return colors[Math.floor(Math.random() * colors.length)]
+}
+
 const columns = [
   {
     title: 'IP地址',
@@ -125,9 +139,29 @@ const columns = [
     title: '端口信息',
     dataIndex: 'port_info',
     key: 'port_info',
-    width: 250,
-    ellipsis: true,
-    render: (ports: any[]) => ports?.map(p => `${p.port_id}(${p.service_name})`).join(', ') || '-'
+    width: 300,
+    customRender: ({ text }) => {
+      if (!text || !Array.isArray(text) || text.length === 0) return '-'
+      return h('div', { 
+        class: 'port-info-bar'
+      }, text.map(port => {
+        const color = getRandomColor()
+        return h('div', {
+          class: 'port-item',
+          style: {
+            padding: '4px 8px',
+            margin: '2px',
+            borderRadius: '4px',
+            display: 'inline-block',
+            fontSize: '13px',
+            background: color.bg,
+            color: color.text,
+            cursor: 'pointer',
+            transition: 'all 0.3s'
+          }
+        }, `${port.port_id}/${port.service_name || '-'}`)
+      }))
+    }
   },
   {
     title: '操作系统',
@@ -268,5 +302,25 @@ handleSearch()
 
 :deep(.ant-table-fixed) {
   background: #fff;
+}
+
+:deep(.port-info-cell) {
+  line-height: 1.5;
+  padding: 4px 0;
+}
+
+:deep(.ant-table-cell) {
+  vertical-align: top;
+}
+
+.port-info-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.port-info-bar .port-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 </style>
