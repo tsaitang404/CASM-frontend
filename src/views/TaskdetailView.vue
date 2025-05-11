@@ -59,62 +59,49 @@
       </a-descriptions>
     </a-card>
 
-    <!-- 任务统计信息卡片 -->
-    <a-card title="统计信息" :bordered="false" class="detail-card">
-      <div class="stat-bar">
-        <div class="stat-item stat-site">
-          <span class="stat-label">站点</span>
-          <span class="stat-value">{{ taskDetail.statistic?.site_cnt || taskDetail.statistics?.site_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-domain">
-          <span class="stat-label">域名</span>
-          <span class="stat-value">{{ taskDetail.statistic?.domain_cnt || taskDetail.statistics?.domain_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-wih">
-          <span class="stat-label">WIH</span>
-          <span class="stat-value">{{ taskDetail.statistic?.wih_cnt || taskDetail.statistics?.wih_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-ip">
-          <span class="stat-label">IP</span>
-          <span class="stat-value">{{ taskDetail.statistic?.ip_cnt || taskDetail.statistics?.ip_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-cip">
-          <span class="stat-label">整数IP</span>
-          <span class="stat-value">{{ taskDetail.statistic?.cip_cnt || taskDetail.statistics?.cip_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-service">
-          <span class="stat-label">服务</span>
-          <span class="stat-value">{{ taskDetail.statistic?.service_cnt || taskDetail.statistics?.service_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-npoc">
-          <span class="stat-label">服务识别</span>
-          <span class="stat-value">{{ taskDetail.statistic?.npoc_service_cnt || taskDetail.statistics?.npoc_service_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-cert">
-          <span class="stat-label">证书</span>
-          <span class="stat-value">{{ taskDetail.statistic?.cert_cnt || taskDetail.statistics?.cert_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-fileleak">
-          <span class="stat-label">泄露</span>
-          <span class="stat-value">{{ taskDetail.statistic?.fileleak_cnt || taskDetail.statistics?.fileleak_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-url">
-          <span class="stat-label">URL</span>
-          <span class="stat-value">{{ taskDetail.statistic?.url_cnt || taskDetail.statistics?.url_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-vuln">
-          <span class="stat-label">漏洞</span>
-          <span class="stat-value">{{ taskDetail.statistic?.vuln_cnt || taskDetail.statistics?.vuln_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-nuclei">
-          <span class="stat-label">Nuclei</span>
-          <span class="stat-value">{{ taskDetail.statistic?.nuclei_result_cnt || taskDetail.statistics?.nuclei_result_cnt || 0 }}</span>
-        </div>
-        <div class="stat-item stat-finger">
-          <span class="stat-label">指纹</span>
-          <span class="stat-value">{{ taskDetail.statistic?.stat_finger_cnt || taskDetail.statistics?.stat_finger_cnt || 0 }}</span>
-        </div>
-      </div>
+    <!-- 任务统计信息卡片，改为资产搜索的多标签列表 -->
+    <a-card title="资产列表" :bordered="false" class="detail-card asset-search-card">
+      <a-tabs v-model:activeKey="activeTab" type="card" class="asset-tabs">
+        <a-tab-pane key="site" tab="站点">
+          <site-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="domain" tab="域名">
+          <domain-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="ip" tab="IP">
+          <ip-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="url" tab="URL">
+          <url-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="ssl" tab="SSL证书">
+          <ssl-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="service" tab="服务">
+          <service-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="npoc" tab="NPOC服务">
+          <npoc-service-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="cip" tab="C段IP">
+          <cip-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="wih" tab="WIH">
+          <wih-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="fileleak" tab="文件泄漏">
+          <fileleak-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="vuln" tab="漏洞">
+          <vuln-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="nuclei" tab="Nuclei结果">
+          <nuclei-result-search :taskId="taskId" />
+        </a-tab-pane>
+        <a-tab-pane key="finger" tab="指纹统计">
+          <stat-finger-search :taskId="taskId" />
+        </a-tab-pane>
+      </a-tabs>
     </a-card>
 
     <!-- 任务进度/结果列表 -->
@@ -143,11 +130,25 @@ import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
 import { LeftOutlined } from '@ant-design/icons-vue';
-import http from '@/plugins/http'
-import ServiceSearch from '@/components/asset/ServiceSearch.vue'
+import http from '@/plugins/http';
+import SiteSearch from '@/components/asset/SiteSearch.vue';
+import DomainSearch from '@/components/asset/DomainSearch.vue';
+import IpSearch from '@/components/asset/IpSearch.vue';
+import UrlSearch from '@/components/asset/UrlSearch.vue';
+import SslSearch from '@/components/asset/SslSearch.vue';
+import ServiceSearch from '@/components/asset/ServiceSearch.vue';
+import NpocServiceSearch from '@/components/asset/NpocServiceSearch.vue';
+import CipSearch from '@/components/asset/CipSearch.vue';
+import WihSearch from '@/components/asset/WihSearch.vue';
+import FileleakSearch from '@/components/asset/FileleakSearch.vue';
+import VulnSearch from '@/components/asset/VulnSearch.vue';
+import NucleiResultSearch from '@/components/asset/NucleiResultSearch.vue';
+import StatFingerSearch from '@/components/asset/StatFingerSearch.vue';
 
 const router = useRouter();
 const route = useRoute();
+const taskId = ref<string>('');
+const activeTab = ref('site');
 
 // 任务详情数据
 const taskDetail = ref<any>({});
@@ -234,18 +235,19 @@ const getStatusText = (status: string) => {
 
 // 获取任务详情
 const fetchTaskDetail = async () => {
-  const taskId = route.params.id;
-  if (!taskId) {
+  const id = route.params.id;
+  if (!id) {
     message.error('任务ID不能为空');
     return;
   }
-
+  
+  taskId.value = id as string;
   loading.value = true;
 
   try {
     // 按接口文档，直接通过 /task/?_id=xxx 获取任务详情和结果
     const { data } = await http.get('/task/', {
-      params: { _id: taskId }
+      params: { _id: taskId.value }
     });
 
     if (data.code !== 200) {
@@ -274,4 +276,23 @@ onMounted(() => {
 
 <style>
 @import '@/assets/styles/views/task-detail.css';
+
+.asset-search-card .asset-tabs {
+  margin-top: -16px;
+  margin-left: -24px;
+  margin-right: -24px;
+}
+
+:deep(.ant-tabs-nav) {
+  margin-bottom: 0;
+  padding: 0 16px;
+}
+
+:deep(.ant-tabs-content-holder) {
+  padding: 0;
+}
+
+:deep(.ant-tabs-nav-wrap) {
+  overflow-x: auto;
+}
 </style>
