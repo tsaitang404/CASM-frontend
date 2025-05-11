@@ -89,11 +89,16 @@ const routes: Array<RouteRecordRaw> = [
     name: 'npoc-service',
     component: () => import('../views/NpocServiceView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/celery-task-test',
+    name: 'celeryTaskTest',
+    component: () => import('../views/CeleryTaskTestView.vue')
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 

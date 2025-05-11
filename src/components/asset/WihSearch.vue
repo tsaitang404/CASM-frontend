@@ -1,18 +1,18 @@
 <template>
-  <div class="site-search">
+  <div class="wih-search">
     <div class="search-form">
       <a-form :model="form" layout="inline">
-        <a-form-item label="网站URL">
-          <a-input v-model:value="form.site" placeholder="请输入网站URL" allow-clear />
+        <a-form-item label="记录类型">
+          <a-input v-model:value="form.record_type" placeholder="请输入记录类型" allow-clear />
         </a-form-item>
-        <a-form-item label="标题">
-          <a-input v-model:value="form.title" placeholder="请输入网站标题" allow-clear />
+        <a-form-item label="内容">
+          <a-input v-model:value="form.content" placeholder="请输入内容" allow-clear />
         </a-form-item>
-        <a-form-item label="状态码">
-          <a-input v-model:value="form.status" placeholder="请输入状态码" allow-clear />
+        <a-form-item label="来源JS">
+          <a-input v-model:value="form.source" placeholder="请输入来源JS" allow-clear />
         </a-form-item>
-        <a-form-item label="标签">
-          <a-input v-model:value="form.tag" placeholder="请输入标签" allow-clear />
+        <a-form-item label="站点">
+          <a-input v-model:value="form.site" placeholder="请输入站点" allow-clear />
         </a-form-item>
         <a-form-item>
           <a-space>
@@ -23,16 +23,16 @@
         </a-form-item>
       </a-form>
     </div>
-
+    
     <div class="search-result">
       <a-table 
         :dataSource="tableData" 
-        :columns="columns"
+        :columns="columns" 
         :pagination="pagination"
-        @change="handleTableChange"
         :loading="loading"
+        @change="handleTableChange"
         :scroll="{ x: 1000 }"
-        bordered
+        bordered 
       />
     </div>
   </div>
@@ -42,7 +42,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'SiteSearch'
+  name: 'WihSearch'
 })
 </script>
 
@@ -50,38 +50,35 @@ export default defineComponent({
 import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import http from '@/plugins/http'
+import http from '../../plugins/http'
 
-interface SiteAsset {
+interface WihData {
   _id: string
+  record_type: string
+  content: string
+  source: string
   site: string
-  title: string
-  status: string
-  tag: string[]
-  update_date: string
-  task_id?: string
+  task_id: string
+  create_time: string
 }
 
 // 定义组件属性
 interface Props {
-  taskId?: string // 可选的任务ID属性，用于过滤指定任务的站点数据
+  taskId?: string // 可选的任务ID属性，用于过滤指定任务的WIH数据
 }
 
 const props = defineProps<Props>()
 
-// 查询表单
 const form = reactive({
-  site: '',
-  title: '',
-  status: '',
-  tag: ''
+  record_type: '',
+  content: '',
+  source: '',
+  site: ''
 })
 
-// 表格数据
-const tableData = ref<SiteAsset[]>([])
+const tableData = ref<WihData[]>([])
 const loading = ref(false)
 
-// 分页配置
 const pagination = reactive<TablePaginationConfig>({
   total: 0,
   current: 1,
@@ -91,54 +88,52 @@ const pagination = reactive<TablePaginationConfig>({
   showQuickJumper: true
 })
 
-// 表格列定义
 const columns = [
   {
-    title: '网站URL',
-    dataIndex: 'site',
-    key: 'site',
-    width: 250,
-    ellipsis: true,
+    title: '记录类型',
+    dataIndex: 'record_type',
+    key: 'record_type',
+    width: 100,
     fixed: 'left'
   },
   {
-    title: '标题',
-    dataIndex: 'title',
-    key: 'title',
+    title: '内容',
+    dataIndex: 'content',
+    key: 'content',
+    width: 250,
+    ellipsis: true
+  },
+  {
+    title: '来源JS',
+    dataIndex: 'source',
+    key: 'source',
     width: 300,
     ellipsis: true
   },
   {
-    title: '状态码',
-    dataIndex: 'status',
-    key: 'status',
-    width: 100
+    title: '站点',
+    dataIndex: 'site',
+    key: 'site',
+    width: 180,
+    ellipsis: true
   },
   {
-    title: '标签',
-    dataIndex: 'tag',
-    key: 'tag',
-    width: 200,
-    ellipsis: true,
-    customRender: ({ text }: { text: string[] }) => text?.join(', ') || '-'
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'update_date',
-    key: 'update_date',
-    width: 180
+    title: '创建时间',
+    dataIndex: 'create_time',
+    key: 'create_time',
+    width: 180,
+    render: (text: string) => text ? new Date(text).toLocaleString() : '-'
   }
 ]
 
-// 搜索站点资产
 const handleSearch = async (pag?: TablePaginationConfig) => {
   loading.value = true
   try {
     const params = new URLSearchParams()
+    if (form.record_type) params.append('record_type', form.record_type)
+    if (form.content) params.append('content', form.content)
+    if (form.source) params.append('source', form.source)
     if (form.site) params.append('site', form.site)
-    if (form.title) params.append('title', form.title)
-    if (form.status) params.append('status', form.status)
-    if (form.tag) params.append('tag', form.tag)
     
     // 如果提供了任务ID，则添加到查询参数中
     if (props.taskId) {
@@ -150,49 +145,45 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
     params.append('page', String(page))
     params.append('size', String(size))
 
-    const res = await http.get(`/asset_site/?${params.toString()}`)
-    const { code, message: msg, items, total } = res.data
-    if (code === 200) {
-      tableData.value = items || []
-      pagination.total = total || 0
+    const res = await http.get(`/wih/?${params.toString()}`)
+    if (res.data.code === 200) {
+      tableData.value = res.data.items || []
+      pagination.total = res.data.total || 0
       pagination.current = page
       pagination.pageSize = size
     } else {
-      throw new Error(msg || '查询失败')
+      throw new Error(res.data.message || '查询失败')
     }
   } catch (error) {
-    console.error('站点搜索错误:', error)
+    console.error('WIH搜索错误:', error)
     message.error('搜索失败')
   } finally {
     loading.value = false
   }
 }
 
-// 重置表单
 const handleReset = () => {
+  form.record_type = ''
+  form.content = ''
+  form.source = ''
   form.site = ''
-  form.title = ''
-  form.status = ''
-  form.tag = ''
   pagination.current = 1
   handleSearch()
 }
 
-// 处理表格分页、排序、筛选变化
 const handleTableChange = (pag: TablePaginationConfig) => {
   handleSearch(pag)
 }
 
-// 导出站点数据
 const handleExport = async () => {
   try {
     const params = new URLSearchParams()
+    if (form.record_type) params.append('record_type', form.record_type)
+    if (form.content) params.append('content', form.content)
+    if (form.source) params.append('source', form.source)
     if (form.site) params.append('site', form.site)
-    if (form.title) params.append('title', form.title)
-    if (form.status) params.append('status', form.status)
-    if (form.tag) params.append('tag', form.tag)
 
-    const res = await http.get(`/asset_site/export/?${params.toString()}`, {
+    const res = await http.get(`/wih/export/?${params.toString()}`, {
       responseType: 'blob'
     })
     
@@ -200,7 +191,7 @@ const handleExport = async () => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `site_export_${new Date().getTime()}.txt`
+    link.download = `wih_export_${new Date().getTime()}.txt`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -228,7 +219,7 @@ if (!props.taskId) {
 </script>
 
 <style scoped>
-.site-search {
+.wih-search {
   padding: 20px;
 }
 

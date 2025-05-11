@@ -1,24 +1,15 @@
 <template>
-  <div class="ip-search">
+  <div class="stat-finger-search">
     <div class="search-form">
       <a-form :model="form" layout="inline">
-        <a-form-item label="IP地址">
-          <a-input v-model:value="form.ip" placeholder="请输入IP地址" allow-clear />
+        <a-form-item label="指纹名称">
+          <a-input v-model:value="form.name" placeholder="请输入指纹名称" allow-clear />
         </a-form-item>
-        <a-form-item label="端口">
-          <a-input v-model:value="form.port" placeholder="请输入端口" allow-clear />
+        <a-form-item label="指纹类型">
+          <a-input v-model:value="form.type" placeholder="请输入指纹类型" allow-clear />
         </a-form-item>
-        <a-form-item label="服务名称">
-          <a-input v-model:value="form.serviceName" placeholder="请输入服务名称" allow-clear />
-        </a-form-item>
-        <a-form-item label="操作系统">
-          <a-input v-model:value="form.osName" placeholder="请输入操作系统" allow-clear />
-        </a-form-item>
-        <a-form-item label="IP类型">
-          <a-select v-model:value="form.ipType" placeholder="请选择IP类型" allow-clear style="width: 120px">
-            <a-select-option value="PUBLIC">公网</a-select-option>
-            <a-select-option value="PRIVATE">内网</a-select-option>
-          </a-select>
+        <a-form-item label="标签">
+          <a-input v-model:value="form.tag" placeholder="请输入标签" allow-clear />
         </a-form-item>
         <a-form-item>
           <a-space>
@@ -37,6 +28,7 @@
         :pagination="pagination"
         :loading="loading"
         @change="handleTableChange"
+        :scroll="{ x: 1000 }"
         bordered 
       />
     </div>
@@ -47,7 +39,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'IpSearch'
+  name: 'StatFingerSearch'
 })
 </script>
 
@@ -57,50 +49,34 @@ import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
 
-interface IpData {
+interface FingerData {
   _id: string
-  ip: string
-  domain: string[]
-  port_info: Array<{
-    port_id: number
-    service_name: string
-    product: string
-    version: string
+  name: string
+  type: string
+  count: number
+  sites: Array<{
+    url: string
+    title: string
   }>
-  os_info: {
-    name: string
-    accuracy: number
-  }
-  ip_type: string
-  cdn_name: string
-  geo_asn: {
-    number: number
-    organization: string
-  }
-  geo_city: {
-    region_name: string
-    country: string
-  }
+  tags: string[]
   task_id: string
   create_time: string
 }
 
 // 定义组件属性
 interface Props {
-  taskId?: string // 可选的任务ID属性，用于过滤指定任务的IP数据
+  taskId?: string // 可选的任务ID属性，用于过滤指定任务的指纹统计数据
 }
 
 const props = defineProps<Props>()
 
 const form = reactive({
-  ip: '',
-  port: '',
-  serviceName: '',
-  osName: '',
-  ipType: undefined as string | undefined
+  name: '',
+  type: '',
+  tag: ''
 })
 
-const tableData = ref<IpData[]>([])
+const tableData = ref<FingerData[]>([])
 const loading = ref(false)
 
 const pagination = reactive<TablePaginationConfig>({
@@ -128,67 +104,69 @@ const getRandomColor = () => {
 
 const columns = [
   {
-    title: 'IP地址',
-    dataIndex: 'ip',
-    key: 'ip',
-    width: 130,
+    title: '指纹名称',
+    dataIndex: 'name',
+    key: 'name',
+    width: 180,
+    ellipsis: true,
     fixed: 'left'
   },
   {
-    title: '域名',
-    dataIndex: 'domain',
-    key: 'domain',
-    minWidth: 200,
-    ellipsis: true,
-    render: (domains: string[]) => domains?.join(', ') || '-'
+    title: '指纹类型',
+    dataIndex: 'type',
+    key: 'type',
+    width: 120
   },
   {
-    title: '端口信息',
-    dataIndex: 'port_info',
-    key: 'port_info',
+    title: '数量',
+    dataIndex: 'count',
+    key: 'count',
+    width: 80,
+    sorter: true
+  },
+  {
+    title: '站点列表',
+    dataIndex: 'sites',
+    key: 'sites',
     width: 300,
-    customRender: ({ text }) => {
-      if (!text || !Array.isArray(text) || text.length === 0) return '-'
-      return h('div', { 
-        class: 'port-info-bar'
-      }, text.map(port => {
-        const color = getRandomColor()
-        return h('div', {
-          class: 'port-item',
-          style: {
-            padding: '4px 8px',
-            margin: '2px',
-            borderRadius: '4px',
-            display: 'inline-block',
-            fontSize: '13px',
-            background: color.bg,
-            color: color.text,
-            cursor: 'pointer',
-            transition: 'all 0.3s'
-          }
-        }, `${port.port_id}/${port.service_name || '-'}`)
-      }))
+    ellipsis: true,
+    render: (sites: Array<{ url: string, title: string }>) => {
+      if (!sites || !sites.length) return '-'
+      
+      return <div>
+        {sites.slice(0, 3).map(site => (
+          <div key={site.url} style={{ marginBottom: '5px' }}>
+            <a href={site.url} target="_blank" rel="noopener noreferrer" title={site.title || site.url}>
+              {site.url}
+            </a>
+          </div>
+        ))}
+        {sites.length > 3 && <div>...等 {sites.length} 个站点</div>}
+      </div>
     }
   },
   {
-    title: '操作系统',
-    dataIndex: ['os_info', 'name'],
-    key: 'os_name',
-    width: 120,
-    ellipsis: true
-  },
-  {
-    title: 'IP类型',
-    dataIndex: 'ip_type',
-    key: 'ip_type',
-    width: 100,
-    render: (text: string) => text === 'PUBLIC' ? '公网' : '内网'
-  },
-  {
-    title: '地理位置',
-    dataIndex: ['geo_city', 'region_name'],
-    key: 'region_name',
-    width: 150
+    title: '标签',
+    dataIndex: 'tags',
+    key: 'tags',
+    width: 200,
+    customRender: ({ text }) => {
+      if (!text || !Array.isArray(text) || text.length === 0) return '-'
+      return h('div', { 
+        style: { display: 'flex', flexWrap: 'wrap', gap: '4px' }
+      }, text.map(tag => {
+        const color = getRandomColor()
+        return h('div', {
+          style: {
+            padding: '2px 8px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            background: color.bg,
+            color: color.text
+          }
+        }, tag)
+      }))
+    }
   },
   {
     title: '创建时间',
@@ -202,11 +180,9 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
   loading.value = true
   try {
     const params = new URLSearchParams()
-    if (form.ip) params.append('ip', form.ip)
-    if (form.port) params.append('port_info.port_id', form.port)
-    if (form.serviceName) params.append('port_info.service_name', form.serviceName)
-    if (form.osName) params.append('os_info.name', form.osName)
-    if (form.ipType) params.append('ip_type', form.ipType)
+    if (form.name) params.append('name', form.name)
+    if (form.type) params.append('type', form.type)
+    if (form.tag) params.append('tag', form.tag)
     
     // 如果提供了任务ID，则添加到查询参数中
     if (props.taskId) {
@@ -218,7 +194,7 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
     params.append('page', String(page))
     params.append('size', String(size))
 
-    const res = await http.get(`/ip/?${params.toString()}`)
+    const res = await http.get(`/stat_finger/?${params.toString()}`)
     if (res.data.code === 200) {
       tableData.value = res.data.items || []
       pagination.total = res.data.total || 0
@@ -228,7 +204,7 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
       throw new Error(res.data.message || '查询失败')
     }
   } catch (error) {
-    console.error('IP搜索错误:', error)
+    console.error('指纹统计搜索错误:', error)
     message.error('搜索失败')
   } finally {
     loading.value = false
@@ -236,11 +212,9 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
 }
 
 const handleReset = () => {
-  form.ip = ''
-  form.port = ''
-  form.serviceName = ''
-  form.osName = ''
-  form.ipType = undefined
+  form.name = ''
+  form.type = ''
+  form.tag = ''
   pagination.current = 1
   handleSearch()
 }
@@ -252,13 +226,11 @@ const handleTableChange = (pag: TablePaginationConfig) => {
 const handleExport = async () => {
   try {
     const params = new URLSearchParams()
-    if (form.ip) params.append('ip', form.ip)
-    if (form.port) params.append('port_info.port_id', form.port)
-    if (form.serviceName) params.append('port_info.service_name', form.serviceName)
-    if (form.osName) params.append('os_info.name', form.osName)
-    if (form.ipType) params.append('ip_type', form.ipType)
+    if (form.name) params.append('name', form.name)
+    if (form.type) params.append('type', form.type)
+    if (form.tag) params.append('tag', form.tag)
 
-    const res = await http.get(`/ip/export/?${params.toString()}`, {
+    const res = await http.get(`/stat_finger/export/?${params.toString()}`, {
       responseType: 'blob'
     })
     
@@ -266,7 +238,7 @@ const handleExport = async () => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `ip_export_${new Date().getTime()}.txt`
+    link.download = `stat_finger_export_${new Date().getTime()}.txt`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -294,7 +266,7 @@ if (!props.taskId) {
 </script>
 
 <style scoped>
-.ip-search {
+.stat-finger-search {
   padding: 20px;
 }
 
@@ -326,35 +298,7 @@ if (!props.taskId) {
   background: #fff;
 }
 
-:deep(.port-info-cell) {
-  line-height: 1.5;
-  padding: 4px 0;
-}
-
 :deep(.ant-table-cell) {
   vertical-align: top;
-}
-
-.port-info-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.port-info-bar .port-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-:deep(.port-item) {
-  transition: all 0.3s ease;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-:deep(.port-item:hover) {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 </style>

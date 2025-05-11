@@ -1,18 +1,24 @@
 <template>
-  <div class="site-search">
+  <div class="url-search">
     <div class="search-form">
       <a-form :model="form" layout="inline">
-        <a-form-item label="网站URL">
-          <a-input v-model:value="form.site" placeholder="请输入网站URL" allow-clear />
+        <a-form-item label="URL">
+          <a-input v-model:value="form.url" placeholder="请输入URL" allow-clear />
         </a-form-item>
-        <a-form-item label="标题">
-          <a-input v-model:value="form.title" placeholder="请输入网站标题" allow-clear />
+        <a-form-item label="站点">
+          <a-input v-model:value="form.site" placeholder="请输入站点" allow-clear />
+        </a-form-item>
+        <a-form-item label="IP">
+          <a-input v-model:value="form.fld" placeholder="请输入IP地址" allow-clear />
         </a-form-item>
         <a-form-item label="状态码">
-          <a-input v-model:value="form.status" placeholder="请输入状态码" allow-clear />
+          <a-input v-model:value="form.status_code" placeholder="请输入状态码" allow-clear />
         </a-form-item>
-        <a-form-item label="标签">
-          <a-input v-model:value="form.tag" placeholder="请输入标签" allow-clear />
+        <a-form-item label="标题">
+          <a-input v-model:value="form.title" placeholder="请输入标题" allow-clear />
+        </a-form-item>
+        <a-form-item label="来源">
+          <a-input v-model:value="form.source" placeholder="请输入来源" allow-clear />
         </a-form-item>
         <a-form-item>
           <a-space>
@@ -23,16 +29,16 @@
         </a-form-item>
       </a-form>
     </div>
-
+    
     <div class="search-result">
       <a-table 
         :dataSource="tableData" 
-        :columns="columns"
+        :columns="columns" 
         :pagination="pagination"
-        @change="handleTableChange"
         :loading="loading"
-        :scroll="{ x: 1000 }"
-        bordered
+        @change="handleTableChange"
+        :scroll="{ x: 1200 }"
+        bordered 
       />
     </div>
   </div>
@@ -42,7 +48,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'SiteSearch'
+  name: 'UrlSearch'
 })
 </script>
 
@@ -50,38 +56,40 @@ export default defineComponent({
 import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import http from '@/plugins/http'
+import http from '../../plugins/http'
 
-interface SiteAsset {
+interface UrlData {
   _id: string
+  url: string
+  fld: string
   site: string
+  content_length: number
+  status_code: number
   title: string
-  status: string
-  tag: string[]
-  update_date: string
-  task_id?: string
+  source: string
+  task_id: string
+  create_time: string
 }
 
 // 定义组件属性
 interface Props {
-  taskId?: string // 可选的任务ID属性，用于过滤指定任务的站点数据
+  taskId?: string // 可选的任务ID属性，用于过滤指定任务的URL数据
 }
 
 const props = defineProps<Props>()
 
-// 查询表单
 const form = reactive({
+  url: '',
   site: '',
+  fld: '',
+  status_code: '',
   title: '',
-  status: '',
-  tag: ''
+  source: ''
 })
 
-// 表格数据
-const tableData = ref<SiteAsset[]>([])
+const tableData = ref<UrlData[]>([])
 const loading = ref(false)
 
-// 分页配置
 const pagination = reactive<TablePaginationConfig>({
   total: 0,
   current: 1,
@@ -91,54 +99,93 @@ const pagination = reactive<TablePaginationConfig>({
   showQuickJumper: true
 })
 
-// 表格列定义
+const getStatusColor = (status: number) => {
+  if (status >= 200 && status < 300) {
+    return 'green'
+  } else if (status >= 300 && status < 400) {
+    return 'blue'
+  } else if (status >= 400 && status < 500) {
+    return 'orange'
+  } else if (status >= 500) {
+    return 'red'
+  }
+  return 'default'
+}
+
 const columns = [
   {
-    title: '网站URL',
+    title: 'URL',
+    dataIndex: 'url',
+    key: 'url',
+    width: 350,
+    ellipsis: true,
+    fixed: 'left',
+    render: (text: string) => {
+      return text ? (
+        <a href={text} target="_blank" rel="noopener noreferrer">{text}</a>
+      ) : '-'
+    }
+  },
+  {
+    title: '站点',
     dataIndex: 'site',
     key: 'site',
-    width: 250,
-    ellipsis: true,
-    fixed: 'left'
+    width: 150,
+    ellipsis: true
+  },
+  {
+    title: 'IP地址',
+    dataIndex: 'fld',
+    key: 'fld',
+    width: 130
+  },
+  {
+    title: '状态码',
+    dataIndex: 'status_code',
+    key: 'status_code',
+    width: 100,
+    render: (text: number) => (
+      <a-tag color={getStatusColor(text)}>{text}</a-tag>
+    )
   },
   {
     title: '标题',
     dataIndex: 'title',
     key: 'title',
-    width: 300,
+    width: 200,
     ellipsis: true
   },
   {
-    title: '状态码',
-    dataIndex: 'status',
-    key: 'status',
-    width: 100
+    title: '大小',
+    dataIndex: 'content_length',
+    key: 'content_length',
+    width: 100,
+    render: (text: number) => text ? `${Math.round(text / 1024 * 100) / 100} KB` : '-'
   },
   {
-    title: '标签',
-    dataIndex: 'tag',
-    key: 'tag',
-    width: 200,
-    ellipsis: true,
-    customRender: ({ text }: { text: string[] }) => text?.join(', ') || '-'
+    title: '来源',
+    dataIndex: 'source',
+    key: 'source',
+    width: 120
   },
   {
-    title: '更新时间',
-    dataIndex: 'update_date',
-    key: 'update_date',
+    title: '创建时间',
+    dataIndex: 'create_time',
+    key: 'create_time',
     width: 180
   }
 ]
 
-// 搜索站点资产
 const handleSearch = async (pag?: TablePaginationConfig) => {
   loading.value = true
   try {
     const params = new URLSearchParams()
+    if (form.url) params.append('url', form.url)
     if (form.site) params.append('site', form.site)
+    if (form.fld) params.append('fld', form.fld)
+    if (form.status_code) params.append('status_code', form.status_code)
     if (form.title) params.append('title', form.title)
-    if (form.status) params.append('status', form.status)
-    if (form.tag) params.append('tag', form.tag)
+    if (form.source) params.append('source', form.source)
     
     // 如果提供了任务ID，则添加到查询参数中
     if (props.taskId) {
@@ -150,49 +197,49 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
     params.append('page', String(page))
     params.append('size', String(size))
 
-    const res = await http.get(`/asset_site/?${params.toString()}`)
-    const { code, message: msg, items, total } = res.data
-    if (code === 200) {
-      tableData.value = items || []
-      pagination.total = total || 0
+    const res = await http.get(`/url/?${params.toString()}`)
+    if (res.data.code === 200) {
+      tableData.value = res.data.items || []
+      pagination.total = res.data.total || 0
       pagination.current = page
       pagination.pageSize = size
     } else {
-      throw new Error(msg || '查询失败')
+      throw new Error(res.data.message || '查询失败')
     }
   } catch (error) {
-    console.error('站点搜索错误:', error)
+    console.error('URL搜索错误:', error)
     message.error('搜索失败')
   } finally {
     loading.value = false
   }
 }
 
-// 重置表单
 const handleReset = () => {
+  form.url = ''
   form.site = ''
+  form.fld = ''
+  form.status_code = ''
   form.title = ''
-  form.status = ''
-  form.tag = ''
+  form.source = ''
   pagination.current = 1
   handleSearch()
 }
 
-// 处理表格分页、排序、筛选变化
 const handleTableChange = (pag: TablePaginationConfig) => {
   handleSearch(pag)
 }
 
-// 导出站点数据
 const handleExport = async () => {
   try {
     const params = new URLSearchParams()
+    if (form.url) params.append('url', form.url)
     if (form.site) params.append('site', form.site)
+    if (form.fld) params.append('fld', form.fld)
+    if (form.status_code) params.append('status_code', form.status_code)
     if (form.title) params.append('title', form.title)
-    if (form.status) params.append('status', form.status)
-    if (form.tag) params.append('tag', form.tag)
+    if (form.source) params.append('source', form.source)
 
-    const res = await http.get(`/asset_site/export/?${params.toString()}`, {
+    const res = await http.get(`/url/export/?${params.toString()}`, {
       responseType: 'blob'
     })
     
@@ -200,7 +247,7 @@ const handleExport = async () => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `site_export_${new Date().getTime()}.txt`
+    link.download = `url_export_${new Date().getTime()}.txt`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -228,7 +275,7 @@ if (!props.taskId) {
 </script>
 
 <style scoped>
-.site-search {
+.url-search {
   padding: 20px;
 }
 

@@ -1,18 +1,24 @@
 <template>
-  <div class="site-search">
+  <div class="npoc-service-search">
     <div class="search-form">
       <a-form :model="form" layout="inline">
-        <a-form-item label="网站URL">
-          <a-input v-model:value="form.site" placeholder="请输入网站URL" allow-clear />
+        <a-form-item label="服务协议">
+          <a-input v-model:value="form.scheme" placeholder="请输入服务协议" allow-clear />
+        </a-form-item>
+        <a-form-item label="主机名">
+          <a-input v-model:value="form.host" placeholder="请输入主机名" allow-clear />
+        </a-form-item>
+        <a-form-item label="端口">
+          <a-input v-model:value="form.port" placeholder="请输入端口" allow-clear />
+        </a-form-item>
+        <a-form-item label="目标URL">
+          <a-input v-model:value="form.target" placeholder="请输入目标URL" allow-clear />
+        </a-form-item>
+        <a-form-item label="服务器">
+          <a-input v-model:value="form.server" placeholder="请输入服务器标识" allow-clear />
         </a-form-item>
         <a-form-item label="标题">
-          <a-input v-model:value="form.title" placeholder="请输入网站标题" allow-clear />
-        </a-form-item>
-        <a-form-item label="状态码">
-          <a-input v-model:value="form.status" placeholder="请输入状态码" allow-clear />
-        </a-form-item>
-        <a-form-item label="标签">
-          <a-input v-model:value="form.tag" placeholder="请输入标签" allow-clear />
+          <a-input v-model:value="form.title" placeholder="请输入页面标题" allow-clear />
         </a-form-item>
         <a-form-item>
           <a-space>
@@ -23,16 +29,16 @@
         </a-form-item>
       </a-form>
     </div>
-
+    
     <div class="search-result">
       <a-table 
         :dataSource="tableData" 
-        :columns="columns"
+        :columns="columns" 
         :pagination="pagination"
-        @change="handleTableChange"
         :loading="loading"
-        :scroll="{ x: 1000 }"
-        bordered
+        @change="handleTableChange"
+        :scroll="{ x: 1200 }"
+        bordered 
       />
     </div>
   </div>
@@ -42,7 +48,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'SiteSearch'
+  name: 'NpocServiceSearch'
 })
 </script>
 
@@ -50,38 +56,40 @@ export default defineComponent({
 import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import http from '@/plugins/http'
+import http from '../../plugins/http'
 
-interface SiteAsset {
+interface NpocServiceData {
   _id: string
-  site: string
+  scheme: string
+  host: string
+  port: string
+  target: string
+  server: string
   title: string
-  status: string
-  tag: string[]
-  update_date: string
-  task_id?: string
+  banner: string
+  task_id: string
+  create_time: string
 }
 
 // 定义组件属性
 interface Props {
-  taskId?: string // 可选的任务ID属性，用于过滤指定任务的站点数据
+  taskId?: string // 可选的任务ID属性，用于过滤指定任务的NPOC服务数据
 }
 
 const props = defineProps<Props>()
 
-// 查询表单
 const form = reactive({
-  site: '',
-  title: '',
-  status: '',
-  tag: ''
+  scheme: '',
+  host: '',
+  port: '',
+  target: '',
+  server: '',
+  title: ''
 })
 
-// 表格数据
-const tableData = ref<SiteAsset[]>([])
+const tableData = ref<NpocServiceData[]>([])
 const loading = ref(false)
 
-// 分页配置
 const pagination = reactive<TablePaginationConfig>({
   total: 0,
   current: 1,
@@ -91,54 +99,79 @@ const pagination = reactive<TablePaginationConfig>({
   showQuickJumper: true
 })
 
-// 表格列定义
 const columns = [
   {
-    title: '网站URL',
-    dataIndex: 'site',
-    key: 'site',
+    title: '协议',
+    dataIndex: 'scheme',
+    key: 'scheme',
+    width: 100,
+    fixed: 'left'
+  },
+  {
+    title: '主机',
+    dataIndex: 'host',
+    key: 'host',
+    width: 180,
+    ellipsis: true
+  },
+  {
+    title: '端口',
+    dataIndex: 'port',
+    key: 'port',
+    width: 80
+  },
+  {
+    title: '目标',
+    dataIndex: 'target',
+    key: 'target',
     width: 250,
     ellipsis: true,
-    fixed: 'left'
+    render: (text: string) => {
+      if (!text) return '-'
+      return text.startsWith('http') ? (
+        <a href={text} target="_blank" rel="noopener noreferrer">{text}</a>
+      ) : text
+    }
+  },
+  {
+    title: '服务器',
+    dataIndex: 'server',
+    key: 'server',
+    width: 150,
+    ellipsis: true
   },
   {
     title: '标题',
     dataIndex: 'title',
     key: 'title',
+    width: 200,
+    ellipsis: true
+  },
+  {
+    title: '横幅信息',
+    dataIndex: 'banner',
+    key: 'banner',
     width: 300,
     ellipsis: true
   },
   {
-    title: '状态码',
-    dataIndex: 'status',
-    key: 'status',
-    width: 100
-  },
-  {
-    title: '标签',
-    dataIndex: 'tag',
-    key: 'tag',
-    width: 200,
-    ellipsis: true,
-    customRender: ({ text }: { text: string[] }) => text?.join(', ') || '-'
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'update_date',
-    key: 'update_date',
+    title: '创建时间',
+    dataIndex: 'create_time',
+    key: 'create_time',
     width: 180
   }
 ]
 
-// 搜索站点资产
 const handleSearch = async (pag?: TablePaginationConfig) => {
   loading.value = true
   try {
     const params = new URLSearchParams()
-    if (form.site) params.append('site', form.site)
+    if (form.scheme) params.append('scheme', form.scheme)
+    if (form.host) params.append('host', form.host)
+    if (form.port) params.append('port', form.port)
+    if (form.target) params.append('target', form.target)
+    if (form.server) params.append('server', form.server)
     if (form.title) params.append('title', form.title)
-    if (form.status) params.append('status', form.status)
-    if (form.tag) params.append('tag', form.tag)
     
     // 如果提供了任务ID，则添加到查询参数中
     if (props.taskId) {
@@ -150,49 +183,49 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
     params.append('page', String(page))
     params.append('size', String(size))
 
-    const res = await http.get(`/asset_site/?${params.toString()}`)
-    const { code, message: msg, items, total } = res.data
-    if (code === 200) {
-      tableData.value = items || []
-      pagination.total = total || 0
+    const res = await http.get(`/npoc_service/?${params.toString()}`)
+    if (res.data.code === 200) {
+      tableData.value = res.data.items || []
+      pagination.total = res.data.total || 0
       pagination.current = page
       pagination.pageSize = size
     } else {
-      throw new Error(msg || '查询失败')
+      throw new Error(res.data.message || '查询失败')
     }
   } catch (error) {
-    console.error('站点搜索错误:', error)
+    console.error('NPOC服务搜索错误:', error)
     message.error('搜索失败')
   } finally {
     loading.value = false
   }
 }
 
-// 重置表单
 const handleReset = () => {
-  form.site = ''
+  form.scheme = ''
+  form.host = ''
+  form.port = ''
+  form.target = ''
+  form.server = ''
   form.title = ''
-  form.status = ''
-  form.tag = ''
   pagination.current = 1
   handleSearch()
 }
 
-// 处理表格分页、排序、筛选变化
 const handleTableChange = (pag: TablePaginationConfig) => {
   handleSearch(pag)
 }
 
-// 导出站点数据
 const handleExport = async () => {
   try {
     const params = new URLSearchParams()
-    if (form.site) params.append('site', form.site)
+    if (form.scheme) params.append('scheme', form.scheme)
+    if (form.host) params.append('host', form.host)
+    if (form.port) params.append('port', form.port)
+    if (form.target) params.append('target', form.target)
+    if (form.server) params.append('server', form.server)
     if (form.title) params.append('title', form.title)
-    if (form.status) params.append('status', form.status)
-    if (form.tag) params.append('tag', form.tag)
 
-    const res = await http.get(`/asset_site/export/?${params.toString()}`, {
+    const res = await http.get(`/npoc_service/export/?${params.toString()}`, {
       responseType: 'blob'
     })
     
@@ -200,7 +233,7 @@ const handleExport = async () => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `site_export_${new Date().getTime()}.txt`
+    link.download = `npoc_service_export_${new Date().getTime()}.txt`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -228,7 +261,7 @@ if (!props.taskId) {
 </script>
 
 <style scoped>
-.site-search {
+.npoc-service-search {
   padding: 20px;
 }
 

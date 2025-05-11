@@ -21,6 +21,7 @@
           <a-space>
             <a-button type="primary" @click="handleSearch" :loading="loading">搜索</a-button>
             <a-button @click="handleReset">重置</a-button>
+            <a-button @click="handleExport">导出</a-button>
           </a-space>
         </a-form-item>
       </a-form>
@@ -33,6 +34,7 @@
         :pagination="pagination"
         :loading="loading"
         @change="handleTableChange"
+        :scroll="{ x: 1000 }"
         bordered 
       />
     </div>
@@ -48,7 +50,7 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import { ref, reactive, h } from 'vue'
+import { ref, reactive, h, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
@@ -65,6 +67,13 @@ interface ServiceInfo {
   task_id: string
   create_time: string
 }
+
+// 定义组件属性
+interface Props {
+  taskId?: string // 可选的任务ID属性，用于过滤指定任务的服务数据
+}
+
+const props = defineProps<Props>()
 
 const form = reactive({
   service_name: '',
@@ -105,7 +114,8 @@ const columns = [
     title: '服务名称',
     dataIndex: 'service_name',
     key: 'service_name',
-    width: 150
+    width: 150,
+    fixed: 'left'
   },
   {
     title: '服务信息',
@@ -160,6 +170,11 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
     if (form.product) params.append('service_info.product', form.product)
     if (form.version) params.append('service_info.version', form.version)
     
+    // 如果提供了任务ID，则添加到查询参数中
+    if (props.taskId) {
+      params.append('task_id', props.taskId)
+    }
+    
     const page = pag?.current || pagination.current
     const size = pag?.pageSize || pagination.pageSize
     params.append('page', String(page))
@@ -196,8 +211,48 @@ const handleTableChange = (pag: TablePaginationConfig) => {
   handleSearch(pag)
 }
 
-// 初始加载
-handleSearch()
+const handleExport = async () => {
+  try {
+    const params = new URLSearchParams()
+    if (form.service_name) params.append('service_name', form.service_name)
+    if (form.ip) params.append('service_info.ip', form.ip)
+    if (form.port) params.append('service_info.port_id', form.port)
+    if (form.product) params.append('service_info.product', form.product)
+    if (form.version) params.append('service_info.version', form.version)
+
+    const res = await http.get(`/service/export/?${params.toString()}`, {
+      responseType: 'blob'
+    })
+    
+    const blob = new Blob([res.data], { type: 'text/plain' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `service_export_${new Date().getTime()}.txt`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    message.success('导出成功')
+  } catch (error) {
+    console.error('导出错误:', error)
+    message.error('导出失败')
+  }
+}
+
+// 监听任务ID变化，重新加载数据
+watch(() => props.taskId, (newTaskId, oldTaskId) => {
+  if (newTaskId && newTaskId !== oldTaskId) {
+    pagination.current = 1; // 重置为第一页
+    handleSearch();
+  }
+}, { immediate: true })
+
+// 初始加载（如果没有taskId的情况）
+if (!props.taskId) {
+  handleSearch()
+}
 </script>
 
 <style scoped>
@@ -229,7 +284,27 @@ handleSearch()
   overflow-x: auto;
 }
 
+:deep(.ant-table-header),
+:deep(.ant-table-body) {
+  overflow-y: auto !important;
+}
+
+:deep(.ant-table-cell-ellipsis) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:deep(.ant-table-fixed) {
+  background: #fff;
+}
+
 :deep(.ant-table-cell) {
   vertical-align: top;
+}
+
+:deep(.port-item:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 </style>

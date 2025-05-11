@@ -1,18 +1,26 @@
 <template>
-  <div class="ssl-search">
+  <div class="vuln-search">
     <div class="search-form">
       <a-form :model="form" layout="inline">
-        <a-form-item label="IP地址">
-          <a-input v-model:value="form.ip" placeholder="请输入IP地址" allow-clear />
+        <a-form-item label="漏洞名称">
+          <a-input v-model:value="form.vul_name" placeholder="请输入漏洞名称" allow-clear />
         </a-form-item>
-        <a-form-item label="端口">
-          <a-input v-model:value="form.port" placeholder="请输入端口" allow-clear />
+        <a-form-item label="应用名称">
+          <a-input v-model:value="form.app_name" placeholder="请输入应用名称" allow-clear />
         </a-form-item>
-        <a-form-item label="主题名称">
-          <a-input v-model:value="form.subject_dn" placeholder="请输入主题名称" allow-clear />
+        <a-form-item label="URL">
+          <a-input v-model:value="form.url" placeholder="请输入URL" allow-clear />
         </a-form-item>
-        <a-form-item label="签发者">
-          <a-input v-model:value="form.issuer_dn" placeholder="请输入签发者" allow-clear />
+        <a-form-item label="IP">
+          <a-input v-model:value="form.host" placeholder="请输入IP地址" allow-clear />
+        </a-form-item>
+        <a-form-item label="风险等级">
+          <a-select v-model:value="form.risk_level" placeholder="请选择风险等级" allow-clear style="width: 120px">
+            <a-select-option value="high">高危</a-select-option>
+            <a-select-option value="medium">中危</a-select-option>
+            <a-select-option value="low">低危</a-select-option>
+            <a-select-option value="info">信息</a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item>
           <a-space>
@@ -42,56 +50,48 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'SslSearch'
+  name: 'VulnSearch'
 })
 </script>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
 
-interface SslCert {
+interface VulnData {
   _id: string
-  ip: string
+  vul_name: string
+  app_name: string
+  url: string
+  host: string
   port: number
-  cert: {
-    subject_dn: string
-    issuer_dn: string
-    serial_number: string
-    validity: {
-      start: string
-      end: string
-    }
-    fingerprint: {
-      sha256: string
-      sha1: string
-      md5: string
-    }
-    extensions: {
-      subjectAltName: string[]
-    }
-  }
-  task_id: string
+  protocol: string
+  risk_level: string
+  description: string
+  poc_name: string
+  verify_result: string
   create_time: string
+  task_id: string
 }
 
 // 定义组件属性
 interface Props {
-  taskId?: string // 可选的任务ID属性，用于过滤指定任务的证书数据
+  taskId?: string // 可选的任务ID属性，用于过滤指定任务的漏洞数据
 }
 
 const props = defineProps<Props>()
 
 const form = reactive({
-  ip: '',
-  port: '',
-  subject_dn: '',
-  issuer_dn: ''
+  vul_name: '',
+  app_name: '',
+  url: '',
+  host: '',
+  risk_level: undefined as string | undefined
 })
 
-const tableData = ref<SslCert[]>([])
+const tableData = ref<VulnData[]>([])
 const loading = ref(false)
 
 const pagination = reactive<TablePaginationConfig>({
@@ -103,13 +103,76 @@ const pagination = reactive<TablePaginationConfig>({
   showQuickJumper: true
 })
 
+const getRiskLevelColor = (level: string) => {
+  switch (level) {
+    case 'high':
+      return 'red'
+    case 'medium':
+      return 'orange'
+    case 'low':
+      return 'blue'
+    case 'info':
+      return 'green'
+    default:
+      return 'default'
+  }
+}
+
+const getRiskLevelText = (level: string) => {
+  switch (level) {
+    case 'high':
+      return '高危'
+    case 'medium':
+      return '中危'
+    case 'low':
+      return '低危'
+    case 'info':
+      return '信息'
+    default:
+      return level || '-'
+  }
+}
+
 const columns = [
   {
-    title: 'IP地址',
-    dataIndex: 'ip',
-    key: 'ip',
-    width: 130,
+    title: '漏洞名称',
+    dataIndex: 'vul_name',
+    key: 'vul_name',
+    width: 200,
+    ellipsis: true,
     fixed: 'left'
+  },
+  {
+    title: '风险等级',
+    dataIndex: 'risk_level',
+    key: 'risk_level',
+    width: 100,
+    render: (text: string) => (
+      <a-tag color={getRiskLevelColor(text)}>{getRiskLevelText(text)}</a-tag>
+    )
+  },
+  {
+    title: '应用名称',
+    dataIndex: 'app_name',
+    key: 'app_name',
+    width: 150,
+    ellipsis: true
+  },
+  {
+    title: 'URL',
+    dataIndex: 'url',
+    key: 'url',
+    width: 300,
+    ellipsis: true,
+    render: (text: string) => text ? (
+      <a href={text} target="_blank" rel="noopener noreferrer">{text}</a>
+    ) : '-'
+  },
+  {
+    title: 'IP地址',
+    dataIndex: 'host',
+    key: 'host',
+    width: 130
   },
   {
     title: '端口',
@@ -118,36 +181,17 @@ const columns = [
     width: 80
   },
   {
-    title: '主题名称',
-    dataIndex: ['cert', 'subject_dn'],
-    key: 'subject_dn',
-    width: 250,
+    title: '协议',
+    dataIndex: 'protocol',
+    key: 'protocol',
+    width: 80
+  },
+  {
+    title: '检测插件',
+    dataIndex: 'poc_name',
+    key: 'poc_name',
+    width: 150,
     ellipsis: true
-  },
-  {
-    title: '签发者',
-    dataIndex: ['cert', 'issuer_dn'],
-    key: 'issuer_dn',
-    width: 250,
-    ellipsis: true
-  },
-  {
-    title: '备用名称',
-    dataIndex: ['cert', 'extensions', 'subjectAltName'],
-    key: 'subjectAltName',
-    width: 220,
-    ellipsis: true,
-    render: (names: string[]) => names?.join(', ') || '-'
-  },
-  {
-    title: '有效期',
-    key: 'validity',
-    width: 300,
-    render: (record: SslCert) => {
-      const start = new Date(record.cert.validity.start).toLocaleString()
-      const end = new Date(record.cert.validity.end).toLocaleString()
-      return `${start} ~ ${end}`
-    }
   },
   {
     title: '创建时间',
@@ -161,10 +205,11 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
   loading.value = true
   try {
     const params = new URLSearchParams()
-    if (form.ip) params.append('ip', form.ip)
-    if (form.port) params.append('port', form.port)
-    if (form.subject_dn) params.append('cert.subject_dn', form.subject_dn)
-    if (form.issuer_dn) params.append('cert.issuer_dn', form.issuer_dn)
+    if (form.vul_name) params.append('vul_name', form.vul_name)
+    if (form.app_name) params.append('app_name', form.app_name)
+    if (form.url) params.append('url', form.url)
+    if (form.host) params.append('host', form.host)
+    if (form.risk_level) params.append('risk_level', form.risk_level)
     
     // 如果提供了任务ID，则添加到查询参数中
     if (props.taskId) {
@@ -176,7 +221,7 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
     params.append('page', String(page))
     params.append('size', String(size))
 
-    const res = await http.get(`/cert/?${params.toString()}`)
+    const res = await http.get(`/vuln/?${params.toString()}`)
     if (res.data.code === 200) {
       tableData.value = res.data.items || []
       pagination.total = res.data.total || 0
@@ -186,7 +231,7 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
       throw new Error(res.data.message || '查询失败')
     }
   } catch (error) {
-    console.error('证书搜索错误:', error)
+    console.error('漏洞搜索错误:', error)
     message.error('搜索失败')
   } finally {
     loading.value = false
@@ -194,10 +239,11 @@ const handleSearch = async (pag?: TablePaginationConfig) => {
 }
 
 const handleReset = () => {
-  form.ip = ''
-  form.port = ''
-  form.subject_dn = ''
-  form.issuer_dn = ''
+  form.vul_name = ''
+  form.app_name = ''
+  form.url = ''
+  form.host = ''
+  form.risk_level = undefined
   pagination.current = 1
   handleSearch()
 }
@@ -209,12 +255,13 @@ const handleTableChange = (pag: TablePaginationConfig) => {
 const handleExport = async () => {
   try {
     const params = new URLSearchParams()
-    if (form.ip) params.append('ip', form.ip)
-    if (form.port) params.append('port', form.port)
-    if (form.subject_dn) params.append('cert.subject_dn', form.subject_dn)
-    if (form.issuer_dn) params.append('cert.issuer_dn', form.issuer_dn)
+    if (form.vul_name) params.append('vul_name', form.vul_name)
+    if (form.app_name) params.append('app_name', form.app_name)
+    if (form.url) params.append('url', form.url)
+    if (form.host) params.append('host', form.host)
+    if (form.risk_level) params.append('risk_level', form.risk_level)
 
-    const res = await http.get(`/cert/export/?${params.toString()}`, {
+    const res = await http.get(`/vuln/export/?${params.toString()}`, {
       responseType: 'blob'
     })
     
@@ -222,7 +269,7 @@ const handleExport = async () => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `ssl_cert_export_${new Date().getTime()}.txt`
+    link.download = `vuln_export_${new Date().getTime()}.txt`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -250,7 +297,7 @@ if (!props.taskId) {
 </script>
 
 <style scoped>
-.ssl-search {
+.vuln-search {
   padding: 20px;
 }
 
