@@ -55,7 +55,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, h } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
@@ -147,9 +147,8 @@ const columns = [
     dataIndex: 'risk_level',
     key: 'risk_level',
     width: 100,
-    render: (text: string) => (
-      <a-tag color={getRiskLevelColor(text)}>{getRiskLevelText(text)}</a-tag>
-    )
+    customRender: ({ text }) => 
+      h('a-tag', { color: getRiskLevelColor(text) }, getRiskLevelText(text))
   },
   {
     title: '应用名称',
@@ -164,9 +163,8 @@ const columns = [
     key: 'url',
     width: 300,
     ellipsis: true,
-    render: (text: string) => text ? (
-      <a href={text} target="_blank" rel="noopener noreferrer">{text}</a>
-    ) : '-'
+    customRender: ({ text }) => text ? 
+      h('a', { href: text, target: '_blank', rel: 'noopener noreferrer' }, text) : '-'
   },
   {
     title: 'IP地址',

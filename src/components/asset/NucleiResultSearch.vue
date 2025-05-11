@@ -56,7 +56,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, h } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
@@ -151,9 +151,8 @@ const columns = [
     dataIndex: 'severity',
     key: 'severity',
     width: 100,
-    render: (text: string) => (
-      <a-tag color={getSeverityColor(text)}>{getSeverityText(text)}</a-tag>
-    )
+    customRender: ({ text }) => 
+      h('a-tag', { color: getSeverityColor(text) }, getSeverityText(text))
   },
   {
     title: '漏洞类型',
@@ -167,9 +166,8 @@ const columns = [
     key: 'matched',
     width: 300,
     ellipsis: true,
-    render: (text: string) => text ? (
-      <a href={text} target="_blank" rel="noopener noreferrer">{text}</a>
-    ) : '-'
+    customRender: ({ text }) => text ? 
+      h('a', { href: text, target: '_blank', rel: 'noopener noreferrer' }, text) : '-'
   },
   {
     title: 'IP地址',

@@ -47,7 +47,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, h } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
@@ -110,11 +110,8 @@ const columns = [
     width: 350,
     ellipsis: true,
     fixed: 'left',
-    render: (text: string) => {
-      return text ? (
-        <a href={text} target="_blank" rel="noopener noreferrer">{text}</a>
-      ) : '-'
-    }
+    customRender: ({ text }) => text ?
+      h('a', { href: text, target: '_blank', rel: 'noopener noreferrer' }, text) : '-'
   },
   {
     title: '站点',
@@ -128,9 +125,8 @@ const columns = [
     dataIndex: 'status_code',
     key: 'status_code',
     width: 100,
-    render: (text: number) => (
-      <a-tag color={getStatusColor(text)}>{text}</a-tag>
-    )
+    customRender: ({ text }) =>
+      h('a-tag', { color: getStatusColor(text) }, text)
   },
   {
     title: '标题',

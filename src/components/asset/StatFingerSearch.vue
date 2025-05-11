@@ -130,19 +130,22 @@ const columns = [
     key: 'sites',
     width: 300,
     ellipsis: true,
-    render: (sites: Array<{ url: string, title: string }>) => {
+    customRender: ({ text: sites }) => {
       if (!sites || !sites.length) return '-'
       
-      return <div>
-        {sites.slice(0, 3).map(site => (
-          <div key={site.url} style={{ marginBottom: '5px' }}>
-            <a href={site.url} target="_blank" rel="noopener noreferrer" title={site.title || site.url}>
-              {site.url}
-            </a>
-          </div>
-        ))}
-        {sites.length > 3 && <div>...等 {sites.length} 个站点</div>}
-      </div>
+      return h('div', {}, [
+        ...sites.slice(0, 3).map(site => 
+          h('div', { style: { marginBottom: '5px' } }, [
+            h('a', { 
+              href: site.url, 
+              target: '_blank', 
+              rel: 'noopener noreferrer', 
+              title: site.title || site.url 
+            }, site.url)
+          ])
+        ),
+        sites.length > 3 ? h('div', {}, `...等 ${sites.length} 个站点`) : null
+      ])
     }
   },
   {

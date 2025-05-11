@@ -53,7 +53,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, h } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import http from '../../plugins/http'
@@ -126,11 +126,11 @@ const columns = [
     key: 'target',
     width: 250,
     ellipsis: true,
-    render: (text: string) => {
+    customRender: ({ text }) => {
       if (!text) return '-'
-      return text.startsWith('http') ? (
-        <a href={text} target="_blank" rel="noopener noreferrer">{text}</a>
-      ) : text
+      return text.startsWith('http') 
+        ? h('a', { href: text, target: '_blank', rel: 'noopener noreferrer' }, text)
+        : text
     }
   },
   {
