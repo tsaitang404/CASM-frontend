@@ -78,6 +78,18 @@
             <div class="action-buttons">
               <a-button type="link" @click="handleEdit(record)">编辑</a-button>
               <a-button type="link" @click="handleEditScope(record)">范围管理</a-button>
+              <a-dropdown>
+                <template #overlay>
+                  <a-menu @click="({ key }) => handleMonitorMenuClick(key, record)">
+                    <a-menu-item key="site_monitor">站点监控任务</a-menu-item>
+                    <a-menu-item key="wih_monitor">WIH监控任务</a-menu-item>
+                  </a-menu>
+                </template>
+                <a-button type="link">
+                  监控任务
+                  <DownOutlined />
+                </a-button>
+              </a-dropdown>
               <a-popconfirm
                 title="确定要删除该资产分组吗？"
                 ok-text="是"
@@ -231,6 +243,88 @@
         </a-tabs>
       </div>
     </a-modal>
+
+    <!-- 监控任务配置弹窗 -->
+    <a-modal
+      :title="monitorTitle"
+      v-model:open="monitorVisible"
+      :confirm-loading="monitorLoading"
+      @ok="handleMonitorSubmit"
+      @cancel="cancelMonitorForm"
+      width="600px"
+    >
+      <a-form
+        ref="monitorFormRef"
+        :model="monitorFormData"
+        :rules="monitorRules"
+        :label-col="{ span: 6 }"
+        :wrapper-col="{ span: 16 }"
+      >
+        <a-form-item label="任务名称" name="name">
+          <a-input v-model:value="monitorFormData.name" placeholder="请输入监控任务名称" />
+        </a-form-item>
+
+        <a-form-item label="任务描述" name="desc">
+          <a-textarea v-model:value="monitorFormData.desc" placeholder="请输入任务描述" rows="3" />
+        </a-form-item>
+
+        <a-form-item label="监控频率" name="schedule">
+          <a-select v-model:value="monitorFormData.schedule" placeholder="请选择监控频率">
+            <a-select-option value="1h">每小时</a-select-option>
+            <a-select-option value="4h">每4小时</a-select-option>
+            <a-select-option value="12h">每12小时</a-select-option>
+            <a-select-option value="1d">每天</a-select-option>
+            <a-select-option value="3d">每3天</a-select-option>
+            <a-select-option value="7d">每周</a-select-option>
+          </a-select>
+        </a-form-item>
+
+        <template v-if="monitorFormData.type === 'site_monitor'">
+          <a-form-item label="监控端口" name="ports">
+            <a-select
+              v-model:value="monitorFormData.ports"
+              mode="tags"
+              placeholder="请输入需要监控的端口，输入后按回车"
+              :token-separators="[',']"
+            >
+              <a-select-option value="80">80</a-select-option>
+              <a-select-option value="443">443</a-select-option>
+              <a-select-option value="8080">8080</a-select-option>
+              <a-select-option value="8443">8443</a-select-option>
+            </a-select>
+          </a-form-item>
+          
+          <a-form-item label="截图" name="screenshot">
+            <a-switch v-model:checked="monitorFormData.screenshot" />
+          </a-form-item>
+        </template>
+
+        <template v-if="monitorFormData.type === 'wih_monitor'">
+          <a-form-item label="JS分析深度" name="depth">
+            <a-slider
+              v-model:value="monitorFormData.depth"
+              :min="1"
+              :max="5"
+              :marks="{
+                1: '低',
+                2: '较低',
+                3: '中',
+                4: '较高',
+                5: '高'
+              }"
+            />
+          </a-form-item>
+        </template>
+
+        <a-form-item label="通知方式" name="notify">
+          <a-checkbox-group v-model:value="monitorFormData.notify">
+            <a-checkbox value="email">邮件</a-checkbox>
+            <a-checkbox value="dingtalk">钉钉</a-checkbox>
+            <a-checkbox value="wechat">微信</a-checkbox>
+          </a-checkbox-group>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -246,7 +340,7 @@ export default defineComponent({
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import { SearchOutlined, ReloadOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { SearchOutlined, ReloadOutlined, DeleteOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons-vue'
 import http from '../../plugins/http'
 
 // 空状态相关变量
@@ -415,6 +509,57 @@ const scopeData = reactive<{
   scope_array: [],
   black_scope: '',
   black_scope_array: []
+})
+
+// 监控任务相关变量
+const monitorVisible = ref(false)
+const monitorLoading = ref(false)
+const monitorFormRef = ref()
+const monitorFormData = reactive({
+  name: '',
+  desc: '',
+  schedule: '1h',
+  type: '',
+  scope_id: '', // 关联的资产分组ID
+  ports: [] as string[],
+  screenshot: false,
+  depth: 1,
+  notify: [] as string[]
+})
+const monitorTitle = computed(() => monitorFormData.type === 'site_monitor' ? '站点监控任务配置' : 'WIH监控任务配置')
+
+// 监控任务规则验证（根据任务类型动态确定验证规则）
+const monitorRules = computed(() => {
+  const baseRules = {
+    name: [
+      { required: true, message: '请输入任务名称', trigger: 'blur' },
+      { min: 2, max: 50, message: '任务名称长度必须在2-50个字符之间', trigger: 'blur' }
+    ],
+    desc: [
+      { max: 200, message: '描述最多200个字符', trigger: 'blur' }
+    ],
+    schedule: [
+      { required: true, message: '请选择监控频率', trigger: 'change' }
+    ],
+    notify: [
+      { type: 'array', required: true, message: '请至少选择一种通知方式', trigger: 'change' }
+    ]
+  }
+
+  // 根据任务类型添加特定验证规则
+  if (monitorFormData.type === 'site_monitor') {
+    return {
+      ...baseRules,
+      ports: [{ type: 'array', required: true, message: '请输入监控端口', trigger: 'change' }]
+    }
+  } else if (monitorFormData.type === 'wih_monitor') {
+    return {
+      ...baseRules,
+      depth: [{ required: true, message: '请选择JS分析深度', trigger: 'change' }]
+    }
+  }
+
+  return baseRules
 })
 
 // 初始化和数据加载
@@ -724,6 +869,84 @@ const removeBlackScopeItem = async (item: string) => {
   scopeData.black_scope = newBlackScopeArray.join(',')
   scopeData.black_scope_array = newBlackScopeArray
   await updateBlackScope()
+}
+
+// 处理监控任务菜单点击
+const handleMonitorMenuClick = (key: string, record: AssetGroupData) => {
+  monitorFormData.type = key
+  // 预填充默认值
+  monitorFormData.name = `${record.name}-${key === 'site_monitor' ? '站点监控' : 'WIH监控'}`
+  monitorFormData.desc = `${record.name}资产分组的${key === 'site_monitor' ? '站点' : 'WIH'}监控任务`
+  monitorFormData.schedule = '1d' // 默认每天执行
+  monitorFormData.ports = key === 'site_monitor' ? ['80', '443'] : []
+  monitorFormData.screenshot = key === 'site_monitor'
+  monitorFormData.depth = key === 'wih_monitor' ? 3 : 1
+  monitorFormData.notify = ['email']
+  monitorFormData.scope_id = record._id // 关联的资产分组ID
+  
+  // 显示监控任务配置对话框
+  monitorVisible.value = true
+}
+
+// 取消监控任务表单
+const cancelMonitorForm = () => {
+  monitorVisible.value = false
+  if (monitorFormRef.value) {
+    monitorFormRef.value.resetFields()
+  }
+}
+
+// 提交监控任务表单
+const handleMonitorSubmit = async () => {
+  try {
+    await monitorFormRef.value.validate()
+    
+    monitorLoading.value = true
+    
+    // 准备Cron表达式，根据选择的频率转换
+    const cronMap = {
+      '1h': '0 0 */1 * * *',
+      '4h': '0 0 */4 * * *',
+      '12h': '0 0 */12 * * *',
+      '1d': '0 0 0 * * *',
+      '3d': '0 0 0 */3 * *',
+      '7d': '0 0 0 * * 0'
+    }
+    const cron = cronMap[monitorFormData.schedule] || cronMap['1d']
+    
+    // 构建监控任务请求参数
+    const taskParams = {
+      name: monitorFormData.name,
+      desc: monitorFormData.desc,
+      schedule_type: 'recurrent_scan', // 周期性扫描
+      cron: cron,
+      task_tag: monitorFormData.type === 'site_monitor' ? 'site_monitor' : 'wih_monitor',
+      params: {
+        scope_id: monitorFormData.scope_id,
+        ports: monitorFormData.type === 'site_monitor' ? monitorFormData.ports : undefined,
+        screenshot: monitorFormData.type === 'site_monitor' ? monitorFormData.screenshot : undefined,
+        depth: monitorFormData.type === 'wih_monitor' ? monitorFormData.depth : undefined,
+        notify_methods: monitorFormData.notify
+      }
+    }
+
+    // 提交到计划任务接口
+    const res = await http.post('/task_schedule/', taskParams)
+    
+    if (res.data && res.data.code === 200) {
+      message.success('监控任务配置成功')
+      monitorVisible.value = false
+      
+      // 可以在这里添加刷新监控任务列表的逻辑
+    } else {
+      throw new Error(res.data?.message || '配置任务失败')
+    }
+  } catch (error) {
+    console.error('监控任务配置失败:', error)
+    message.error(typeof error === 'string' ? error : '配置失败')
+  } finally {
+    monitorLoading.value = false
+  }
 }
 
 // 暴露给父组件的方法
