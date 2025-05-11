@@ -1,88 +1,70 @@
 <template>
   <div class="asset-search">
-    <a-tabs v-model:activeKey="activeTab" type="card" class="asset-tabs">
-      <a-tab-pane key="site" tab="站点搜索">
-        <SiteSearch />
-      </a-tab-pane>
-      <a-tab-pane key="domain" tab="域名搜索">
-        <DomainSearch />
-      </a-tab-pane>
-      <a-tab-pane key="ip" tab="IP搜索">
-        <IpSearch />
-      </a-tab-pane>
-      <a-tab-pane key="url" tab="URL搜索">
-        <UrlSearch />
-      </a-tab-pane>
-      <a-tab-pane key="ssl" tab="SSL证书搜索">
-        <SslSearch />
-      </a-tab-pane>
-      <a-tab-pane key="service" tab="服务搜索">
-        <ServiceSearch />
-      </a-tab-pane>
-      <a-tab-pane key="npoc" tab="NPOC服务搜索">
-        <NpocServiceSearch />
-      </a-tab-pane>
-      <a-tab-pane key="cip" tab="C段IP搜索">
-        <CipSearch />
-      </a-tab-pane>
-      <a-tab-pane key="wih" tab="WIH搜索">
-        <WihSearch />
-      </a-tab-pane>
-      <a-tab-pane key="fileleak" tab="文件泄漏搜索">
-        <FileleakSearch />
-      </a-tab-pane>
-      <a-tab-pane key="vuln" tab="漏洞搜索">
-        <VulnSearch />
-      </a-tab-pane>
-      <a-tab-pane key="nuclei" tab="Nuclei结果搜索">
-        <NucleiResultSearch />
-      </a-tab-pane>
-      <a-tab-pane key="finger" tab="指纹统计搜索">
-        <StatFingerSearch />
-      </a-tab-pane>
-    </a-tabs>
+    <a-card class="search-card">
+      <h2 class="page-title">资产综合检索</h2>
+      <a-tabs v-model:activeKey="activeTab" type="card">
+        <a-tab-pane key="ip" tab="IP资产">
+          <AssetIPSearch />
+        </a-tab-pane>
+        <a-tab-pane key="domain" tab="域名资产">
+          <AssetDomainSearch />
+        </a-tab-pane>
+        <a-tab-pane key="site" tab="站点资产">
+          <AssetSiteSearch />
+        </a-tab-pane>
+      </a-tabs>
+    </a-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import SiteSearch from '../components/asset/SiteSearch.vue'
-import DomainSearch from '../components/asset/DomainSearch.vue'
-import IpSearch from '../components/asset/IpSearch.vue'
-import UrlSearch from '../components/asset/UrlSearch.vue'
-import SslSearch from '../components/asset/SslSearch.vue'
-import ServiceSearch from '../components/asset/ServiceSearch.vue'
-import NpocServiceSearch from '../components/asset/NpocServiceSearch.vue'
-import CipSearch from '../components/asset/CipSearch.vue'
-import WihSearch from '../components/asset/WihSearch.vue'
-import FileleakSearch from '../components/asset/FileleakSearch.vue'
-import VulnSearch from '../components/asset/VulnSearch.vue'
-import NucleiResultSearch from '../components/asset/NucleiResultSearch.vue'
-import StatFingerSearch from '../components/asset/StatFingerSearch.vue'
+import AssetIPSearch from '../components/asset/AssetIPSearch.vue'
+import AssetDomainSearch from '../components/asset/AssetDomainSearch.vue'
+import AssetSiteSearch from '../components/asset/AssetSiteSearch.vue'
 
-const activeTab = ref('site')
+// 默认显示IP资产页签
+const activeTab = ref('ip')
 </script>
 
 <style scoped>
 .asset-search {
-  padding: 20px;
+  padding: 24px;
+  background: #f0f2f5;
+  min-height: calc(100vh - 64px);
 }
 
-.asset-tabs {
-  background-color: #fff;
-  border-radius: 4px;
+.search-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.page-title {
+  margin-bottom: 24px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+}
+
+:deep(.ant-card-body) {
+  padding: 24px;
 }
 
 :deep(.ant-tabs-nav) {
   margin-bottom: 0;
-  padding: 0 16px;
 }
 
-:deep(.ant-tabs-content-holder) {
-  padding: 0;
+:deep(.ant-tabs-tab) {
+  padding: 8px 16px;
+  font-size: 14px;
+  transition: all 0.3s;
 }
 
-:deep(.ant-tabs-nav-wrap) {
-  overflow-x: auto;
+:deep(.ant-tabs-tab-active) {
+  background: #e6f7ff;
+  border-bottom-color: #e6f7ff;
+}
+
+:deep(.ant-tabs-tab-btn) {
+  font-weight: 500;
 }
 </style>
