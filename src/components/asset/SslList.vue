@@ -132,15 +132,15 @@ const columns = [
 ];
 
 // 搜索处理函数
-const handleSearch = async (params: TablePaginationConfig = { current: 1, pageSize: 10 }) => {
+const handleSearch = async (pag?: TablePaginationConfig) => {
   if (!props.taskId) return;
   
   loading.value = true;
   try {
     const queryParams = new URLSearchParams({
       task_id: props.taskId,
-      page: String(params.current),
-      size: String(params.pageSize)
+      page: String(pag?.current || pagination.current),
+      size: String(pag?.pageSize || pagination.pageSize)
     });
 
     if (form.ip) queryParams.append('ip', form.ip);
@@ -152,7 +152,8 @@ const handleSearch = async (params: TablePaginationConfig = { current: 1, pageSi
     if (res.data.code === 200) {
       data.value = res.data.items || [];
       pagination.total = res.data.total || 0;
-      pagination.current = params.current || 1;
+      pagination.current = pag?.current || pagination.current;
+      pagination.pageSize = pag?.pageSize || pagination.pageSize;
     } else {
       throw new Error(res.data.message || '获取SSL证书列表失败');
     }
