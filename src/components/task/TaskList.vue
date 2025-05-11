@@ -147,21 +147,27 @@ import { ref, defineProps, defineEmits, computed } from 'vue'
 import { Modal, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { PauseCircleOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons-vue'
-import type { Task } from '@/types/task'
-import http from '@/plugins/http'
+import type { Task } from '../../types/task'
+import http from '../../plugins/http'
 import { 
   getTaskStatusColor, 
   getTaskStatusText, 
   calculateProgress,
   truncateText,
   formatTaskStatistic 
-} from '@/utils/taskHelper'
-import DomainSearch from '@/components/asset/DomainSearch.vue'
-import IpSearch from '@/components/asset/IpSearch.vue'
-import SiteSearch from '@/components/asset/SiteSearch.vue'
-import ServiceList from '@/components/asset/ServiceList.vue'
-import VulnList from '@/components/asset/VulnList.vue'
-import WihList from '@/components/asset/WihList.vue'
+} from '../../utils/taskHelper'
+import DomainSearch from '../asset/DomainSearch.vue'
+import IpSearch from '../asset/IpSearch.vue'
+import SiteSearch from '../asset/SiteSearch.vue'
+import ServiceSearch from '../asset/ServiceSearch.vue'  // 添加 ServiceSearch 导入
+import VulnList from '../asset/VulnList.vue'
+import WihList from '../asset/WihList.vue'
+import SslList from '../asset/SslList.vue'
+import CipList from '../asset/CipList.vue'
+import FileleakList from '../asset/FileleakList.vue'
+import UrlList from '../asset/UrlList.vue'
+import NucleiResultList from '../asset/NucleiResultList.vue'
+import StatFingerList from '../asset/StatFingerList.vue'
 
 const router = useRouter()
 
@@ -389,10 +395,16 @@ const statTypeMap: Record<string, any> = {
   domain: DomainSearch,
   ip: IpSearch,
   site: SiteSearch,
-  service: ServiceList,
+  service: ServiceSearch,
   vuln: VulnList,
-  wih: WihList
-  // 端口、证书等可后续补充
+  wih: WihList,
+  cert: SslList,
+  cip: CipList,
+  fileleak: FileleakList,
+  url: UrlList,
+  nuclei_result: NucleiResultList,
+  stat_finger: StatFingerList,
+  npoc_service: ServiceSearch  // 添加服务识别的组件映射
 }
 
 const statTypeTitleMap: Record<string, string> = {
@@ -402,7 +414,13 @@ const statTypeTitleMap: Record<string, string> = {
   service: '服务列表',
   vuln: '漏洞列表',
   wih: 'Web信息收集列表',
-  port: '端口列表' // 如有端口列表组件可补充
+  cert: 'SSL证书列表',
+  cip: '整数IP列表', 
+  fileleak: '文件泄露列表',
+  url: 'URL列表',
+  nuclei_result: 'Nuclei检测结果',
+  stat_finger: '指纹统计列表',
+  npoc_service: '服务识别'  // 添加服务识别的标题映射
 }
 
 // 功能名映射

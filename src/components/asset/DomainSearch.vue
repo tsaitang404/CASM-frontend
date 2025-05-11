@@ -38,6 +38,7 @@
         :pagination="pagination"
         :loading="loading"
         @change="handleTableChange"
+        :scroll="{ x: 1000 }"
         bordered 
       />
     </div>
@@ -95,7 +96,8 @@ const columns = [
     dataIndex: 'domain',
     key: 'domain',
     width: 200,
-    ellipsis: true
+    ellipsis: true,
+    fixed: 'left'
   },
   {
     title: '解析类型',
@@ -114,7 +116,7 @@ const columns = [
     title: 'IP地址',
     dataIndex: 'ips',
     key: 'ips',
-    width: 200,
+    width: 250,
     ellipsis: true,
     render: (ips: string[]) => ips?.join(', ') || '-'
   },
@@ -128,7 +130,8 @@ const columns = [
     title: '创建时间',
     dataIndex: 'create_time',
     key: 'create_time',
-    width: 180
+    width: 180,
+    fixed: 'right'
   }
 ]
 
@@ -223,5 +226,25 @@ handleSearch()
 
 .search-result {
   margin-top: 20px;
+  overflow-x: auto; /* 添加横向滚动 */
+}
+
+:deep(.ant-table-wrapper) {
+  overflow-x: auto;
+}
+
+:deep(.ant-table-header),
+:deep(.ant-table-body) {
+  overflow-y: auto !important;
+}
+
+:deep(.ant-table-cell-ellipsis) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:deep(.ant-table-fixed) {
+  background: #fff;
 }
 </style>

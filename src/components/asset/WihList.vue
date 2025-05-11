@@ -1,5 +1,28 @@
 <template>
   <div class="asset-list">
+    <div class="search-form">
+      <a-form :model="form" layout="inline">
+        <a-form-item label="记录类型">
+          <a-input v-model:value="form.record_type" placeholder="请输入记录类型" allow-clear />
+        </a-form-item>
+        <a-form-item label="内容">
+          <a-input v-model:value="form.content" placeholder="请输入内容" allow-clear />
+        </a-form-item>
+        <a-form-item label="来源JS">
+          <a-input v-model:value="form.source" placeholder="请输入来源JS" allow-clear />
+        </a-form-item>
+        <a-form-item label="站点">
+          <a-input v-model:value="form.site" placeholder="请输入站点" allow-clear />
+        </a-form-item>
+        <a-form-item>
+          <a-space>
+            <a-button type="primary" @click="handleSearch" :loading="loading">搜索</a-button>
+            <a-button @click="handleReset">重置</a-button>
+          </a-space>
+        </a-form-item>
+      </a-form>
+    </div>
+
     <a-table
       :columns="columns"
       :data-source="data"
@@ -25,6 +48,15 @@ import { message } from 'ant-design-vue';
 import http from '@/plugins/http';
 
 const props = defineProps<{ taskId?: string }>();
+
+// 添加搜索表单数据
+const form = reactive({
+  record_type: '',
+  content: '',
+  source: '',
+  site: ''
+});
+
 const data = ref([]);
 const loading = ref(false);
 
@@ -78,8 +110,8 @@ const columns = [
   }
 ];
 
-// 加载WIH列表数据
-async function fetchData(params: TablePaginationConfig = { current: 1, pageSize: 10 }) {
+// 搜索处理函数
+const handleSearch = async (params: TablePaginationConfig = { current: 1, pageSize: 10 }) => {
   if (!props.taskId) return;
   
   loading.value = true;
@@ -89,6 +121,11 @@ async function fetchData(params: TablePaginationConfig = { current: 1, pageSize:
       page: String(params.current),
       size: String(params.pageSize)
     });
+
+    if (form.record_type) queryParams.append('record_type', form.record_type);
+    if (form.content) queryParams.append('content', form.content);
+    if (form.source) queryParams.append('source', form.source);
+    if (form.site) queryParams.append('site', form.site);
 
     const res = await http.get(`/wih/?${queryParams.toString()}`);
     if (res.data.code === 200) {
@@ -106,17 +143,26 @@ async function fetchData(params: TablePaginationConfig = { current: 1, pageSize:
   }
 }
 
-// 处理表格变化（分页、排序、筛选）
+// 重置搜索表单
+const handleReset = () => {
+  form.record_type = '';
+  form.content = '';
+  form.source = '';
+  form.site = '';
+  pagination.current = 1;
+  handleSearch();
+};
+
 const handleTableChange = (pag: TablePaginationConfig) => {
-  fetchData({
+  handleSearch({
     current: pag.current,
     pageSize: pag.pageSize
   });
 };
 
 // 初始加载和taskId变化时重新加载数据
-onMounted(() => fetchData());
-watch(() => props.taskId, () => fetchData());
+onMounted(() => handleSearch());
+watch(() => props.taskId, () => handleSearch());
 </script>
 
 <style scoped>
@@ -138,5 +184,13 @@ watch(() => props.taskId, () => fetchData());
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+:deep(.ant-table-fixed) {
+  background: #fff;
+}
+
+.search-form {
+  margin-bottom: 20px;
 }
 </style>

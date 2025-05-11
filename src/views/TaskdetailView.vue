@@ -144,6 +144,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
 import { LeftOutlined } from '@ant-design/icons-vue';
 import http from '@/plugins/http'
+import ServiceSearch from '@/components/asset/ServiceSearch.vue'
 
 const router = useRouter();
 const route = useRoute();

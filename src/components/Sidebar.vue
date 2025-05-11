@@ -65,6 +65,12 @@
           <span v-show="!collapsed">GitHub监控</span>
         </div>
       </a-menu-item>
+      <a-menu-item key="npoc-service" style="height: 56px; line-height: 56px;" :title="collapsed ? '服务识别' : ''">
+        <div class="menu-item-content">
+          <ion-icon name="scan"></ion-icon>
+          <span v-show="!collapsed">服务识别</span>
+        </div>
+      </a-menu-item>
     </a-menu>
     
     <div class="status-link" :class="{ 'collapsed': collapsed }">
@@ -106,6 +112,7 @@ function handleSelect({ key }) {
     'pocinfo': '/pocinfo',
     'poc': '/poc',
     'github-monitor': '/github-monitor',
+    'npoc-service': '/npoc-service',
     'status': '/status'
   }
   

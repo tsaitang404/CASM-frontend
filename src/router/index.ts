@@ -83,6 +83,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'status',
     component: () => import('../views/StatusView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/npoc-service',
+    name: 'npoc-service',
+    component: () => import('../views/NpocServiceView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
