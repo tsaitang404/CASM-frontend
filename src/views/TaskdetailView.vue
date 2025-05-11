@@ -2,7 +2,7 @@
   <div class="task-detail-container">
     <!-- 返回按钮 -->
     <div class="header-actions">
-      <a-button @click="goBack">
+      <a-button @click="goBack" class="back-button">
         <LeftOutlined />
         返回任务列表
       </a-button>
@@ -59,68 +59,49 @@
       </a-descriptions>
     </a-card>
 
-    <!-- 任务统计信息卡片，改为资产搜索的多标签列表 -->
+    <!-- 资产列表 -->
     <a-card title="资产列表" :bordered="false" class="detail-card asset-search-card">
       <a-tabs v-model:activeKey="activeTab" type="card" class="asset-tabs">
-        <a-tab-pane key="site" tab="站点">
+        <a-tab-pane key="site" :tab="`站点 (${taskDetail.statistic?.site_cnt || taskDetail.statistics?.site_cnt || 0})`">
           <site-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="domain" tab="域名">
+        <a-tab-pane key="domain" :tab="`域名 (${taskDetail.statistic?.domain_cnt || taskDetail.statistics?.domain_cnt || 0})`">
           <domain-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="ip" tab="IP">
+        <a-tab-pane key="ip" :tab="`IP (${taskDetail.statistic?.ip_cnt || taskDetail.statistics?.ip_cnt || 0})`">
           <ip-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="url" tab="URL">
+        <a-tab-pane key="url" :tab="`URL (${taskDetail.statistic?.url_cnt || taskDetail.statistics?.url_cnt || 0})`">
           <url-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="ssl" tab="SSL证书">
+        <a-tab-pane key="ssl" :tab="`SSL证书 (${taskDetail.statistic?.cert_cnt || taskDetail.statistics?.cert_cnt || 0})`">
           <ssl-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="service" tab="服务">
+        <a-tab-pane key="service" :tab="`服务 (${taskDetail.statistic?.service_cnt || taskDetail.statistics?.service_cnt || 0})`">
           <service-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="npoc" tab="NPOC服务">
+        <a-tab-pane key="npoc" :tab="`NPOC服务 (${taskDetail.statistic?.npoc_service_cnt || taskDetail.statistics?.npoc_service_cnt || 0})`">
           <npoc-service-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="cip" tab="C段IP">
+        <a-tab-pane key="cip" :tab="`C段IP (${taskDetail.statistic?.cip_cnt || taskDetail.statistics?.cip_cnt || 0})`">
           <cip-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="wih" tab="WIH">
+        <a-tab-pane key="wih" :tab="`WIH (${taskDetail.statistic?.wih_cnt || taskDetail.statistics?.wih_cnt || 0})`">
           <wih-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="fileleak" tab="文件泄漏">
+        <a-tab-pane key="fileleak" :tab="`文件泄漏 (${taskDetail.statistic?.fileleak_cnt || taskDetail.statistics?.fileleak_cnt || 0})`">
           <fileleak-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="vuln" tab="漏洞">
+        <a-tab-pane key="vuln" :tab="`漏洞 (${taskDetail.statistic?.vuln_cnt || taskDetail.statistics?.vuln_cnt || 0})`">
           <vuln-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="nuclei" tab="Nuclei结果">
+        <a-tab-pane key="nuclei" :tab="`Nuclei结果 (${taskDetail.statistic?.nuclei_result_cnt || taskDetail.statistics?.nuclei_result_cnt || 0})`">
           <nuclei-result-search :taskId="taskId" />
         </a-tab-pane>
-        <a-tab-pane key="finger" tab="指纹统计">
+        <a-tab-pane key="finger" :tab="`指纹统计 (${taskDetail.statistic?.stat_finger_cnt || taskDetail.statistics?.stat_finger_cnt || 0})`">
           <stat-finger-search :taskId="taskId" />
         </a-tab-pane>
       </a-tabs>
-    </a-card>
-
-    <!-- 任务进度/结果列表 -->
-    <a-card title="任务结果" :bordered="false" class="detail-card">
-      <a-table
-        :columns="resultColumns"
-        :data-source="taskResults"
-        :loading="loading"
-        :pagination="{ pageSize: 10 }"
-        size="middle"
-      >
-        <template #bodyCell="{ column, text }">
-          <template v-if="column.key === 'status'">
-            <a-tag :color="text === 'success' ? 'success' : 'error'">
-              {{ text === 'success' ? '成功' : '失败' }}
-            </a-tag>
-          </template>
-        </template>
-      </a-table>
     </a-card>
   </div>
 </template>
@@ -152,35 +133,7 @@ const activeTab = ref('site');
 
 // 任务详情数据
 const taskDetail = ref<any>({});
-const taskResults = ref<any[]>([]);
 const loading = ref(false);
-
-// 结果表格列定义
-const resultColumns = [
-  {
-    title: '时间',
-    dataIndex: 'time',
-    key: 'time',
-    width: 180
-  },
-  {
-    title: '类型',
-    dataIndex: 'type',
-    key: 'type',
-    width: 120
-  },
-  {
-    title: '内容',
-    dataIndex: 'content',
-    key: 'content'
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-    width: 100
-  }
-];
 
 // 返回任务列表
 const goBack = () => {
@@ -256,8 +209,6 @@ const fetchTaskDetail = async () => {
 
     if (data.items && data.items.length > 0) {
       taskDetail.value = data.items[0];
-      // 任务结果直接从详情数据中获取（如有）
-      taskResults.value = data.items[0].results || [];
     } else {
       throw new Error('未找到任务详情');
     }
@@ -294,5 +245,16 @@ onMounted(() => {
 
 :deep(.ant-tabs-nav-wrap) {
   overflow-x: auto;
+}
+
+/* 添加样式确保按钮在最左侧 */
+.header-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+
+.back-button {
+  margin-left: 0;
 }
 </style>
