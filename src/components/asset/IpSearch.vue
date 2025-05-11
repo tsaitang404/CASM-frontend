@@ -107,12 +107,12 @@ const pagination = reactive<TablePaginationConfig>({
 
 const getRandomColor = () => {
   const colors = [
-    { bg: '#e6f7ff', text: '#1890ff' }, // 蓝色
+    { bg: '#f0f5ff', text: '#2f54eb' }, // 蓝色
     { bg: '#f6ffed', text: '#52c41a' }, // 绿色
     { bg: '#fff7e6', text: '#fa8c16' }, // 橙色
     { bg: '#f9f0ff', text: '#722ed1' }, // 紫色
     { bg: '#fff0f6', text: '#eb2f96' }, // 粉色
-    { bg: '#f4ffb8', text: '#7cb305' }, // 黄绿色
+    { bg: '#fcffe6', text: '#7cb305' }, // 黄绿色
     { bg: '#fff2e8', text: '#fa541c' }, // 红橙色
     { bg: '#e6fffb', text: '#13c2c2' }  // 青色
   ]
@@ -320,6 +320,18 @@ handleSearch()
 }
 
 .port-info-bar .port-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+:deep(.port-item) {
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+:deep(.port-item:hover) {
   transform: translateY(-2px);
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
