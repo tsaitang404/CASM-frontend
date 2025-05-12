@@ -574,8 +574,16 @@ const handleCreateSubmit = async () => {
         submitLoading.value = false;
         return;
       }
-      // 修改日期格式，不使用Z时区标识符，而是使用ISO格式但不包含时区信息
-      submitData.start_date = datePickerValue.value.format('YYYY-MM-DDTHH:mm:00');
+
+      // 确保选择的日期在未来
+      if (datePickerValue.value.isBefore(dayjs())) {
+        message.error('执行时间必须是未来时间');
+        submitLoading.value = false;
+        return;
+      }
+
+      // 使用简单的日期格式 YYYY-MM-DD HH:mm:ss
+      submitData.start_date = datePickerValue.value.format('YYYY-MM-DD HH:mm:ss');
     }
     
     // 提交创建请求
